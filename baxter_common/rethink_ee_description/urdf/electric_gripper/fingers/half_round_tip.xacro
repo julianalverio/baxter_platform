@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="half_round_tip">
+  <xacro:macro name="finger_tip_xacro" params="parent_link reflect grasp *joint_origin">
+    <xacro:property name="link_name" value="${parent_link}_tip" scope="local"/>
+    <xacro:property name="sensor_name" value="${link_name}_contact_sensor" scope="local"/>
+    <xacro:property name="collision_name" value="${link_name}_collision" scope="local"/>
+    <xacro:property name="g_reflect" value="${reflect}" scope="local"/>
+    <xacro:if value="${grasp == 'outer'}">
+      <xacro:property name="g_reflect" value="${-reflect}" scope="local"/>
+    </xacro:if>
+    <link name="${link_name}">
+      <visual>
+        <origin rpy="0 0 ${pi*(g_reflect+1)/2}" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://rethink_ee_description/meshes/electric_gripper/fingers/half_round_tip.DAE" />
+        </geometry>
+      </visual>
+      <collision name="${collision_name}">
+        <origin rpy="0 0 ${pi*(g_reflect+1)/2}" xyz="0 ${-0.0045*g_reflect} -0.015"/>
+        <geometry>
+          <cylinder length="0.037" radius="0.008"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin rpy="0 0 ${pi*(g_reflect+1)/2}" xyz="0 0 0"/>
+        <mass value="0.01"/>
+        <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+      </inertial>
+    </link>
+    <gazebo reference="${link_name}">
+      <sensor name="${sensor_name}" type="contact">
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <contact>
+          <collision>${collision_name}_collision</collision>
+        </contact>
+        <plugin name="${link_name}_bumper" filename="libgazebo_ros_bumper.so">
+          <bumperTopicName>${link_name}_contact_sensor_state</bumperTopicName>
+          <frameName>${link_name}</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+    <joint name="${parent_link}_tip_joint" type="fixed">
+      <xacro:insert_block name="joint_origin" />
+      <parent link="${parent_link}"/>
+      <child link="${link_name}"/>
+    </joint>
+  </xacro:macro>
+</robot>
