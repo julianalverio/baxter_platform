@@ -100,7 +100,9 @@ class RobotController(object):
     rospy.sleep(10)
 
 
-  def jointAngleToPosition
+  def jointAngleToPosition(self):
+  	pass
+  	#$$$$$
 
 	def followMoveItTrajectoryWithPosition(self, poses, group='left_arm', resolution=0.01, visualize=False, check_collision=True):
 		#setting the last parameter to zero skips the "jump" step
@@ -132,14 +134,14 @@ class RobotController(object):
 	# Check for collision; return False if collision, otherwise return True
 	def checkCollision(self, trajectory, groups=['left_arm']):
 		for traj_point in trajectory.joint_trajectory.points:
-	    rs = RobotState()
-	    rs.joint_state.name = trajectory.joint_trajectory.joint_names
-	    rs.joint_state.position = traj_point.positions
-	    for group in groups:
-	      result = StateValidity().getStateValidity(rs, group)
-			if not result.valid: # if one point is not valid, the trajectory is not valid >:(
-				return False
-		return True
+			rs = RobotState()
+			rs.joint_state.name = trajectory.joint_trajectory.joint_names
+			rs.joint_state.position = traj_point.positions
+			for group in groups:
+				result = StateValidity().getStateValidity(rs, group)
+				if not result.valid: # if one point is not valid, the trajectory is not valid >:(
+					return False
+			return True
   
   def shutdown(self):
   	moveit_commander.roscpp_shutdown()

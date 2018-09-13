@@ -100,13 +100,9 @@ def main():
   #                  'left_s1': -0.9999781166910306}
   manager = Manager()
   rospy.on_shutdown(manager.shutdown())
-
-  # def __init__(self, shape='box', size_x=0.5, size_y=0.5, 
-  #              size_z=0.5, size_r=0.5, x=None, y=None, z=None, 
-  #              mass=0.5, color=None, mu1=1000, mu2=1000,
-  #              reference_frame='world',
-  #              restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
-  #              name=None):
+  trajectory = manager.robot_controller.generateTrajectoryPose()
+  manager.robot_controller.followTrajectoryWithIK(trajectory)
+  import pdb; pdb.set_trace()
 
   models = []
   import pdb; pdb.set_trace()
