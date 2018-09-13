@@ -3,7 +3,7 @@
   <xacro:macro name="finger_xacro" params="gripper_side finger_side reflect finger_tip finger_grasp">
   <xacro:property name="finger_length" value="0.1127" scope="local"/>
   <xacro:property name="finger_width" value="0.01725" scope="local"/>
-  <xacro:property name="link_name" value="${gripper_side}_gripper" scope="local"/>
+  <xacro:property name="link_name" value="${gripper_side}_gripper_${finger_side}_finger" scope="local"/>
   <xacro:property name="collision_name" value="${link_name}_collision" scope="local"/>
   <xacro:property name="sensor_name" value="${link_name}_contact_sensor" scope="local"/>
     <link name="${link_name}">
@@ -50,9 +50,9 @@
         <contact>
           <collision>${collision_name}_collision</collision>
         </contact>
-        <plugin name="${gripper_side}_side_gripper_bumper" filename="libgazebo_ros_bumper.so">
+        <plugin name="${link_name}_bumper" filename="libgazebo_ros_bumper.so">
           <bumperTopicName>${gripper_side}_side_gripper_contact_sensor_state</bumperTopicName>
-          <frameName>${gripper_side}_side_gripper</frameName>
+          <frameName>${link_name}_frame</frameName>
         </plugin>
       </sensor>
     </gazebo>
