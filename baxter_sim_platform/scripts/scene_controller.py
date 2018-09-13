@@ -60,14 +60,22 @@ from gazebo_msgs.msg import ContactsState
 import csv
 import rospkg
 
+import sys
+import copy
+import rospy
+import moveit_commander
+import moveit_msgs.msg
+import geometry_msgs.msg
+
   
-class sceneController(object):
+class SceneController(object):
   def __init__(self):
     self.models = []
     self.camera = False
     self.srv = placeholder()
     self.pause_proxy = rospy.ServiceProxy('/gazebo/pause_physics', placeholder)
     self.unpause_proxy = rospy.ServiceProxy('/gazebo/unpause_physics', placeholder)
+    self.scene_commander = moveit_commander.PlanningSceneInterface()
 
   def pause(self):
     self.pause_proxy()
@@ -84,7 +92,7 @@ class sceneController(object):
     for model in models:
       pose = model.pose
       reference_frame = model.reference_frame
-      sdf = generateSDF(model, len(models)).replace('\n', '')
+      sdf = generateSDF(model, len(models)).replace('\n', '').replace('\t', '')
       try:
         print 'loading model named: %s' % model.name
         resp_sdf = spawn_proxy(model.name, sdf, "/",
@@ -115,9 +123,7 @@ class sceneController(object):
   #generate an external camera from camera.sdf
   #default values set intelligently
   def externalCamera(self, x=2.5, y=0.0, z=1.5, quat_x=-0.15, quat_y=0., quat_z=0.98, quat_w=0.):
-    rospack = rospkg.RosPack()
-    sdf_path = rospack.get_path('baxter_sim_platform') + '/models/camera.sdf'
-    sdf = open(sdf_path, 'r').read().replace('\n', '')
+    sdf = getSDFString.replace('\n', '').replace('\t', '')
     rospy.wait_for_service('/gazebo/spawn_sdf_model')
     spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
     pose = Pose()
@@ -149,17 +155,58 @@ class ExternalCamera(object):
 
 
 
-  #generate SDF string. See camera.sdf for an example of what will be generated.
+  #Read in SDF string. See camera.sdf for an example of what will be generated.
   def getSDFString(self):
     sdf = ''
-    sdf += '''<?xml version="1.0"?>'''
-    sdf += '''<sdf version="1.6">'''
-    sdf += '''\t<model name='camera'>'''
-    sdf += '''\t\t<static>true</static>'''
-    sdf += '''\t\t<pose frame=''>0 0 0 0 0 0</pose>'''
-    sdf += ''''''
-
-
+    sdf += '''<?xml version="1.0"?>\n'''
+    sdf += '''<sdf version="1.6">\n'''
+    sdf += '''\t<model name='camera'>\n'''
+    sdf += '''\t\t<static>true</static>\n'''
+    sdf += '''\t\t<pose frame=''>0 0 0 0 0 0</pose>\n'''
+    sdf += '''\t\t<link name='link'>\n'''
+    sdf += '''\t\t\t<visual name='visual'>\n'''
+    sdf += '''\t\t\t\t<geometry>\n'''
+    sdf += '''\t\t\t\t\t<box>\n'''
+    sdf += '''\t\t\t\t\t\t<box>\n'''
+    sdf += '''\t\t\t\t\t<box>\n'''
+    sdf += '''\t\t\t\t<box>\n'''
+    sdf += '''\t\t\t</visual>\n'''
+    sdf += '''\t\t\t<sensor name='my_camera' type='camera'>\n'''
+    sdf += '''\t\t\t\t<camera>\n'''
+    sdf += '''\t\t\t\t\t<save enabled="true">\n'''
+    sdf += '''\t\t\t\t\t\t<path>~/Documents/camera_save</path>\n'''
+    sdf += '''\t\t\t\t\t</save>\n'''
+    sdf += '''\t\t\t\t\t<horizontal_fov>1.047</horizontal_fov>\n'''
+    sdf += '''\t\t\t\t\t<image>\n'''
+    sdf += '''\t\t\t\t\t\t<width>1920</width>\n'''
+    sdf += '''\t\t\t\t\t\t<height>1080</height>\n'''
+    sdf += '''\t\t\t\t\t</image>\n'''
+    sdf += '''\t\t\t\t\t<clip>\n'''
+    sdf += '''\t\t\t\t\t\t<near>0.1</near>\n'''
+    sdf += '''\t\t\t\t\t\t<far>100</far>\n'''
+    sdf += '''\t\t\t\t\t</clip>\n'''
+    sdf += '''\t\t\t\t</camera>\n'''
+    sdf += '''\t\t\t\t<always_on>1</always_on>\n'''
+    sdf += '''\t\t\t\t<update_rate>30</update_rate>\n'''
+    sdf += '''\t\t\t\t<plugin name="camera_controller" filename="libgazebo_ros_camera.so">\n'''
+    sdf += '''\t\t\t\t\t<alwaysOn>true</alwaysOn>\n'''
+    sdf += '''\t\t\t\t\t<updateRate>0.0</updateRate>\n'''
+    sdf += '''\t\t\t\t\t<cameraName>external_camera</cameraName>\n'''
+    sdf += '''\t\t\t\t\t<imageTopicName>/cameras/external_camera/image</imageTopicName>\n'''
+    sdf += '''\t\t\t\t\t<cameraInfoTopicName>/cameras/external_camera/camera_info</cameraInfoTopicName>\n'''
+    sdf += '''\t\t\t\t\t<frameName>camera_frame</frameName>\n'''
+    sdf += '''\t\t\t\t\t<hackBaseline>0.07</hackBaseline>\n'''
+    sdf += '''\t\t\t\t\t<distortionK1>0.0</distortionK1>\n'''
+    sdf += '''\t\t\t\t\t<distortionK2>0.0</distortionK2>\n'''
+    sdf += '''\t\t\t\t\t <distortionK3>0.0</distortionK3>\n'''
+    sdf += '''\t\t\t\t\t<distortionT1>0.0</distortionT1>\n'''
+    sdf += '''\t\t\t\t\t<distortionT2>0.0</distortionT2>\n'''
+    sdf += '''\t\t\t\t</plugin>\n'''
+    sdf += '''\t\t\t</sensor>\n'''
+    sdf += '''\t\t</link>\n'''
+    sdf += '''\t</model>\n'''
+    sdf ++ '''</sdf>'''
+    return sdf
 
 
 class Model(object):
@@ -248,6 +295,7 @@ def generateGeometrySDF(model):
   if model.shape == 'box':
     sdf += '\t\t\t\t\t\t<size>%s %s %s</size>\n' % (model.size_x, model.size_y, model.size_z)
   sdf += '\t\t\t\t</geometry>\n'
+  return sdf
 
 
 #Takes in a Model object
@@ -295,6 +343,7 @@ def generateSDFExperimental(model, index=0, writeToFile=False):
   if writeToFile:
     with open('%s.sdf', 'w+') as f:
       f.write(sdf)
+  return sdf
 
 
 

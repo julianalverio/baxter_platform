@@ -60,6 +60,20 @@ from gazebo_msgs.msg import ContactsState
 import csv
 
 
+import sys
+import copy
+import rospy
+import moveit_commander
+import moveit_msgs.msg
+import geometry_msgs.msg
+
+from std_msgs.msg import String
+
+from kinematics_interface import StateValidity
+
+
+
+
 
 class RobotController(object):
   def __init__(self, limb='left'):
@@ -76,6 +90,63 @@ class RobotController(object):
     print("Enabling robot... ")
     self._rs.enable()
     print("robot enabled")
+    self.robot_commander = moveit_commander.RobotCommander()
+    self.left_commander = moveit_commander.MoveGroupCommander("left_arm")
+    self.right_commander = moveit_commander.MoveGroupCommander("right_arm")
+    self.display_trajectory_publisher = rospy.Publisher(
+                                      '/move_group/display_planned_path',
+                                      moveit_msgs.msg.DisplayTrajectory)
+    print("Sleeping to allow RVIZ to start up")
+    rospy.sleep(10)
+
+
+  def jointAngleToPosition
+
+	def followMoveItTrajectoryWithPosition(self, poses, group='left_arm', resolution=0.01, visualize=False, check_collision=True):
+		#setting the last parameter to zero skips the "jump" step
+		plan, fraction = group.compute_cartesian_path(waypoints, resolution, 0.0)
+		if visualize:
+			display_trajectory = moveit_msgs.msg.DisplayTrajectory()
+			display_trajectory.trajectory_start = self.robot_commander.get_current_state()
+			display_trajectory.trajectory.append(plan)
+			# Publish
+			self.display_trajectory_publisher.publish(display_trajectory)
+		if check_collision:
+			if not checkCollision(plan, wait=True):
+				group.execute(plan, wait=True)
+		else:
+			group.execute(plan(wait=True))
+
+
+	# Input: a list of lists of joint angles, where each list of joint angles has length 7.
+	# Angles must be in the same order as self._limb.joint_names()
+	def followMoveItTrajectoryWithJointAngles(self, angles, group='left_arm'):
+		for angle in angles:
+			joint_goal = group.get_current_joint_values()
+			for idx in xrange(7):
+				joint_goal[idx] = angle[idx]
+			group.go(joint_goal, wait=True)
+			group.stop()
+
+
+	# Check for collision; return False if collision, otherwise return True
+	def checkCollision(self, trajectory, groups=['left_arm']):
+		for traj_point in trajectory.joint_trajectory.points:
+	    rs = RobotState()
+	    rs.joint_state.name = trajectory.joint_trajectory.joint_names
+	    rs.joint_state.position = traj_point.positions
+	    for group in groups:
+	      result = StateValidity().getStateValidity(rs, group)
+			if not result.valid: # if one point is not valid, the trajectory is not valid >:(
+				return False
+		return True
+  
+  def shutdown(self):
+  	moveit_commander.roscpp_shutdown()
+
+
+  def showRobotState(self):
+  	print(self.robot_commander.get_current_state())
 
 
   def gripper_open(self):
@@ -184,7 +255,7 @@ class RobotController(object):
     return [pair[0] for pair in poses]
 
 
-  #Follow a trajectory without consideration for time.
+  #Follow a trajectory with consideration for time.
   #Requires joint position server is running on another thread
   #Requires joint velocity server is not running.
   #input: list of (angle, timestamp) or (angle, timedelta as float) pairs
@@ -253,6 +324,7 @@ class RobotController(object):
 
 
   #Follow trajectory of joint angles, while linearly interpolating between points
+  #No consideration for time
   #Requires neither joint position nor joint velocity server are running
   #input can be a list of length-7 list with angles in order: 's0, s1, e0, e1, w0, w1, w2' (self._limb.joint_names())
   #input can also be a list of dictionaries with joints as keys and angles as values

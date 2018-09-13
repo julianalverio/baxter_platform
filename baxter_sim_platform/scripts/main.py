@@ -72,6 +72,22 @@ from robot_controller import *
 from scene_controller import *
 from utils import *
 
+class Manager(object):
+  def __init__(self):
+    rospy.init_node("baxter_platform_manager")
+    rospy.wait_for_message("/robot/sim/started", Empty)
+    moveit_commander.roscpp_initialize(sys.argv)
+    robot_controller = RobotController()
+    scene_controller = SceneController()
+
+  def shutdown(self):
+    robot_controller.shutdown()
+    scene_controller.delete_gazebo_models()
+
+
+
+
+
 def main():
 
 
@@ -82,9 +98,8 @@ def main():
   #                  'left_e1': 1.9400238130755056,
   #                  'left_s0': -0.08000397926829805,
   #                  'left_s1': -0.9999781166910306}
-  rospy.init_node("ik_pick_and_place_demo")
-  rospy.wait_for_message("/robot/sim/started", Empty)
-  robo_controller = RobotController()
+  manager = Manager()
+  rospy.on_shutdown(manager.shutdown())
 
   # def __init__(self, shape='box', size_x=0.5, size_y=0.5, 
   #              size_z=0.5, size_r=0.5, x=None, y=None, z=None, 
