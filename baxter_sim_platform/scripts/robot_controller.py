@@ -69,7 +69,7 @@ import geometry_msgs.msg
 
 from std_msgs.msg import String
 
-from kinematics_interface import StateValidity
+#from kinematics_interface import StateValidity
 
 
 
@@ -131,17 +131,18 @@ class RobotController(object):
 			group.stop()
 
 
-	# Check for collision; return False if collision, otherwise return True
-	def checkCollision(self, trajectory, groups=['left_arm']):
-		for traj_point in trajectory.joint_trajectory.points:
-			rs = RobotState()
-			rs.joint_state.name = trajectory.joint_trajectory.joint_names
-			rs.joint_state.position = traj_point.positions
-			for group in groups:
-				result = StateValidity().getStateValidity(rs, group)
-				if not result.valid: # if one point is not valid, the trajectory is not valid >:(
-					return False
-			return True
+  # Check for collision; return False if collision, otherwise return True
+  def checkCollision(self, trajectory, groups=['left_arm']):
+    return True
+    # for traj_point in trajectory.joint_trajectory.points:
+    # 	rs = RobotState()
+    # 	rs.joint_state.name = trajectory.joint_trajectory.joint_names
+    # 	rs.joint_state.position = traj_point.positions
+    # 	for group in groups:
+    # 		result = StateValidity().getStateValidity(rs, group)
+    # 		if not result.valid: # if one point is not valid, the trajectory is not valid >:(
+    # 			return False
+    # 	return True
   
   def shutdown(self):
   	moveit_commander.roscpp_shutdown()
