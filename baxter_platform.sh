@@ -31,9 +31,15 @@ sudo apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control
 # Install MoveIt!
 sudo apt-get install ros-kinetic-moveit -y
 source /opt/ros/kinetic/setup.bash
+# Install MoveIt! for Baxter
+cd ~/catkin_ws/src
+git clone https://github.com/ros-planning/moveit_robots.git
+# Build everything
 cd ~/catkin_ws; rm –rf devel; rm –rf build; catkin_make
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
+# Make sure the baxter world is executable to avoid an error
 sudo chmod u+x ~/catkin_ws/src/baxter_platform/baxter_simulator/baxter_gazebo/worlds/baxter.world
+# Add bash aliases
 echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 echo "alias resource='source ~/.bashrc'" >> ~/.bashrc
 echo "alias sim_shell='cd ~/catkin_ws; ./baxter.sh sim'" >> ~/.bashrc
