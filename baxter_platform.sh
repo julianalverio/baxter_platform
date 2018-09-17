@@ -21,7 +21,7 @@ echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 source /opt/ros/kinetic/setup.bash
 sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
-mkdir ~/catkin_ws/src -p; cd ~/catkin_ws; catkin_make
+mkdir ~/catkin_ws/src -p;
 # Install pip and pyassimp package
 sudo apt install python-pip -y
 pip install --upgrade pip
