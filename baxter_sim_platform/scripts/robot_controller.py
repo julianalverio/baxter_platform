@@ -78,9 +78,11 @@ from std_msgs.msg import String
 class RobotController(object):
   def __init__(self, limb='left'):
     self._limb_name = limb # string
+    # self._hover_distance = hover_distance # in meters
+    # self._verbose = verbose # bool
     self._limb = baxter_interface.Limb(limb)
     self._gripper = baxter_interface.Gripper(limb)
-    ns = "ExternalTfools/" + limb + "/PositionKinematicsNode/IKService"
+    ns = "ExternalTools/" + limb + "/PositionKinematicsNode/IKService"
     self._iksvc = rospy.ServiceProxy(ns, SolvePositionIK)
     rospy.wait_for_service(ns, 5.0)
     # verify robot is enabled
@@ -89,7 +91,9 @@ class RobotController(object):
     self._init_state = self._rs.state().enabled
     print("Enabling robot... ")
     self._rs.enable()
-    print("robot enabled")
+
+
+    
     self.robot_commander = moveit_commander.RobotCommander()
     self.left_commander = moveit_commander.MoveGroupCommander("left_arm")
     self.right_commander = moveit_commander.MoveGroupCommander("right_arm")
