@@ -31,9 +31,22 @@ sudo apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control
 # Install MoveIt!
 sudo apt-get install ros-kinetic-moveit -y
 source /opt/ros/kinetic/setup.bash
+# Move the installation folder out of the way
+mv ~/catkin_ws/src/baxter_platform/installation ~/installation
+# Delete the custom platform to avoid name collisions
+sudo rm -rf ~/catkin_ws/src/baxter_platform 
+
+# Install Rethink Default Platform
+cd ~/catkin_ws/src
+wstool init .
+wstool merge https://raw.githubusercontent.com/RethinkRobotics/baxter_simulator/kinetic-devel/baxter_simulator.rosinstall
+wstool update
+
 # Install MoveIt! for Baxter
 cd ~/catkin_ws/src
 git clone https://github.com/ros-planning/moveit_robots.git
+
+
 # Build everything
 cd ~/catkin_ws; rm –rf devel; rm –rf build; catkin_make
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
