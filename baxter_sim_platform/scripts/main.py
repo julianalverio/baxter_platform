@@ -60,13 +60,6 @@ from gazebo_msgs.msg import ContactsState
 import csv
 
 
-# import physics_tests
-# import scene_controller
-# import trajectory
-# import robot_controller
-# import utils
-
-from physics_tests import *
 from trajectory import *
 from robot_controller import *
 from scene_controller import *
@@ -115,7 +108,6 @@ def main():
   #                  'left_s0': -0.08000397926829805,
   #                  'left_s1': -0.9999781166910306}
   manager = Manager()
-  manager.robot_controller.jointAngleToPosition()
   assert False
 
 

@@ -54,12 +54,12 @@ class RobotController(object):
     moveit_commander.roscpp_initialize(sys.argv)
     self.robot_commander = moveit_commander.RobotCommander()
     self.limb_commander = moveit_commander.MoveGroupCommander(self._limb_name + "_arm")
-    # self.display_trajectory_publisher = rospy.Publisher(
-    #                                   '/move_group/display_planned_path',
-    #                                   moveit_msgs.msg.DisplayTrajectory)
-    # print("Sleeping to allow RVIZ to start up")
-    # rospy.sleep(10)
-    # import pdb; pdb.set_trace()
+    self.display_trajectory_publisher = rospy.Publisher(
+                                      '/move_group/display_planned_path',
+                                      moveit_msgs.msg.DisplayTrajectory)
+    print("Sleeping to allow RVIZ to start up")
+    rospy.sleep(10)
+    import pdb; pdb.set_trace()
 
 
 
@@ -109,7 +109,8 @@ class RobotController(object):
   Trajectory must be a list of length-7 lists.
   Each length-7 list must be a list of joint angles in the same order as self._limb.joint_names()
   '''
-  def checkCollision(self, trajectory, num_points=20, group=self._limb):
+  def checkCollision(self, trajectory, num_points=20):
+    group = self._limb
     if num_points_interpolated > 0:
       full_trajectory = []
       for waypoint_idx in xrange(len(trajectory) - 1):

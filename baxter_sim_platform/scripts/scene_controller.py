@@ -144,7 +144,7 @@ class SceneController(object):
         resp_delete = delete_model(model.name)
       except rospy.ServiceException, _:
         print 'FAILED TO DELETE MODEL: %s' % model.name
-    for camera_idx in xrange self.camera_count:
+    for camera_idx in xrange(self.camera_count):
       camera_name = 'camera_' + camera_idx
       try:
         resp_delete = delete_model(camera_name)
@@ -155,13 +155,13 @@ class SceneController(object):
   # Delete a particular Gazebo model
   def deleteGazeboModel(self, model_name):
     try:
-        delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+      delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
     except rospy.ServiceException, _:
-        print 'FAILED TO CONTACT SERVICE PROXY: /gazebo/delete_model'
+      print 'FAILED TO CONTACT SERVICE PROXY: /gazebo/delete_model'
     try:
-        resp_delete = delete_model(model.name)
-      except rospy.ServiceException, _:
-        print 'FAILED TO DELETE MODEL: %s' % model.name
+      resp_delete = delete_model(model.name)
+    except rospy.ServiceException, _:
+      print 'FAILED TO DELETE MODEL: %s' % model.name
 
 
   # Deletes a particular MoveIt object
@@ -218,7 +218,7 @@ class SceneController(object):
   Detach box from end effector to simulate dropping it.
   Note: This method only supports boxes.
   '''
-  def detachBox(self, end_effector_link, box_name)
+  def detachBox(self, end_effector_link, box_name):
     scene_commander.remove_attached_object(end_effector_link, name=box_name)
 
 
