@@ -215,8 +215,6 @@ class SceneController(object):
 ###################################### Camera-Related Methods ######################################
 ####################################################################################################
 
-
-  
   '''
   Generate and render an external camera to view the scene
   Default values are set intelligently to view the Baxter.
