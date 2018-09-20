@@ -68,9 +68,12 @@ class RobotController(object):
   Print out the current state of the robot
   '''
   def printRobotInfo(self):
-    print("============ End effector: ", self.limb_commander.get_end_effector_link())
+    print("============ End effector Link: ", self.limb_commander.get_end_effector_link())
     print("============ Robot state: ", self.robot_commander.get_current_state())
   
+  def getEndEffectorLinkName(self):
+    return self.limb_commander.get_end_effector_link()
+
   '''
   Shut down MoveIt!
   '''

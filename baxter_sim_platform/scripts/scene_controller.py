@@ -78,12 +78,12 @@ class SceneController(object):
     self.scene_commander = moveit_commander.PlanningSceneInterface()
 
   def shutdown(self):
-    self.deleteGazeboModels()
+    self.deleteAllGazeboModels()
+    self.deleteAllMoveItModels()
 
 ####################################################################################################
 ################################# Pause/Unpause Simulation Methods #################################
 ####################################################################################################
-
 
   # Pause the simulation
   def pause(self):
@@ -120,14 +120,16 @@ class SceneController(object):
     if moveit:
       for model in models:
         pose = Pose()
-        pose.orientation = Quaternion(tf_conversions.transformations.quaternion_from_euler(model.roll, model.pitch, model.yaw))
+        pose.orientation = Quaternion(
+          tf_conversions.transformations.quaternion_from_euler(model.roll, model.pitch, model.yaw))
         pose.position.x = model.x
         pose.position.y = model.y
         pose.position.z = model.z
         model_msg = geometry_msgs.msg.PoseStamped()
         model_msg.pose = pose
         if model.shape == 'box':
-          self.scene_commander.add_box(model.name, pose, size=(model.size_x, model.size_y, model.size_z))
+          self.scene_commander.add_box(
+            model.name, pose, size=(model.size_x, model.size_y, model.size_z))
           success = waitForSpawn(model.name)
         if model.shape == 'sphere':
           self.scene_commander.add_sphere(model.name, pose, radius=model.size_r)
@@ -164,12 +166,14 @@ class SceneController(object):
     rospy.shutdown()
 
 
-  # Recommended to be called upon ROS Exit. Deletes Gazebo models
-  # Do not wait for the Gazebo Delete Model service, since
-  # Gazebo should already be running. If the service is not
-  # available since Gazebo has been killed, it is fine to error out
-  # This will also delete any cameras you make
-  def deleteGazeboModels(self):
+  '''
+  Will be called upon ROS Exit. Deletes Gazebo models
+  Do not wait for the Gazebo Delete Model service, since
+  Gazebo should already be running. If the service is not
+  available since Gazebo has been killed, it is fine to error out
+  This will also delete any cameras you make
+  '''
+  def deleteAllGazeboModels(self):
     try:
         delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
     except rospy.ServiceException, _:
@@ -180,7 +184,36 @@ class SceneController(object):
         resp_delete = delete_model(model.name)
       except rospy.ServiceException, _:
         print 'FAILED TO DELETE MODEL: %s' % model.name
+    for camera_idx in xrange self.camera_count:
+      camera_name = 'camera_' + camera_idx
+      try:
+        resp_delete = delete_model(camera_name)
+      except rospy.ServiceException, _:
+        print 'FAILED TO DELETE CAMERA: %s' % camera_name
 
+
+  # Delete a particular Gazebo model
+  def deleteGazeboModel(self, model_name):
+    try:
+        delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+    except rospy.ServiceException, _:
+        print 'FAILED TO CONTACT SERVICE PROXY: /gazebo/delete_model'
+    try:
+        resp_delete = delete_model(model.name)
+      except rospy.ServiceException, _:
+        print 'FAILED TO DELETE MODEL: %s' % model.name
+
+
+  # Deletes a particular MoveIt object
+  def deleteMoveItModel(self, object_name):
+    scene_commander.remove_world_object(object_name)
+
+
+  # Deletes all MoveIt! objects
+  def deleteAllMoveItModels(self):
+    for object_name in [model.name for model in models]:
+      scene_commander.remove_world_object(object_name)
+  
 
   def makeModel(self, shape='box', size_x=0.5, size_y=0.5, 
                size_z=0.5, size_r=0.5, x=None, y=None, z=None, 
@@ -211,6 +244,24 @@ class SceneController(object):
     assert len(names) != len(set(names)), 'Model Names Must Be Unique!'
 
 
+  '''
+  Attach box to end effector to simulate picking it up.
+  Note: This method only supports picking up boxes.
+  Note: MoveIt! Only supports picking up boxes and meshes.
+  '''
+  def attachBox(self, end_effector_link, box_name, side='left'):
+    grasping_group = side + '_gripper'
+    touch_links = robot_commander.get_link_names(group=grasping_group)
+    scene_commander.attach_box(end_effector_link, box_name, touch_links=touch_links)
+
+  '''
+  Detach box from end effector to simulate dropping it.
+  Note: This method only supports boxes.
+  '''
+  def detachBox(self, end_effector_link, box_name)
+    scene_commander.remove_attached_object(end_effector_link, name=box_name)
+
+
 ####################################################################################################
 ###################################### Camera-Related Methods ######################################
 ####################################################################################################
@@ -233,8 +284,6 @@ class SceneController(object):
 ####################################################################################################
 ####################################### External Camera Class ######################################
 ####################################################################################################
-
-
 
 class ExternalCamera(object):
 
@@ -303,7 +352,7 @@ class ExternalCamera(object):
     sdf += '''\t\t\t\t\t<updateRate>0.0</updateRate>\n'''
     sdf += '''\t\t\t\t\t<cameraName>%s</cameraName>\n''' % self.name
     sdf += '''\t\t\t\t\t<imageTopicName>/cameras/%s/image</imageTopicName>\n''' % self.name
-    sdf += '''\t\t\t\t\t<cameraInfoTopicName>/cameras/$s/camera_info</cameraInfoTopicName>\n''' % self.name
+    sdf += '''\t\t\t\t\t<cameraInfoTopicName>/cameras/%s/camera_info</cameraInfoTopicName>\n''' % self.name
     sdf += '''\t\t\t\t\t<frameName>camera_frame</frameName>\n'''
     sdf += '''\t\t\t\t\t<hackBaseline>0.07</hackBaseline>\n'''
     sdf += '''\t\t\t\t\t<distortionK1>0.0</distortionK1>\n'''
@@ -321,7 +370,6 @@ class ExternalCamera(object):
 ####################################################################################################
 ############################################ Model Class ###########################################
 ####################################################################################################
-
 
 class Model(object):
   def __init__(self, shape='box', size_x=0.5, size_y=0.5, 
