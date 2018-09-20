@@ -89,6 +89,23 @@ class Manager(object):
 
 def main():
 
+#stuff for callback functions
+
+#for contact sensors
+# def contactCallback(data):
+#   if data.states:
+#     print 'Contact detected!'
+#     print data.states
+    
+#   rospy.Subscriber("/l_side_r_finger_contact_sensor_state", ContactsState, contactCallback)
+#   rospy.Subscriber("/l_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
+#   rospy.Subscriber("/r_side_r_finger_contact_sensor_state", ContactsState, contactCallback)
+#   rospy.Subscriber("/r_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
+
+
+
+  # deprecated version of the work table
+  # models.append(Model(name='table', shape='block', roll=0., pitch=0., yaw=0., restitution_coeff=0., size_x=.7, size_y=1.5, size_z=.7, x=.4, y=0.1, z=0., mass=5000, color='Grey', mu1=1, mu2=1, reference_frame=''))
 
   # starting_angles = {'left_w0': 0.6699952259595108,
   #                  'left_w1': 1.030009435085784,
@@ -129,14 +146,14 @@ def main():
   #                  'left_s0': 0.1,
   #                  'left_s1': 0.1}
   # robot_controller._limb.move_to_joint_positions(zero_angles)
-  # # robo_controller._limb.move_to_joint_positions(small_angles)
+  # # robot_controller._limb.move_to_joint_positions(small_angles)
   # while not rospy.is_shutdown():
   #   pass
   # import sys; sys.exit()
 
   # rospy.init_node("ik_pick_and_place_demo")
   # rospy.wait_for_message("/robot/sim/started", Empty)
-  # robo_controller = RobotController()
+  # robot_controller = RobotController()
   # collectData()
   # getNoisyData()
   # import sys; sys.exit()
@@ -151,13 +168,13 @@ def main():
   for angles in path:
       joints = ['left_w0', 'left_w1', 'left_w2', 'left_e0', 'left_e1', 'left_s0', 'left_s1']
       move_angles = dict(zip(joints, angles))
-      robo_controller._limb.move_to_joint_positions(move_angles)
+      robot_controller._limb.move_to_joint_positions(move_angles)
   print 'NOW USING STANDARD PATH'
   start_dict = {'left_w0': 0.6699952259595108, 'left_w1': 1.030009435085784, 'left_w2': -0.4999997247485215,'left_e0': -1.189968899785275,'left_e1': 1.9400238130755056,'left_s0': -0.08000397926829805,'left_s1': -0.9999781166910306}
   goal_dict = {'left_w0': 0.713473354262754, 'left_w1': 1.014095801262804, 'left_w2': -0.7107767620135959, 'left_e0': -0.598464939148772, 'left_e1': 0.9698857738523418, 'left_s0': -0.8576164362879198, 'left_s1': -0.2443509381144592}
-  robo_controller._limb.move_to_joint_positions(start_dict)
+  robot_controller._limb.move_to_joint_positions(start_dict)
 
-  robo_controller._limb.move_to_joint_positions(goal_dict)
+  robot_controller._limb.move_to_joint_positions(goal_dict)
   return
 
 
@@ -165,17 +182,17 @@ def main():
   pre_grip_angles = {'left_w0': 0.713473354262754, 'left_w1': 1.014095801262804, 'left_w2': -0.7107767620135959, 'left_e0': -0.598464939148772, 'left_e1': 0.9698857738523418, 'left_s0': -0.8576164362879198, 'left_s1': -0.2443509381144592}
   generateNoisyData(ending_angles_dict=pre_grip_angles)
   trajectories = getNoisyData()
-  # robo_controller = RobotController()
+  # robot_controller = RobotController()
   # final_positions = [pair[1] for pair in trajectories]
   # for index, angles in enumerate(final_positions):
   #   print 'moving to', index
-  #   robo_controller._limb.move_to_joint_positions(eval(angles))
+  #   robot_controller._limb.move_to_joint_positions(eval(angles))
   return
 
   # robot_controller = RobotController()
   # robot_controller._limb.move_to_joint_positions(starting_angles)
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x + 0.1
   next_pose.position.y = current_pose['position'].y - 0.1
@@ -184,10 +201,10 @@ def main():
   next_pose.orientation.y = current_pose['orientation'].y - 0.1
   next_pose.orientation.z = current_pose['orientation'].z - 0.1
   next_pose.orientation.w = current_pose['orientation'].w + 0.1
-  next_angles = robo_controller.solveIK(next_pose)
+  next_angles = robot_controller.solveIK(next_pose)
   print "Showing Next Angles:"
   print next_angles
-  robo_controller._limb.move_to_joint_positions(next_angles)
+  robot_controller._limb.move_to_joint_positions(next_angles)
 
   return
   

@@ -59,7 +59,7 @@ from gazebo_msgs.srv import GetLinkState
 from gazebo_msgs.msg import ContactsState
 import csv
 
-
+# This is just a helper class provided by ROS
 class Trajectory(object):
   def __init__(self, limb='left'):
       ns = 'robot/limb/' + limb + '/'

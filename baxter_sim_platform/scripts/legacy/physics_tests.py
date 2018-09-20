@@ -59,7 +59,14 @@ from gazebo_msgs.srv import GetLinkState
 from gazebo_msgs.msg import ContactsState
 import csv
 
-#for contact sensors
+
+###### A bunch of methods where the Baxter executes a bunch of edge-case-y behavior.
+###### We ran these tests with multiple physics engines and concluded that the physics engines behaved identically
+###### In all the cases we could think of. We primarily tested ODE and Bullet, but briefly looked at others.
+######
+###### This code did not get refactored along with everything else. If you'd like to use it, you'll have to refactor it.
+
+#helper function for contact sensors
 def contactCallback(data):
   if data.states:
     print 'Contact detected!'
@@ -69,18 +76,18 @@ def contactCallback(data):
 def nonantipodalGrasp():
   print 'Showing: Nonantipodal Grasp of Rectangular Prism.'
 
-  robo_controller = RobotController()
-  robo_controller._gripper.set_holding_force(100)
+  robot_controller = RobotController()
+  robot_controller._gripper.set_holding_force(100)
   rospy.on_shutdown(cleanUp)
 
   print 'setting up camera...'
   externalCamera()
 
-  robo_controller.gripper_open()
+  robot_controller.gripper_open()
 
   print 'moving to start position...'
   pre_grip_angles = {'left_w0': 0.713473354262754, 'left_w1': 1.014095801262804, 'left_w2': -0.7107767620135959, 'left_e0': -0.598464939148772, 'left_e1': 0.9698857738523418, 'left_s0': -0.8576164362879198, 'left_s1': -0.2443509381144592}
-  robo_controller._limb.move_to_joint_positions(pre_grip_angles)
+  robot_controller._limb.move_to_joint_positions(pre_grip_angles)
 
   ##work table
   models = list()
@@ -101,9 +108,9 @@ def nonantipodalGrasp():
   rospy.Subscriber("/r_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
 
   print 'Gripping now.'
-  robo_controller.gripper_close()
+  robot_controller.gripper_close()
   starting_overhead_angles = {'left_w0': 0.590693567655256, 'left_w1': 1.059736120576616, 'left_w2': -0.7595985440689625, 'left_e0': -1.1059240339618084, 'left_e1': 1.8919082513633318, 'left_s0': -0.1417684774660966, 'left_s1': -1.0218518327712416}
-  robo_controller._limb.move_to_joint_positions(starting_overhead_angles)
+  robot_controller._limb.move_to_joint_positions(starting_overhead_angles)
 
   print 'Done. Hanging now.'
   while not rospy.is_shutdown():
@@ -114,18 +121,18 @@ def nonantipodalGrasp():
 def pushObjectOnTable():
   print 'Pushing Rectangular Prism Into Table.'
 
-  robo_controller = RobotController()
-  robo_controller._gripper.set_holding_force(100)
+  robot_controller = RobotController()
+  robot_controller._gripper.set_holding_force(100)
   rospy.on_shutdown(cleanUp)
 
   print 'setting up camera...'
   externalCamera()
 
 
-  robo_controller.gripper_open()
+  robot_controller.gripper_open()
   print 'moving to start position...'
   pre_grip_angles = {'left_w0': 0.713473354262754, 'left_w1': 1.014095801262804, 'left_w2': -0.7107767620135959, 'left_e0': -0.598464939148772, 'left_e1': 0.9698857738523418, 'left_s0': -0.8576164362879198, 'left_s1': -0.2443509381144592}
-  robo_controller._limb.move_to_joint_positions(pre_grip_angles)
+  robot_controller._limb.move_to_joint_positions(pre_grip_angles)
 
 
   ##work table
@@ -147,27 +154,27 @@ def pushObjectOnTable():
   rospy.Subscriber("/r_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
 
   print 'Gripping now.'
-  robo_controller.gripper_close()
+  robot_controller.gripper_close()
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
   next_pose.position.z = current_pose['position'].z + 0.1
   next_pose.orientation = current_pose['orientation']
 
-  angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(angles)
+  angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(angles)
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
   next_pose.position.z = current_pose['position'].z - 0.2
   next_pose.orientation = current_pose['orientation']
 
-  angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(angles)
+  angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(angles)
 
   #it should not get past this point.
 
@@ -180,8 +187,8 @@ def pushObjectOnTable():
 def pushHandOnTable():
   print 'Crashing Hand Into Table Top'
 
-  robo_controller = RobotController()
-  robo_controller._gripper.set_holding_force(100)
+  robot_controller = RobotController()
+  robot_controller._gripper.set_holding_force(100)
   rospy.on_shutdown(cleanUp)
 
   print 'setting up camera...'
@@ -189,10 +196,10 @@ def pushHandOnTable():
 
   print 'moving to start position...'
 
-  robo_controller.gripper_close()
+  robot_controller.gripper_close()
 
   pre_grip_angles = {'left_w0': 0.713473354262754, 'left_w1': 1.014095801262804, 'left_w2': -0.7107767620135959, 'left_e0': -0.598464939148772, 'left_e1': 0.9698857738523418, 'left_s0': -0.8576164362879198, 'left_s1': -0.2443509381144592}
-  robo_controller._limb.move_to_joint_positions(pre_grip_angles)
+  robot_controller._limb.move_to_joint_positions(pre_grip_angles)
 
   ##work table
   models = list()
@@ -206,25 +213,25 @@ def pushHandOnTable():
   rospy.Subscriber("/r_side_r_finger_contact_sensor_state", ContactsState, contactCallback)
   rospy.Subscriber("/r_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
   next_pose.position.z = current_pose['position'].z + 0.1
   next_pose.orientation = current_pose['orientation']
 
-  angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(angles)
+  angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(angles)
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
   next_pose.position.z = current_pose['position'].z - 0.2
   next_pose.orientation = current_pose['orientation']
 
-  angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(angles)
+  angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(angles)
 
   #It should not get past this point.
 
@@ -237,8 +244,8 @@ def pushHandOnTable():
 def grabCorners():
   print 'Grabbing Corners of Rectagular Prism.'
 
-  robo_controller = RobotController()
-  robo_controller._gripper.set_holding_force(100)
+  robot_controller = RobotController()
+  robot_controller._gripper.set_holding_force(100)
   rospy.on_shutdown(cleanUp)
 
   print 'setting up camera...'
@@ -247,10 +254,10 @@ def grabCorners():
   print 'moving to start position...'
 
   
-  robo_controller.gripper_open()
+  robot_controller.gripper_open()
 
   pre_grip_angles = {'left_w0': 0.713473354262754, 'left_w1': 1.014095801262804, 'left_w2': -0.7107767620135959, 'left_e0': -0.598464939148772, 'left_e1': 0.9698857738523418, 'left_s0': -0.8576164362879198, 'left_s1': -0.2443509381144592}
-  robo_controller._limb.move_to_joint_positions(pre_grip_angles)
+  robot_controller._limb.move_to_joint_positions(pre_grip_angles)
 
   ##work table
   models = list()
@@ -271,27 +278,27 @@ def grabCorners():
   rospy.Subscriber("/r_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
 
   print 'Gripping now.'
-  robo_controller.gripper_close()
+  robot_controller.gripper_close()
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
   next_pose.position.z = current_pose['position'].z + 0.1
   next_pose.orientation = current_pose['orientation']
 
-  angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(angles)
+  angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(angles)
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
   next_pose.position.z = current_pose['position'].z - 0.2
   next_pose.orientation = current_pose['orientation']
 
-  angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(angles)
+  angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(angles)
 
   #It should not get past this point.
 
@@ -304,18 +311,18 @@ def grabCorners():
 def manipulateCylinder():
   print 'Manipulating Cylinder.'
 
-  robo_controller = RobotController()
-  robo_controller._gripper.set_holding_force(100)
+  robot_controller = RobotController()
+  robot_controller._gripper.set_holding_force(100)
   rospy.on_shutdown(cleanUp)
 
   print 'setting up camera...'
   externalCamera()
 
   print 'moving to start position...'
-  robo_controller.gripper_open()
+  robot_controller.gripper_open()
 
   pre_grip_angles = {'left_w0': 0.713473354262754, 'left_w1': 1.014095801262804, 'left_w2': -0.7107767620135959, 'left_e0': -0.598464939148772, 'left_e1': 0.9698857738523418, 'left_s0': -0.8576164362879198, 'left_s1': -0.2443509381144592}
-  robo_controller._limb.move_to_joint_positions(pre_grip_angles)
+  robot_controller._limb.move_to_joint_positions(pre_grip_angles)
 
   ##work table
   models = list()
@@ -336,27 +343,27 @@ def manipulateCylinder():
   rospy.Subscriber("/r_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
 
   print 'Gripping now.'
-  robo_controller.gripper_close()
+  robot_controller.gripper_close()
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
   next_pose.position.z = current_pose['position'].z + 0.1
   next_pose.orientation = current_pose['orientation']
 
-  angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(angles)
+  angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(angles)
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
   next_pose.position.z = current_pose['position'].z - 0.2
   next_pose.orientation = current_pose['orientation']
 
-  angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(angles)
+  angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(angles)
 
   print 'Done. Hanging now.'
   while not rospy.is_shutdown():
@@ -368,18 +375,18 @@ def manipulateCylinder():
 def manipulateSphere():
   print 'Manipulating Sphere.'
 
-  robo_controller = RobotController()
-  robo_controller._gripper.set_holding_force(100)
+  robot_controller = RobotController()
+  robot_controller._gripper.set_holding_force(100)
   rospy.on_shutdown(cleanUp)
 
   print 'setting up camera...'
   externalCamera()
 
-  robo_controller.gripper_open()
+  robot_controller.gripper_open()
 
   print 'moving to start position...'
   pre_grip_angles = {'left_w0': 0.713473354262754, 'left_w1': 1.014095801262804, 'left_w2': -0.7107767620135959, 'left_e0': -0.598464939148772, 'left_e1': 0.9698857738523418, 'left_s0': -0.8576164362879198, 'left_s1': -0.2443509381144592}
-  robo_controller._limb.move_to_joint_positions(pre_grip_angles)
+  robot_controller._limb.move_to_joint_positions(pre_grip_angles)
 
   ##work table
   models = list()
@@ -394,7 +401,7 @@ def manipulateSphere():
   print 'generating test object'
   loadGazeboModels(models)
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
@@ -402,9 +409,9 @@ def manipulateSphere():
   next_pose.orientation = current_pose['orientation']
 
   print 'doing IK for next movement...'
-  next_angles = robo_controller.solveIK(next_pose)
+  next_angles = robot_controller.solveIK(next_pose)
   print 'moving to grasp'
-  robo_controller._limb.move_to_joint_positions(next_angles)
+  robot_controller._limb.move_to_joint_positions(next_angles)
 
   rospy.Subscriber("/l_side_r_finger_contact_sensor_state", ContactsState, contactCallback)
   rospy.Subscriber("/l_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
@@ -412,27 +419,27 @@ def manipulateSphere():
   rospy.Subscriber("/r_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
 
   print 'Gripping now.'
-  robo_controller.gripper_close()
+  robot_controller.gripper_close()
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
   next_pose.position.z = current_pose['position'].z + 0.1
   next_pose.orientation = current_pose['orientation']
 
-  angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(angles)
+  angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(angles)
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y
   next_pose.position.z = current_pose['position'].z - 0.2
   next_pose.orientation = current_pose['orientation']
 
-  angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(angles)
+  angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(angles)
 
   #It should not get past this point.
 
@@ -447,18 +454,18 @@ def hitHandOnTableSide():
   print 'Colliding with Side of Table.'
   
 
-  robo_controller = RobotController()
-  robo_controller._gripper.set_holding_force(100)
+  robot_controller = RobotController()
+  robot_controller._gripper.set_holding_force(100)
   rospy.on_shutdown(cleanUp)
 
   print 'setting up camera...'
   externalCamera()
 
-  robo_controller.gripper_close()
+  robot_controller.gripper_close()
 
   print 'moving to start position...'
   pre_grip_angles = {'left_w0': 0.713473354262754, 'left_w1': 1.014095801262804, 'left_w2': -0.7107767620135959, 'left_e0': -0.598464939148772, 'left_e1': 0.9698857738523418, 'left_s0': -0.8576164362879198, 'left_s1': -0.2443509381144592}
-  robo_controller._limb.move_to_joint_positions(pre_grip_angles)
+  robot_controller._limb.move_to_joint_positions(pre_grip_angles)
 
   ##work table
   models = list()
@@ -467,15 +474,15 @@ def hitHandOnTableSide():
   print 'generating table'
   loadGazeboModels(models)
 
-  current_pose = robo_controller._limb.endpoint_pose()
+  current_pose = robot_controller._limb.endpoint_pose()
   next_pose = Pose()
   next_pose.position.x = current_pose['position'].x
   next_pose.position.y = current_pose['position'].y + 0.3
   next_pose.position.z = current_pose['position'].z
   next_pose.orientation = current_pose['orientation']
 
-  next_angles = robo_controller.solveIK(next_pose)
-  robo_controller._limb.move_to_joint_positions(next_angles)
+  next_angles = robot_controller.solveIK(next_pose)
+  robot_controller._limb.move_to_joint_positions(next_angles)
 
   #It shouldn't get past this point.
 
