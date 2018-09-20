@@ -1,16 +1,11 @@
 #!/usr/bin/env python
 
-import argparse
-import struct
-import sys
-import copy
-import os
-import re
 import random
 import numpy as np
-
 import rospy
-import rospkg
+import moveit_commander
+import moveit_msgs.msg
+import geometry_msgs.msg
 
 from gazebo_msgs.srv import (
     SpawnModel,
@@ -29,43 +24,8 @@ from std_msgs.msg import (
     Empty,
 )
 
-from baxter_core_msgs.srv import (
-    SolvePositionIK,
-    SolvePositionIKRequest,
-)
-
-from baxter_core_msgs.msg import (
-    JointCommand,
-)
-
-import baxter_interface
-from baxter_interface import CHECK_VERSION
-
-import actionlib
-
-from control_msgs.msg import (
-    FollowJointTrajectoryAction,
-    FollowJointTrajectoryGoal,
-)
-from trajectory_msgs.msg import (
-    JointTrajectoryPoint,
-)
-
-import genpy
-
 from std_srvs.srv import Empty as placeholder
 
-from gazebo_msgs.srv import GetLinkState
-from gazebo_msgs.msg import ContactsState
-import csv
-import rospkg
-
-import sys
-import copy
-import rospy
-import moveit_commander
-import moveit_msgs.msg
-import geometry_msgs.msg
 
   
 class SceneController(object):
