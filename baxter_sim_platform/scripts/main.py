@@ -76,9 +76,8 @@ class Manager(object):
   def __init__(self):
     rospy.init_node("baxter_platform_manager")
     rospy.wait_for_message("/robot/sim/started", Empty)
-    moveit_commander.roscpp_initialize(sys.argv)
-    robot_controller = RobotController()
-    scene_controller = SceneController()
+    self.robot_controller = RobotController()
+    self.scene_controller = SceneController()
 
   def shutdown(self):
     robot_controller.shutdown()
@@ -99,6 +98,10 @@ def main():
   #                  'left_s0': -0.08000397926829805,
   #                  'left_s1': -0.9999781166910306}
   manager = Manager()
+  manager.robot_controller.jointAngleToPosition()
+  assert False
+
+
   rospy.on_shutdown(manager.shutdown())
   trajectory = manager.robot_controller.generateTrajectoryPose()
   manager.robot_controller.followTrajectoryWithIK(trajectory)
@@ -125,7 +128,7 @@ def main():
   #                  'left_e1': 0.1,
   #                  'left_s0': 0.1,
   #                  'left_s1': 0.1}
-  # robo_controller._limb.move_to_joint_positions(zero_angles)
+  # robot_controller._limb.move_to_joint_positions(zero_angles)
   # # robo_controller._limb.move_to_joint_positions(small_angles)
   # while not rospy.is_shutdown():
   #   pass
@@ -169,8 +172,8 @@ def main():
   #   robo_controller._limb.move_to_joint_positions(eval(angles))
   return
 
-  robo_controller = RobotController()
-  robo_controller._limb.move_to_joint_positions(starting_angles)
+  # robot_controller = RobotController()
+  # robot_controller._limb.move_to_joint_positions(starting_angles)
 
   current_pose = robo_controller._limb.endpoint_pose()
   next_pose = Pose()

@@ -77,15 +77,20 @@ class SceneController(object):
     self.unpause_proxy = rospy.ServiceProxy('/gazebo/unpause_physics', placeholder)
     self.scene_commander = moveit_commander.PlanningSceneInterface()
 
+  # Pause the simulation
   def pause(self):
     self.pause_proxy()
 
+  # Unpause the simulation
   def unpause(self):
     self.unpause_proxy()
 
-  #Spawn SDF models
-  #input: a list of Model objects
-  def spawnGazeboModels(self, models):
+  '''
+  Spawn SDF models in Gazebo
+  If moveit=True, also spawn the models in MoveIt! :D
+  Input a list of Model Objects
+  '''
+  def spawnGazeboModels(self, models, moveit=False):
     self.models.extend(models)
     rospy.wait_for_service('/gazebo/spawn_sdf_model')
     spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
@@ -100,6 +105,14 @@ class SceneController(object):
         index += 1
       except rospy.ServiceException, e:
           rospy.logerr("Spawn SDF service call failed: {0}".format(e))
+    if moveit:
+      for model in models:
+        pose = Pose()
+        pose.orientation = Quaternion(tf_conversions.transformations.quaternion_from_euler(model.roll, model.pitch, model.yaw))
+        pose.position.x = model.x
+        pose.position.y = model.y
+        pose.position.z = model.z
+        #TO BE CONTINUED
 
   # Recommended to be called upon ROS Exit. Deletes Gazebo models
   # Do not wait for the Gazebo Delete Model service, since
