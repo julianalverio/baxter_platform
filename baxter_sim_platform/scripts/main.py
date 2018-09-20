@@ -81,7 +81,7 @@ class Manager(object):
 
   def shutdown(self):
     robot_controller.shutdown()
-    scene_controller.delete_gazebo_models()
+    scene_controller.shutdown()
 
 
 

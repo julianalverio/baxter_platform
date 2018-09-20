@@ -71,11 +71,19 @@ import geometry_msgs.msg
 class SceneController(object):
   def __init__(self):
     self.models = []
-    self.camera = False
+    self.cameras = 0
     self.srv = placeholder()
     self.pause_proxy = rospy.ServiceProxy('/gazebo/pause_physics', placeholder)
     self.unpause_proxy = rospy.ServiceProxy('/gazebo/unpause_physics', placeholder)
     self.scene_commander = moveit_commander.PlanningSceneInterface()
+
+  def shutdown(self):
+    self.deleteGazeboModels()
+
+####################################################################################################
+################################# Pause/Unpause Simulation Methods #################################
+####################################################################################################
+
 
   # Pause the simulation
   def pause(self):
@@ -85,24 +93,28 @@ class SceneController(object):
   def unpause(self):
     self.unpause_proxy()
 
+####################################################################################################
+############################### Methods to Add/Remove Gazebo Objects ###############################
+####################################################################################################
+
   '''
   Spawn SDF models in Gazebo
   If moveit=True, also spawn the models in MoveIt! :D
-  Input a list of Model Objects
+  NOTE: This method only supports BOXES and SPHERES. It can be extended to support meshes.
+  NOTE: MoveIt! Currently only supports boxes, spheres, and meshes -- NOT cylinders.
+  http://docs.ros.org/jade/api/moveit_commander/html/planning__scene__interface_8py_source.html 
   '''
-  def spawnGazeboModels(self, models, moveit=False):
-    self.models.extend(models)
+  def spawnGazeboModels(self, moveit=False):
     rospy.wait_for_service('/gazebo/spawn_sdf_model')
     spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-    for model in models:
+    for model in self.models:
       pose = model.pose
       reference_frame = model.reference_frame
-      sdf = generateSDF(model, len(models)).replace('\n', '').replace('\t', '')
+      sdf = generateSDF(model).replace('\n', '').replace('\t', '')
       try:
-        print 'loading model named: %s' % model.name
+        print 'Loading model named: %s' % model.name
         resp_sdf = spawn_proxy(model.name, sdf, "/",
                              pose, reference_frame)
-        index += 1
       except rospy.ServiceException, e:
           rospy.logerr("Spawn SDF service call failed: {0}".format(e))
     if moveit:
@@ -112,7 +124,45 @@ class SceneController(object):
         pose.position.x = model.x
         pose.position.y = model.y
         pose.position.z = model.z
-        #TO BE CONTINUED
+        model_msg = geometry_msgs.msg.PoseStamped()
+        model_msg.pose = pose
+        if model.shape == 'box':
+          self.scene_commander.add_box(model.name, pose, size=(model.size_x, model.size_y, model.size_z))
+          success = waitForSpawn(model.name)
+        if model.shape == 'sphere':
+          self.scene_commander.add_sphere(model.name, pose, radius=model.size_r)
+        else:
+          rospy.logerr('MoveIt is ignoring model named %s of shape %s.' % (model.name, model.shape))
+
+
+  '''
+  Sometimes a node can fail and a message will be lost, causing an object to not to what's expected
+  Wait for the appropriate action to happen and ensure nothing gets lost.
+  Inputs:
+    name: name of the object you're waiting for
+    end: must be 'scene' or 'attached' -- the end state you want to object to be in
+    timeout: how long you're willing to wait for the object
+  '''
+  def waitForMoveItObject(self, name, end='scene', timeout=5):
+    start = rospy.get_time()
+    while (rospy.get_time() - start < timeout) and not rospy.is_shutdown():
+      in_scene = name in scene.get_known_object_names()
+      attached_objects = scene.get_attached_objects([box_name])
+      is_attached = len(attached_objects.keys()) > 0
+
+      if in_scene and is_attached:
+        rospy.logerr('Aww snap. An object was found both in the scene and attached to the arm.')
+        rospy.shutdown()
+
+      if end == 'scene' and in_scene:
+        return
+
+      if end == 'attached' and is_attached:
+        return
+
+    rospy.logerr('Yikes -- timed out while adding object to MoveIt! scene. A node must have failed')
+    rospy.shutdown()
+
 
   # Recommended to be called upon ROS Exit. Deletes Gazebo models
   # Do not wait for the Gazebo Delete Model service, since
@@ -127,45 +177,94 @@ class SceneController(object):
 
     for model in self.models:
       try:
-        resp_delete = delete_model(model)
+        resp_delete = delete_model(model.name)
       except rospy.ServiceException, _:
-        print 'FAILED TO DELETE MODEL: %s' % model
-    if self.camera:
-      delete_model('external_camera')
+        print 'FAILED TO DELETE MODEL: %s' % model.name
 
-  #generate an external camera from camera.sdf
-  #default values set intelligently
+
+  def makeModel(self, shape='box', size_x=0.5, size_y=0.5, 
+               size_z=0.5, size_r=0.5, x=None, y=None, z=None, 
+               mass=0.5, color=None, mu1=1000, mu2=1000,
+               reference_frame='world',
+               restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
+               name=None):
+    if not name:
+      name = 'object_' + str(len(self.models))
+    model = Model(shape=shape, size_x=size_x, size_y=size_y,
+      size_z=size_z, size_r=size_r, x=x, y=y, z=z, mass=mass, color=color,
+      mu1=mu1, mu2=mu2, reference_frame=reference_frame, restitution_coeff=restitution_coeff,
+      roll=roll, pitch=pitch, yaw=yaw, name=name)
+    self.models.append(model)
+    self.checkUniqueModelNames()
+    return model
+
+
+  '''
+  Check that all model objects in the scene have unique names
+  Throw an assertion error if not
+  Hint: If you leave the name fields blank, unique names will be generated for you
+  '''
+  def checkUniqueModelNames(self):
+    names = []
+    for model in self.models:
+      names.append(model.name)
+    assert len(names) != len(set(names)), 'Model Names Must Be Unique!'
+
+
+####################################################################################################
+###################################### Camera-Related Methods ######################################
+####################################################################################################
+
+
+  
+  '''
+  Generate and render an external camera to view the scene
+  Default values are set intelligently to view the Baxter.
+  Inputs: location/orientation parameters for camera placement
+  NOTE: This platform can support any number of external cameras
+  WARNING: External cameras are computationally expensive
+  Camera names are automatically generated as camera_0, camera_1, etc.
+  To view camera output: 'rosrun image_view image_view image:=/cameras/CAMERA_NAME/image'
+  '''
   def externalCamera(self, x=2.5, y=0.0, z=1.5, quat_x=-0.15, quat_y=0., quat_z=0.98, quat_w=0.):
-    sdf = getSDFString.replace('\n', '').replace('\t', '')
-    rospy.wait_for_service('/gazebo/spawn_sdf_model')
-    spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-    pose = Pose()
-    pose.position.x = x
-    pose.position.y = y
-    pose.position.z = z
-    pose.orientation.x = quat_x
-    pose.orientation.y = quat_y
-    pose.orientation.z = quat_z
-    pose.orientation.w = quat_w
-
-    resp_sdf = spawn_proxy('external_camera', sdf, "/",
-                           pose, 'world')
-    self.camera = True
+    camera = ExternalCamera(x, y, z, quat_x, quat_y, quat_z, quat_w, self.cameras)
+    self.cameras += 1
+    camera.render()
 
 
-#Renders camera from camera.sdf
-#To view camera output: 'rosrun image_view image_view image:=/cameras/external_camera/image'
-#This cannot yet support multiple external cameras
+####################################################################################################
+####################################### External Camera Class ######################################
+####################################################################################################
+
+
+
 class ExternalCamera(object):
 
-  def __init__(self, x, y, z, roll, pitch, yaw):
+  def __init__(self, x, y, z, quat_x, quat_y, quat_z, quat_w, camera_count):
     self.x = x
     self.y = y
     self.z = z
-    self.roll = roll
-    self.pitch = pitch
-    self.yaw = yaw
+    self.quat_x = quat_x
+    self.quat_y = quat_y
+    self.quat_z = quat_z
+    self.quat_w = quat_w
+    self.name = 'camera_' + str(camera_count)
 
+
+  def render(self):
+    rospy.wait_for_service('/gazebo/spawn_sdf_model')
+    spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+    pose = Pose()
+    pose.position.x = self.x
+    pose.position.y = self.y
+    pose.position.z = self.z
+    pose.orientation.x = self.quat_x
+    pose.orientation.y = self.quat_y
+    pose.orientation.z = self.quat_z
+    pose.orientation.w = self.quat_w
+
+    resp_sdf = spawn_proxy(self.name, self.getSDFString, "/",
+                           pose, 'world')
 
 
   #Read in SDF string. See camera.sdf for an example of what will be generated.
@@ -204,9 +303,9 @@ class ExternalCamera(object):
     sdf += '''\t\t\t\t<plugin name="camera_controller" filename="libgazebo_ros_camera.so">\n'''
     sdf += '''\t\t\t\t\t<alwaysOn>true</alwaysOn>\n'''
     sdf += '''\t\t\t\t\t<updateRate>0.0</updateRate>\n'''
-    sdf += '''\t\t\t\t\t<cameraName>external_camera</cameraName>\n'''
-    sdf += '''\t\t\t\t\t<imageTopicName>/cameras/external_camera/image</imageTopicName>\n'''
-    sdf += '''\t\t\t\t\t<cameraInfoTopicName>/cameras/external_camera/camera_info</cameraInfoTopicName>\n'''
+    sdf += '''\t\t\t\t\t<cameraName>%s</cameraName>\n''' % self.name
+    sdf += '''\t\t\t\t\t<imageTopicName>/cameras/%s/image</imageTopicName>\n''' % self.name
+    sdf += '''\t\t\t\t\t<cameraInfoTopicName>/cameras/$s/camera_info</cameraInfoTopicName>\n''' % self.name
     sdf += '''\t\t\t\t\t<frameName>camera_frame</frameName>\n'''
     sdf += '''\t\t\t\t\t<hackBaseline>0.07</hackBaseline>\n'''
     sdf += '''\t\t\t\t\t<distortionK1>0.0</distortionK1>\n'''
@@ -220,6 +319,10 @@ class ExternalCamera(object):
     sdf += '''\t</model>\n'''
     sdf ++ '''</sdf>'''
     return sdf
+
+####################################################################################################
+############################################ Model Class ###########################################
+####################################################################################################
 
 
 class Model(object):
@@ -271,13 +374,12 @@ class Model(object):
     self.pitch = pitch
     self.yaw = yaw
 
-  def __str__(self):
-    return self.name
 
-  #assumption: x_size is width, y_size is depth, and z_size is height
-  #assumption: mass is uniformly distributed
-  #reference: dynref.engr.illinois.edu/rem.html
-  #returns: [ixx, iyy, izz]
+  '''
+  Calculates moments: [ixx, iyy, izz]
+  Assumes mass is uniformly distributed
+  Reference: dynref.engr.illinois.edu/rem.html
+  '''
   def getMoments(self):
     moments = np.ones((1, 3))
     if self.shape == 'box':
@@ -297,126 +399,55 @@ class Model(object):
 
     return moments.tolist()[0]
 
-def generateGeometrySDF(model):
-  sdf = '\t\t\t\t<geometry>\n'
-  sdf += '\t\t\t\t\t<%s>\n' % model.shape
-  if model.shape == 'sphere':
-    sdf += '\t\t\t\t\t\t<radius>%s</radius>\n' % model.size_r
-  if model.shape == 'cylinder':
-    sdf += '\t\t\t\t\t\t<radius>%s</radius>\n' % model.size_r
-    sdf += '\t\t\t\t\t\t<height>%s</height>\n' % model.size_z
-  if model.shape == 'box':
-    sdf += '\t\t\t\t\t\t<size>%s %s %s</size>\n' % (model.size_x, model.size_y, model.size_z)
-  sdf += '\t\t\t\t</geometry>\n'
-  return sdf
 
+  # Return the SDF string for a model
+  def generateSDF(self):
+    sdf = ''
+    sdf += '<?xml version="1.0" ?>\n'
+    sdf += '<sdf version="1.3">\n'
+    sdf += '\t<self name="%s">\n' % self.name
+    sdf += '\t\t<pose>%s %s %s %s %s %s</pose>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
+    sdf += '\t\t<link name="link_%s">\n' % self.self.name
+    sdf += '\t\t\t<inertial>\n'
+    sdf += '\t\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
+    sdf += '\t\t\t\t<mass value="%s" />\n' % self.mass
+    sdf += '\t\t\t\t<inertia  ixx="%f" ixy="%f"  ixz="%f"  iyy="%f"  iyz="%f"  izz="%f" />\n' % (self.ixx, self.ixy, self.ixz, self.iyy, self.iyz, self.izz)
+    sdf += '\t\t\t</inertial>\n'
+    sdf += '\t\t\t<collision name="collision_%s">\n' % self.self.name
+    sdf += generateGeometrySDF(self)
+    sdf += '\t\t\t\t</geometry>\n'
+    sdf += '\t\t\t\t<surface>\n'
+    sdf += '\t\t\t\t\t<bounce>\n'
+    sdf += '\t\t\t\t\t\t<restitution_coefficient>%d</restitution_coefficient>\n' % self.COR
+    sdf += '\t\t\t\t\t\t<threshold>0</threshold>\n'
+    sdf += '\t\t\t\t\t</bounce>\n'
+    sdf += '\t\t\t\t\t<contact>\n'
+    sdf += '\t\t\t\t\t\t<ode>\n'
+    sdf += '\t\t\t\t\t\t\t<max_vel>10000</max_vel>\n'
+    sdf += '\t\t\t\t\t\t</ode>\n'
+    sdf += '\t\t\t\t\t</contact>\n'
+    sdf += '\t\t\t\t</surface>\n'
+    sdf += '\t\t\t</collision>\n'
+    sdf += '\t\t\t<visual name="visual_%s"\n' % self.name
+    sdf += generateGeometrySDF(self)
+    sdf += '\t\t\t\t<material>\n'
+    sdf += '\t<gazebo reference="%s">\n' % self.name
+    sdf += '\t\t<material>Gazebo/%s</material>\n' % self.color
+    sdf += '\t\t\t<mu1>%f</mu1>\n' % self.mu1
+    sdf += '\t\t\t<mu2>%f</mu1>\n' % self.mu2
+    sdf += '\t</gazebo>\n'
+    return sdf
 
-#Takes in a Model object
-#Returns SDF string
-def generateSDFExperimental(model, index=0, writeToFile=False):
-  sdf = ''
-  if not model.name:
-    name = 'object%d' % index
-    model.name = name
-  else:
-    name = model.name
-  sdf += '<?xml version="1.0" ?>\n'
-  sdf += '<sdf version="1.3">\n'
-  sdf += '\t<model name="%s">\n' % name
-  sdf += '\t\t<pose>%s %s %s %s %s %s</pose>\n' % (model.x, model.y, model.z, model.roll, model.pitch, model.yaw)
-  sdf += '\t\t<link name="link_%s">\n' % model.name
-  sdf += '\t\t\t<inertial>\n'
-  sdf += '\t\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (model.x, model.y, model.z, model.roll, model.pitch, model.yaw)
-  sdf += '\t\t\t\t<mass value="%s" />\n' % model.mass
-  sdf += '\t\t\t\t<inertia  ixx="%f" ixy="%f"  ixz="%f"  iyy="%f"  iyz="%f"  izz="%f" />\n' % (model.ixx, model.ixy, model.ixz, model.iyy, model.iyz, model.izz)
-  sdf += '\t\t\t</inertial>\n'
-  sdf += '\t\t\t<collision name="collision_%s">\n' % model.name
-  sdf += generateGeometrySDF(model)
-  sdf += '\t\t\t\t</geometry>\n'
-  sdf += '\t\t\t\t<surface>\n'
-  sdf += '\t\t\t\t\t<bounce>\n'
-  sdf += '\t\t\t\t\t\t<restitution_coefficient>%d</restitution_coefficient>\n' % model.COR
-  sdf += '\t\t\t\t\t\t<threshold>0</threshold>\n'
-  sdf += '\t\t\t\t\t</bounce>\n'
-  sdf += '\t\t\t\t\t<contact>\n'
-  sdf += '\t\t\t\t\t\t<ode>\n'
-  sdf += '\t\t\t\t\t\t\t<max_vel>10000</max_vel>\n'
-  sdf += '\t\t\t\t\t\t</ode>\n'
-  sdf += '\t\t\t\t\t</contact>\n'
-  sdf += '\t\t\t\t</surface>\n'
-  sdf += '\t\t\t</collision>\n'
-  sdf += '\t\t\t<visual name="visual_%s"\n' % model.name
-  sdf += generateGeometrySDF(model)
-  sdf += '\t\t\t\t<material>\n'
-  sdf += '\t<gazebo reference="%s">\n' % name
-  sdf += '\t\t<material>Gazebo/%s</material>\n' % model.color
-  sdf += '\t\t\t<mu1>%f</mu1>\n' % model.mu1
-  sdf += '\t\t\t<mu2>%f</mu1>\n' % model.mu2
-  sdf += '\t</gazebo>\n'
-  if writeToFile:
-    with open('%s.sdf', 'w+') as f:
-      f.write(sdf)
-  return sdf
-
-
-
-#Takes in a Model object
-#Returns SDF string
-def generateSDF(model, index=0):
-  sdf = ''
-  if not model.name:
-    name = 'object%d' % index
-    model.name = name
-  else:
-    name = model.name
-  sdf += '<robot name="%s">\n' % name
-  sdf += '\t<link name="%s">\n' % name
-  sdf += '\t\t<inertial>\n'
-  # sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (0,0,0,0,0,0)
-  sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (model.x, model.y, model.z, model.roll, model.pitch, model.yaw)
-  sdf += '\t\t\t<mass value="%s" />\n' % model.mass
-  sdf += '\t\t\t<inertia  ixx="%f" ixy="%f"  ixz="%f"  iyy="%f"  iyz="%f"  izz="%f" />\n' % (model.ixx, model.ixy, model.ixz, model.iyy, model.iyz, model.izz)
-  sdf += '\t\t</inertial>\n'
-  sdf += '\t\t<visual>\n'
-  sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (model.x, model.y, model.z, model.roll, model.pitch, model.yaw)
-  # sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (0,0,0,0,0,0)
-  sdf += '\t\t\t<geometry>\n'
-  if model.shape == 'box':
-    sdf += '\t\t\t\t<box size="%f %f %f" />\n' % (model.size_x, model.size_y, model.size_z)
-  elif model.shape == 'cylinder':
-    sdf += '\t\t\t\t<cylinder radius="%f" length="%f" />\n' % (model.size_r, model.size_z)
-  else:
-    sdf += '\t\t\t\t<sphere radius="%f" />\n' % (model.size_r)
-  sdf += '\t\t\t</geometry>\n'
-  sdf += '\t\t</visual>\n'
-  sdf += '\t\t<collision>\n'
-  # sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (0,0,0,0,0,0)
-  sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (model.x, model.y, model.z, model.roll, model.pitch, model.yaw)
-  sdf += '\t\t\t<geometry>\n'
-  if model.shape == 'box':
-    sdf += '\t\t\t\t<box size="%f %f %f" />\n' % (model.size_x, model.size_y, model.size_z)
-  elif model.shape == 'cylinder':
-    sdf += '\t\t\t\t<cylinder radius="%f" length="%f" />\n' % (model.size_r, model.size_z)
-  else:
-    sdf += '\t\t\t\t<sphere radius="%f" />\n' % (model.size_r)
-  sdf += '\t\t\t</geometry>\n'
-  sdf += '\t\t\t<surface>\n'
-  sdf += '\t\t\t\t<bounce>\n'
-  sdf += '\t\t\t\t\t<restitution_coefficient>%s</restitution_coefficient>\n' % model.COR
-  sdf += '\t\t\t\t\t<threshold>0</threshold>\n'
-  sdf += '\t\t\t\t</bounce>\n'
-  sdf += '\t\t\t\t<contact>\n'
-  # sdf += '\t\t\t\t\t<ode>\n'
-  # sdf += '\t\t\t\t\t\t<max_vel>10000</max_vel>\n'
-  # sdf += '\t\t\t\t\t</ode>\n'
-  sdf += '\t\t\t\t</contact>\n'
-  sdf += '\t\t\t</surface>\n'
-  sdf += '\t\t</collision>\n'
-  sdf += '\t</link>\n'
-  sdf += '\t<gazebo reference="%s">\n' % name
-  sdf += '\t\t<material>Gazebo/%s</material>\n' % model.color
-  sdf += '\t\t\t<mu1>%f</mu1>\n' % model.mu1
-  sdf += '\t\t\t<mu2>%f</mu1>\n' % model.mu2
-  sdf += '\t</gazebo>\n'
-  sdf += '</robot>\n'
-  return sdf
+  # Helper method called by generateSDF()
+  def generateGeometrySDF(self):
+    sdf = '\t\t\t\t<geometry>\n'
+    sdf += '\t\t\t\t\t<%s>\n' % self.shape
+    if self.shape == 'sphere':
+      sdf += '\t\t\t\t\t\t<radius>%s</radius>\n' % self.size_r
+    if self.shape == 'cylinder':
+      sdf += '\t\t\t\t\t\t<radius>%s</radius>\n' % self.size_r
+      sdf += '\t\t\t\t\t\t<height>%s</height>\n' % self.size_z
+    if self.shape == 'box':
+      sdf += '\t\t\t\t\t\t<size>%s %s %s</size>\n' % (self.size_x, self.size_y, self.size_z)
+    sdf += '\t\t\t\t</geometry>\n'
+    return sdf
