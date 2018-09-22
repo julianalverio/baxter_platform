@@ -60,8 +60,4 @@ echo "alias sim='roslaunch baxter_gazebo baxter_world.launch'" >> ~/.bashrc
 echo "alias sim_headless='roslaunch baxter_gazebo baxter_world.launch gui:=false recording:=true'" >> ~/.bashrc
 echo "alias velocity_server='rosrun baxter_interface joint_trajectory_action_server.py --mode velocity'" >> ~/.bashrc
 echo "alias position_server='rosrun baxter_interface joint_trajectory_action_server.py --mode position'" >> ~/.bashrc
-echo "alias run='cd ~/catkin_ws/src/baxter_platform/baxter_sim_platform/scripts; python main.py'" >> ~/.bashrc
-echo "alias contact='rostopic echo /l_side_l_finger_contact_sensor_state'" >> ~/.bashrc
-echo "alias camera='rosrun image_view image_view image:=/cameras/external_camera/image'" >> ~/.bashrc
 source ~/.bashrc
-
