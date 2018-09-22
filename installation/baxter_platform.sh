@@ -31,9 +31,6 @@ sudo apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control
 # Install MoveIt!
 sudo apt-get install ros-kinetic-moveit -y
 source /opt/ros/kinetic/setup.bash
-# Install MoveIt! for Baxter
-cd ~/catkin_ws/src
-git clone https://github.com/ros-planning/moveit_robots.git
 # Move the installation folder out of the way
 mv ~/catkin_ws/src/baxter_platform/installation ~/installation
 # Build everything
