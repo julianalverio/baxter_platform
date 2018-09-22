@@ -6,7 +6,7 @@ echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sou
 sudo apt-get update
 sudo apt-get install sublime-text -y
 # Set up keys for Gazebo
-sudo apt-get remove '.*gazebo.*' '.*sdformat.*' '.*ignition-math.*' '.*ignition-msgs.*' '.*ignition-transport.*'
+sudo apt-get remove '.*gazebo.*' '.*sdformat.*' '.*ignition-math.*' '.*ignition-msgs.*' '.*ignition-transport.*' -y
 sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
 wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
 sudo apt-get update
@@ -49,9 +49,9 @@ git clone https://github.com/ros-planning/moveit_robots.git
 
 # Build everything
 cd ~/catkin_ws; rm –rf devel; rm –rf build; catkin_make
-cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
+cp ~/catkin_ws/src/baxter/baxter.sh ~/catkin_ws/baxter.sh
 # Make sure the baxter world is executable to avoid an error
-sudo chmod u+x ~/catkin_ws/src/baxter_platform/baxter_simulator/baxter_gazebo/worlds/baxter.world
+sudo chmod u+x ~/catkin_ws/src/baxter_simulator/baxter_gazebo/worlds/baxter.world
 # Add bash aliases
 echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 echo "alias resource='source ~/.bashrc'" >> ~/.bashrc
