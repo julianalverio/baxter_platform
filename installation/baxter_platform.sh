@@ -30,4 +30,4 @@ sudo -H pip install pyassimp==3.3
 sudo apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-moveit-commander -y
 # Install MoveIt!
 sudo apt-get install ros-kinetic-moveit -y
-cd ~/catkin_ws/src/baxter_platform/installation; sudo ./baxter_platform_build.sh
+cd ~/catkin_ws/src/baxter_platform/installation

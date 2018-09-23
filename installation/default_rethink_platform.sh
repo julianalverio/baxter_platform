@@ -46,4 +46,4 @@ wstool update
 cd ~/catkin_ws/src
 git clone https://github.com/ros-planning/moveit_robots.git
 
-cd ~/installation; sudo ./default_rethink_platform_build.sh
+cd ~/installation
