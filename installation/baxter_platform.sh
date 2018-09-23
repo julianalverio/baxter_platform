@@ -46,6 +46,6 @@ echo "alias set_stuff='rosparam set /robot_description_semantic -t ~/catkin_ws/s
 echo "alias load_stuff='rosparam load ~/catkin_ws/src/baxter_platform/moveit_robots/baxter/baxter_moveit_config/config/kinematics.yaml'" >> ~/.bashrc
 echo "alias setup='set_stuff; load_stuff; rosrun baxter_interface joint_trajectory_action_server.py'" >> ~/.bashrc
 
-./opt/ros/kinetic/setup.bash
+. /opt/ros/kinetic/setup.bash
 cd ~/catkin_ws; catkin_make
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
