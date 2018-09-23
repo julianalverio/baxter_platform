@@ -52,6 +52,4 @@ echo "alias velocity_server='rosrun baxter_interface joint_trajectory_action_ser
 echo "alias position_server='rosrun baxter_interface joint_trajectory_action_server.py --mode position'" >> ~/.bashrc
 # Make sure the baxter world is executable to avoid an error
 sudo chmod u+x ~/catkin_ws/src/baxter_platform/baxter_gazebo/worlds/baxter.world
-. /opt/ros/kinetic/setup.bash
-cd ~/catkin_ws; catkin_make
-. ~/.bashrc
+cd ~/catkin_ws
