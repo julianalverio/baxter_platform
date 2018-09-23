@@ -48,6 +48,7 @@ git clone https://github.com/ros-planning/moveit_robots.git
 
 
 # Build everything
+source /opt/ros/kinetic/setup.bash
 cd ~/catkin_ws; catkin_make
 cp ~/catkin_ws/src/baxter/baxter.sh ~/catkin_ws/baxter.sh
 # Make sure the baxter world is executable to avoid an error

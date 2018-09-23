@@ -34,6 +34,7 @@ source /opt/ros/kinetic/setup.bash
 # Move the installation folder out of the way
 mv ~/catkin_ws/src/baxter_platform/installation ~/installation
 # Build everything
+source /opt/ros/kinetic/setup.bash
 cd ~/catkin_ws; catkin_make
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
 # Make sure the baxter world is executable to avoid an error
