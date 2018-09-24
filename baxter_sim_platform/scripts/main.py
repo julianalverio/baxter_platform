@@ -81,19 +81,7 @@ class Manager(object):
 
 
 def main():
-
-#stuff for callback functions
-
-#for contact sensors
-# def contactCallback(data):
-#   if data.states:
-#     print 'Contact detected!'
-#     print data.states
     
-#   rospy.Subscriber("/l_side_r_finger_contact_sensor_state", ContactsState, contactCallback)
-#   rospy.Subscriber("/l_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
-#   rospy.Subscriber("/r_side_r_finger_contact_sensor_state", ContactsState, contactCallback)
-#   rospy.Subscriber("/r_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
 
 
 

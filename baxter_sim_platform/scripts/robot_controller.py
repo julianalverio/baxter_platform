@@ -33,6 +33,8 @@ from baxter_core_msgs.srv import (
 from baxter_core_msgs.msg import (
     JointCommand,
 )
+from gazebo_msgs.msg import ContactsState
+
 
 
 
@@ -346,6 +348,19 @@ class RobotController(object):
 
 
 ####################################################################################################
+###################################### Contact Sensor Methods ######################################
+####################################################################################################
+
+  #You will likely want to write more callback methods here
+
+  def turnOnCallBacks(self):
+    rospy.Subscriber("/l_side_r_finger_contact_sensor_state", ContactsState, contactCallback)
+    rospy.Subscriber("/l_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
+    rospy.Subscriber("/r_side_r_finger_contact_sensor_state", ContactsState, contactCallback)
+    rospy.Subscriber("/r_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
+
+
+####################################################################################################
 ########################################### For Testing ############################################
 ####################################################################################################
   '''
@@ -409,3 +424,11 @@ class RobotController(object):
 
     if timestamped: return poses
     return [pair[0] for pair in poses]
+
+
+
+# You will likely want to add more custom callback methods here
+def contactCallback(contact_data):
+  if contact_data.states:
+    print 'Contact detected!'
+    print data.states
