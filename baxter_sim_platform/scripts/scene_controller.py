@@ -144,7 +144,7 @@ class SceneController(object):
         resp_delete = delete_model(model.name)
       except rospy.ServiceException, _:
         print 'FAILED TO DELETE MODEL: %s' % model.name
-    for camera_idx in xrange(self.camera_count):
+    for camera_idx in xrange(self.cameras):
       camera_name = 'camera_' + camera_idx
       try:
         resp_delete = delete_model(camera_name)
@@ -171,7 +171,7 @@ class SceneController(object):
 
   # Deletes all MoveIt! objects
   def deleteAllMoveItModels(self):
-    for object_name in [model.name for model in models]:
+    for object_name in [model.name for model in self.models]:
       scene_commander.remove_world_object(object_name)
   
 
@@ -358,8 +358,9 @@ class Model(object):
       self.z = -size_z/2.0
     self.mass = mass
     self.color = color
-    if self.color not in COLORS:
-      self.color = random.sample(COLORS, 1)
+    self.COLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo'  'purple', 'grey', 'black']
+    if self.color not in self.COLORS:
+      self.color = random.sample(self.COLORS, 1)
     self.mu1 = mu1
     self.mu2 = mu2
 
@@ -379,6 +380,7 @@ class Model(object):
     self.roll = roll
     self.pitch = pitch
     self.yaw = yaw
+
 
 
   '''
