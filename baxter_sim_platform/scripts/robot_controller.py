@@ -11,6 +11,8 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 import baxter_interface
 from baxter_interface import CHECK_VERSION
+import os
+import rospkg
 
 from geometry_msgs.msg import (
     PoseStamped,
@@ -60,6 +62,8 @@ class RobotController(object):
     print("Sleeping to allow RVIZ to start up")
     rospy.sleep(10)
     import pdb; pdb.set_trace()
+
+    self.server_pid_path = None
 
 
 
@@ -307,6 +311,21 @@ class RobotController(object):
       return joint_angles
     else:
       rospy.logerr("INVALID POSE - No Valid Joint Solution Found.")
+
+  def startServer(self, limb='left', rate=100.0, mode='position', interpolation='bezier'):
+    out_path = rospkg.RosPack().get_path('baxter_sim_platform') + '/scripts/pid.txt'
+    command = 'rosrun baxter_interface joint_trajectory_action_server.py -l %s -r %s -m %s -i %s > %s' % (limb, rate, mode, interpolation, out_path)
+    os.system(command)
+    self.server_pid_path = out_path
+
+  def getPID(self):
+    f = open(self.server_pid_path, 'r')
+    return int(f.read())
+
+  def stopServer(self):
+    command = 'kill %s' % self.getPID()
+    os.system(command)
+    
 
 ####################################################################################################
 ########################################### For Testing ############################################

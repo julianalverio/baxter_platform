@@ -30,7 +30,7 @@ platform currently supports use of only position and velocity modes
 interpolation input: interpolation method for trajectory generation
 interpotation input must be one of 'bezier' or 'minjerk'
 '''
-def start_server(limb='both', rate=100.0, mode='position', interpolation='bezier'):
+def start_server(limb='left', rate=100.0, mode='position', interpolation='bezier'):
     if mode == 'velocity':
         dyn_cfg_srv = Server(VelocityJointTrajectoryActionServerConfig,
                              lambda config, level: config)
