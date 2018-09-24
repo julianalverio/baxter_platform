@@ -37,15 +37,19 @@ from baxter_core_msgs.msg import (
 
 
 class RobotController(object):
-  def __init__(self, limb='left', tolerance=0.008726646):
-    self._limb_name = limb
+  def __init__(self, tolerance=0.008726646):
     baxter_interface.JOINT_ANGLE_TOLERANCE = tolerance
-    print(baxter_interface.JOINT_ANGLE_TOLERANCE)
-    self._limb = baxter_interface.Limb(limb)
-    self._gripper = baxter_interface.Gripper(limb)
-    ns = "ExternalTools/" + limb + "/PositionKinematicsNode/IKService"
-    self._iksvc = rospy.ServiceProxy(ns, SolvePositionIK)
-    rospy.wait_for_service(ns, 5.0)
+    self._left_limb = baxter_interface.Limb('left')
+    self._right_limb = baxter_interface.Limb('right')
+    self._left_gripper = baxter_interface.Gripper('left')
+    self._right_gripper = baxter_interface.Gripper('right')
+    left_ns = "ExternalTools/" + 'left' + "/PositionKinematicsNode/IKService"
+    self.left_iksvc = rospy.ServiceProxy(left_ns, SolvePositionIK)
+    rospy.wait_for_service(left_ns, 5.0)
+    right_ns = "ExternalTools/" + 'right' + "/PositionKinematicsNode/IKService"
+    self.right_iksvc = rospy.ServiceProxy(right_ns, SolvePositionIK)
+    rospy.wait_for_service(right_ns, 5.0)
+
     # verify robot is enabled
     print("Getting robot state... ")
     self._rs = baxter_interface.RobotEnable(baxter_interface.CHECK_VERSION)
@@ -55,7 +59,8 @@ class RobotController(object):
 
     moveit_commander.roscpp_initialize(sys.argv)
     self.robot_commander = moveit_commander.RobotCommander()
-    self.limb_commander = moveit_commander.MoveGroupCommander(self._limb_name + "_arm")
+    self.left_commander = moveit_commander.MoveGroupCommander('left_arm')
+    self.right_commander = moveit_commander.MoveGroupCommander('right_arm')
     self.display_trajectory_publisher = rospy.Publisher(
                                       '/move_group/display_planned_path',
                                       moveit_msgs.msg.DisplayTrajectory)
@@ -72,35 +77,44 @@ class RobotController(object):
   Print out the current state of the robot
   '''
   def printRobotInfo(self):
-    print("============ End effector Link: ", self.limb_commander.get_end_effector_link())
+    print("============ Left End effector Link: ", self.left_commander.get_end_effector_link())
+    print("============ Right End effector Link: ", self.right_commander.get_end_effector_link())
     print("============ Robot state: ", self.robot_commander.get_current_state())
   
-  def getEndEffectorLinkName(self):
-    return self.limb_commander.get_end_effector_link()
+  def getEndEffectorLinkName(self, limb='left'):
+    if limb == 'left':
+      return self.left_commander.get_end_effector_link()
+    return self.right_commander.get_end_effector_link()
 
-  '''
-  Shut down MoveIt!
-  '''
+  # Shut down MoveIt!
   def shutdown(self):
     moveit_commander.roscpp_shutdown()
 
-  def gripper_open(self):
-    self._gripper.open()
+  def gripper_open(self, limb='left'):
+    if limb == 'left':
+      self._left_gripper.open()
+    else:
+      self._right_gripper.open()
     rospy.sleep(1.0)
 
-  def gripper_close(self):
-    self._gripper.close()
+  def gripper_close(self, limb='left'):
+    if limb == 'left':
+      self._left_gripper.close()
+    else:
+      self._right_gripper.close()
     rospy.sleep(1.0)
 
-  '''
-  Move arm to position where all joint angles are zero.
-  '''
-  def move_to_start(self, start_angles=None):
-    print("Moving the %s arm to start pose..." % (self._limb_name))
+  # Move arm to position where all joint angles are zero.
+  def move_to_start(self, start_angles=None, limb='left'):
+    print("Moving the %s arm to start pose..." % limb)
     if not start_angles:
         start_angles = dict(zip(self._joint_names, [0]*7))
-    self._limb.move_to_joint_positions(start_angles)
-    self._gripper.open()
+    if limb == 'left':
+      self._left_limb.move_to_joint_positions(start_angles)
+      self._left_gripper.open()
+    else:
+      self._right_limb.move_to_joint_positions(start_angles)
+      self._right_gripper.open()
 
 ####################################################################################################
 ####################################### Collision Checking #########################################
@@ -181,7 +195,7 @@ class RobotController(object):
   To run position server: rosrun baxter_interface joint_trajectory_action_server.py --mode position
   WARNING: If you give the robot too little time to get to each position it starts behaving weirdly.
   '''
-  def followTrajectoryWithIK(self, trajectory, time_buffer=2., wait=True):
+  def followTrajectoryWithIK(self, trajectory, time_buffer=2., wait=True, limb='left'):
     joints = self._limb.joint_names()
     #process joint angles
     if type(trajectory[0][0]) == dict:
@@ -196,7 +210,7 @@ class RobotController(object):
     elif type(trajectory[0][1]) not in [float, int]:
       raise ValueError('Unexpected input format.')
 
-    traj = Trajectory(self._limb.name)
+    traj = Trajectory(limb)
     rospy.on_shutdown(traj.stop)
     #command current joint positions first
     current_angles = [self._limb.joint_angle(joint) for joint in self._limb.joint_names()]
@@ -221,15 +235,16 @@ class RobotController(object):
   Timedeltas must be floats
   For velocity server: rosrun baxter_interface joint_trajectory_action_server.py --mode velocity
   '''
-  def followTrajectoryFromJointVelocity(self, trajectory, stop=True):
-    topic = 'robot/limb/%s/joint_command' % self._limb.name
+  def followTrajectoryFromJointVelocity(self, trajectory, stop=True, limb='left'):
+    joint_names = self._left_limb.joint_names()
+    topic = 'robot/limb/%s/joint_command' % limb
     pub = rospy.Publisher(topic, JointCommand, queue_size=10)
     rate = rospy.Rate(50.)
 
     VELOCITY_MODE = 2
     template = JointCommand()
     template.mode = VELOCITY_MODE
-    template.names.extend(self._limb.joint_names())
+    template.names.extend(joint_names)
     for pair in trajectory:
       velocities, delta = pair
       msg = copy.deepcopy(template)
@@ -238,8 +253,8 @@ class RobotController(object):
       rospy.sleep(delta)
 
     if stop:
-      velocities = [0.0] * len(self._limb.joint_names())
-      cmd = dict(zip(self._limb.joint_names(), velocities))
+      velocities = [0.0] * len(joint_names)
+      cmd = dict(zip(joint_names, velocities))
       self._limb.set_joint_velocities(cmd)
 
 
@@ -252,7 +267,7 @@ class RobotController(object):
   's0, s1, e0, e1, w0, w1, w2' which is the same as self._limb.joint_names()
   Input can also be a list of dictionaries with joints as keys and angles as values
   '''
-  def followTrajectoryFromJointAngles(self, input_trajectory):
+  def followTrajectoryFromJointAngles(self, input_trajectory, limb='left'):
     if type(input_trajectory[0]) == list:
       prefix = self._limb.name + '_'
       trajectory = list()
@@ -274,7 +289,10 @@ class RobotController(object):
       raise ValueError('Unexpected input format.')
 
     for joint_angles in trajectory:
-      self._limb.move_to_joint_positions(joint_angles)
+      if limb=='left':
+        self._left_limb.move_to_joint_positions(joint_angles)
+      else:
+        self._right_limb.move_to_joint_positions(joint_angles)
 
 ####################################################################################################
 ############################### Trajectory Following Helper Methods ################################
@@ -325,7 +343,7 @@ class RobotController(object):
   def stopServer(self):
     command = 'kill %s' % self.getPID()
     os.system(command)
-    
+
 
 ####################################################################################################
 ########################################### For Testing ############################################
