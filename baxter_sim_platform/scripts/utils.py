@@ -6,6 +6,8 @@ import numpy as np
 import rospkg
 
 
+##### Utils for DeRRT* Re-implementation #####
+
 '''
 Generates noisy data without actually executing a trajectory.
 Uses a hard-coded start position
