@@ -58,6 +58,8 @@ class RobotController(object):
     self._init_state = self._rs.state().enabled
     print("Enabling robot... ")
     self._rs.enable()
+    
+    self.server_pid_path = None
 
     moveit_commander.roscpp_initialize(sys.argv)
     self.robot_commander = moveit_commander.RobotCommander()
@@ -70,7 +72,6 @@ class RobotController(object):
     rospy.sleep(10)
     import pdb; pdb.set_trace()
 
-    self.server_pid_path = None
 
 
 
