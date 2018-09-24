@@ -53,3 +53,4 @@ echo "alias position_server='rosrun baxter_interface joint_trajectory_action_ser
 # Make sure the baxter world is executable to avoid an error
 sudo chmod u+x ~/catkin_ws/src/baxter_simulator/baxter_gazebo/worlds/baxter.world
 cd ~/catkin_ws
+sudo chmod 777 ~/.ros
