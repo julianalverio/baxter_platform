@@ -66,9 +66,6 @@ class RobotController(object):
     # self.robot_commander = moveit_commander.RobotCommander()
     # self.left_commander = moveit_commander.MoveGroupCommander('left_arm')
     # self.right_commander = moveit_commander.MoveGroupCommander('right_arm')
-    # self.display_trajectory_publisher = rospy.Publisher(
-    #                                   '/move_group/display_planned_path',
-    #                                   moveit_msgs.msg.DisplayTrajectory)
     # print("Sleeping to allow RVIZ to start up")
     # rospy.sleep(10)
     # import pdb; pdb.set_trace()
