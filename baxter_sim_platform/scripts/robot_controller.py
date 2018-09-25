@@ -73,22 +73,6 @@ class RobotController(object):
     # import pdb; pdb.set_trace()
 
 
-
-
-  '''
-  Print information for the end effector links
-  Print out the current state of the robot
-  '''
-  def printRobotInfo(self):
-    print("============ Left End effector Link: ", self.left_commander.get_end_effector_link())
-    print("============ Right End effector Link: ", self.right_commander.get_end_effector_link())
-    print("============ Robot state: ", self.robot_commander.get_current_state())
-  
-  def getEndEffectorLinkName(self, limb='left'):
-    if limb == 'left':
-      return self.left_commander.get_end_effector_link()
-    return self.right_commander.get_end_effector_link()
-
   # Shut down MoveIt!
   def shutdown(self):
     moveit_commander.roscpp_shutdown()
