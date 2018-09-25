@@ -154,3 +154,21 @@ def generateTestTrajectoryAngles(self):
   trajectory.append([2*angle for angle in angles], 10.)
   trajectory.append([1.2*angle for angle in angles], 10.)
 
+
+  '''
+  Attach box to end effector to simulate picking it up.
+  Note: This method only supports picking up boxes.
+  Note: MoveIt! Only supports picking up boxes and meshes.
+  '''
+  def attachBox(self, end_effector_link, box_name, side='left'):
+    grasping_group = side + '_gripper'
+    touch_links = robot_commander.get_link_names(group=grasping_group)
+    scene_commander.attach_box(end_effector_link, box_name, touch_links=touch_links)
+
+  '''
+  Detach box from end effector to simulate dropping it.
+  Note: This method only supports boxes.
+  '''
+  def detachBox(self, end_effector_link, box_name):
+    scene_commander.remove_attached_object(end_effector_link, name=box_name)
+
