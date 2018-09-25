@@ -70,7 +70,7 @@ class SceneController(object):
     for model in self.models:
       pose = model.pose
       reference_frame = model.reference_frame
-      sdf = generateSDF(model).replace('\n', '').replace('\t', '')
+      sdf = model.generateSDF().replace('\n', '').replace('\t', '')
       try:
         print 'Loading model named: %s' % model.name
         resp_sdf = spawn_proxy(model.name, sdf, "/",
@@ -172,7 +172,7 @@ class SceneController(object):
   # Deletes all MoveIt! objects
   def deleteAllMoveItModels(self):
     for object_name in [model.name for model in self.models]:
-      scene_commander.remove_world_object(object_name)
+      self.scene_commander.remove_world_object(object_name)
   
 
   def makeModel(self, shape='box', size_x=0.5, size_y=0.5, 
@@ -201,7 +201,7 @@ class SceneController(object):
     names = []
     for model in self.models:
       names.append(model.name)
-    assert len(names) != len(set(names)), 'Model Names Must Be Unique!'
+    assert len(names) == len(set(names)), 'Model Names Must Be Unique!'
 
 
   '''
@@ -412,17 +412,17 @@ class Model(object):
   def generateSDF(self):
     sdf = ''
     sdf += '<?xml version="1.0" ?>\n'
-    sdf += '<sdf version="1.3">\n'
-    sdf += '\t<self name="%s">\n' % self.name
+    sdf += '<sdf version="1.6">\n'
+    sdf += '\t<model name="%s">\n' % self.name
     sdf += '\t\t<pose>%s %s %s %s %s %s</pose>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
-    sdf += '\t\t<link name="link_%s">\n' % self.self.name
+    sdf += '\t\t<link name="link_%s">\n' % self.name
     sdf += '\t\t\t<inertial>\n'
     sdf += '\t\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
     sdf += '\t\t\t\t<mass value="%s" />\n' % self.mass
     sdf += '\t\t\t\t<inertia  ixx="%f" ixy="%f"  ixz="%f"  iyy="%f"  iyz="%f"  izz="%f" />\n' % (self.ixx, self.ixy, self.ixz, self.iyy, self.iyz, self.izz)
     sdf += '\t\t\t</inertial>\n'
-    sdf += '\t\t\t<collision name="collision_%s">\n' % self.self.name
-    sdf += generateGeometrySDF(self)
+    sdf += '\t\t\t<collision name="collision_%s">\n' % self.name
+    sdf += self.generateGeometrySDF()
     sdf += '\t\t\t\t</geometry>\n'
     sdf += '\t\t\t\t<surface>\n'
     sdf += '\t\t\t\t\t<bounce>\n'
@@ -437,7 +437,7 @@ class Model(object):
     sdf += '\t\t\t\t</surface>\n'
     sdf += '\t\t\t</collision>\n'
     sdf += '\t\t\t<visual name="visual_%s"\n' % self.name
-    sdf += generateGeometrySDF(self)
+    sdf += self.generateGeometrySDF()
     sdf += '\t\t\t\t<material>\n'
     sdf += '\t<gazebo reference="%s">\n' % self.name
     sdf += '\t\t<material>Gazebo/%s</material>\n' % self.color

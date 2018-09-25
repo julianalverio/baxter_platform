@@ -335,16 +335,23 @@ class RobotController(object):
 
   def startServer(self, limb='left', rate=100.0, mode='position', interpolation='bezier'):
     out_path = rospkg.RosPack().get_path('baxter_sim_platform') + '/scripts/pid.txt'
-    command = 'rosrun baxter_interface joint_trajectory_action_server.py -l %s -r %s -m %s -i %s > %s' % (limb, rate, mode, interpolation, out_path)
+    command = 'rosrun baxter_interface joint_trajectory_action_server.py -l %s -r %s -m %s -i %s & echo $! > %s' % (limb, rate, mode, interpolation, out_path)
     os.system(command)
     self.server_pid_path = out_path
+    rospy.sleep(3)
 
   def getPID(self):
-    f = open(self.server_pid_path, 'r')
-    return int(f.read())
+    try:
+      f = open(self.server_pid_path, 'r')
+      return int(f.read())
+    except:
+      return
 
   def stopServer(self):
-    command = 'kill %s' % self.getPID()
+    pid = self.getPID()
+    if not pid:
+      return
+    command = 'kill %s' % pid
     os.system(command)
 
 
