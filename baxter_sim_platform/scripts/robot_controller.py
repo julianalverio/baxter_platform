@@ -93,25 +93,33 @@ class RobotController(object):
   def shutdown(self):
     moveit_commander.roscpp_shutdown()
 
-  def gripper_open(self, limb='left'):
+  def gripperOpen(self, limb='left'):
     if limb == 'left':
       self._left_gripper.open()
     else:
       self._right_gripper.open()
     rospy.sleep(1.0)
 
-  def gripper_close(self, limb='left'):
+  def gripperClose(self, limb='left'):
     if limb == 'left':
       self._left_gripper.close()
     else:
       self._right_gripper.close()
     rospy.sleep(1.0)
 
-  # Move arm to position where all joint angles are zero.
-  def move_to_start(self, start_angles=None, limb='left'):
+  # Move arm to position where it's ready to manipulate objects
+  def moveToStart(self, start_angles=None, limb='left'):
     print("Moving the %s arm to start pose..." % limb)
+    starting_angles = {'left_w0': 0.6699952259595108,
+                       'left_w1': 1.030009435085784,
+                       'left_w2': -0.4999997247485215,
+                       'left_e0': -1.189968899785275,
+                       'left_e1': 1.9400238130755056,
+                       'left_s0': -0.08000397926829805,
+                       'left_s1': -0.9999781166910306}
     if not start_angles:
-        start_angles = dict(zip(self._joint_names, [0]*7))
+      joints = self._left_limb.joint_names()
+      start_angles = dict(zip(joints, [starting_angles[joint] for joint in joints]))
     if limb == 'left':
       self._left_limb.move_to_joint_positions(start_angles)
       self._left_gripper.open()
