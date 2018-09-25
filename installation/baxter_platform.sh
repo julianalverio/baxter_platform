@@ -43,5 +43,4 @@ echo "alias run='rosrun baxter_sim_platform/scripts main.py'" >> ~/.bashrc
 echo "alias set_stuff='rosparam set /robot_description_semantic -t ~/catkin_ws/src/baxter_platform/moveit_robots/baxter/baxter_moveit_config/config/baxter.srdf'" >> ~/.bashrc
 echo "alias load_stuff='rosparam load ~/catkin_ws/src/baxter_platform/moveit_robots/baxter/baxter_moveit_config/config/kinematics.yaml'" >> ~/.bashrc
 echo "alias setup='set_stuff; load_stuff; rosrun moveit_ros_move_group move_group'" >> ~/.bashrc
-sudo chmod 777 ~.ros
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
