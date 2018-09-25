@@ -446,6 +446,7 @@ class Model(object):
     sdf += '\t\t\t<mu1>%f</mu1>\n' % self.mu1
     sdf += '\t\t\t<mu2>%f</mu1>\n' % self.mu2
     sdf += '\t</gazebo>\n'
+    sdf += '</sdf>'
     return sdf
 
   # Helper method called by generateSDF()
