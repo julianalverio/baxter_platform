@@ -13,6 +13,7 @@ import baxter_interface
 from baxter_interface import CHECK_VERSION
 import os
 import rospkg
+from trajectory import *
 
 from geometry_msgs.msg import (
     PoseStamped,
@@ -117,13 +118,14 @@ class RobotController(object):
                        'left_e1': 1.9400238130755056,
                        'left_s0': -0.08000397926829805,
                        'left_s1': -0.9999781166910306}
-    if not start_angles:
+    if not start_angles and limb == 'left':
       joints = self._left_limb.joint_names()
       start_angles = dict(zip(joints, [starting_angles[joint] for joint in joints]))
-    if limb == 'left':
       self._left_limb.move_to_joint_positions(start_angles)
       self._left_gripper.open()
-    else:
+    elif not start_angles:
+      joints = self._right_limb.joint_names()
+      start_angles = dict(zip(joints, [starting_angles[joint] for joint in joints]))
       self._right_limb.move_to_joint_positions(start_angles)
       self._right_gripper.open()
 
@@ -204,10 +206,14 @@ class RobotController(object):
   Angle can be dict or list in order: 's0, s1, e0, e1, w0, w1, w2' 
   Input ordering is the same as self._limb.joint_names()
   To run position server: rosrun baxter_interface joint_trajectory_action_server.py --mode position
-  WARNING: If you give the robot too little time to get to each position it starts behaving weirdly.
+  WARNING: If you give the robot way too little time to get to each position it starts behaving weirdly.
+  Note: This all happens in simulated time, not real time.
   '''
   def followTrajectoryWithIK(self, trajectory, time_buffer=2., wait=True, limb='left'):
-    joints = self._limb.joint_names()
+    if limb == 'left':
+      joints = self._left_limb.joint_names()
+    else:
+      joints = self._right_limb.joint_names()
     #process joint angles
     if type(trajectory[0][0]) == dict:
       for idx, (angle, timestamp) in enumerate(trajectory):
@@ -224,7 +230,10 @@ class RobotController(object):
     traj = Trajectory(limb)
     rospy.on_shutdown(traj.stop)
     #command current joint positions first
-    current_angles = [self._limb.joint_angle(joint) for joint in self._limb.joint_names()]
+    if limb == 'left':
+      current_angles = [self._left_limb.joint_angle(joint) for joint in self._left_limb.joint_names()]
+    else:
+      current_angles = [self._right_limb.joint_angle(joint) for joint in self._right_limb.joint_names()]
     traj.add_point(current_angles, 0.0)
     #now add other positions
     for angles, delta in trajectory:
@@ -247,7 +256,10 @@ class RobotController(object):
   For velocity server: rosrun baxter_interface joint_trajectory_action_server.py --mode velocity
   '''
   def followTrajectoryFromJointVelocity(self, trajectory, stop=True, limb='left'):
-    joint_names = self._left_limb.joint_names()
+    if limb == 'left':
+      joint_names = self._left_limb.joint_names()
+    else:
+      joint_names = self._right_limb.joint_names()
     topic = 'robot/limb/%s/joint_command' % limb
     pub = rospy.Publisher(topic, JointCommand, queue_size=10)
     rate = rospy.Rate(50.)
@@ -257,6 +269,7 @@ class RobotController(object):
     template.mode = VELOCITY_MODE
     template.names.extend(joint_names)
     for pair in trajectory:
+      print pair
       velocities, delta = pair
       msg = copy.deepcopy(template)
       msg.command.extend(velocities)
@@ -266,7 +279,10 @@ class RobotController(object):
     if stop:
       velocities = [0.0] * len(joint_names)
       cmd = dict(zip(joint_names, velocities))
-      self._limb.set_joint_velocities(cmd)
+      if limb == 'left':
+        self._left_limb.set_joint_velocities(cmd)
+      else:
+        self._right_limb.set_joint_velocities(cmd)
 
 
   '''
@@ -280,7 +296,7 @@ class RobotController(object):
   '''
   def followTrajectoryFromJointAngles(self, input_trajectory, limb='left'):
     if type(input_trajectory[0]) == list:
-      prefix = self._limb.name + '_'
+      prefix = limb + '_'
       trajectory = list()
       for input_list in input_trajectory:
         trajectory_dict = dict()
@@ -370,10 +386,10 @@ class RobotController(object):
   #You will likely want to write more callback methods here
 
   def turnOnCallBacks(self):
-    rospy.Subscriber("/l_side_r_finger_contact_sensor_state", ContactsState, contactCallback)
-    rospy.Subscriber("/l_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
-    rospy.Subscriber("/r_side_r_finger_contact_sensor_state", ContactsState, contactCallback)
-    rospy.Subscriber("/r_side_l_finger_contact_sensor_state", ContactsState, contactCallback)
+    rospy.Subscriber("/l_gripper_l_finger_tip_contact_sensor_state", ContactsState, contactCallback)
+    rospy.Subscriber("/l_gripper_r_finger_tip_contact_sensor_state", ContactsState, contactCallback)
+    rospy.Subscriber("/r_gripper_l_finger_tip_contact_sensor_state", ContactsState, contactCallback)
+    rospy.Subscriber("/r_gripper_r_finger_tip_contact_sensor_state", ContactsState, contactCallback)
 
 
 ####################################################################################################

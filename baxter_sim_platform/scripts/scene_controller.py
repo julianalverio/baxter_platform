@@ -150,6 +150,8 @@ class SceneController(object):
         resp_delete = delete_model(camera_name)
       except rospy.ServiceException, _:
         print 'FAILED TO DELETE CAMERA: %s' % camera_name
+    self.cameras = 0
+    self.models = []
 
 
   # Delete a particular Gazebo model
