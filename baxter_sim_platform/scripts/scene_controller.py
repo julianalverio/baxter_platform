@@ -180,7 +180,7 @@ class SceneController(object):
       except rospy.ServiceException, _:
         print 'FAILED TO DELETE MODEL: %s' % model.name
     for camera_idx in xrange(self.cameras):
-      camera_name = 'camera_' + camera_idx
+      camera_name = 'camera_' + str(camera_idx)
       try:
         resp_delete = delete_model(camera_name)
       except rospy.ServiceException, _:
@@ -199,6 +199,9 @@ class SceneController(object):
       resp_delete = delete_model(model.name)
     except rospy.ServiceException, _:
       print 'FAILED TO DELETE MODEL: %s' % model.name
+    for idx, model in self.models:
+      if  model.name == model_name:
+        self.models.pop(idx)
 
 
   # Deletes a particular MoveIt object
@@ -289,62 +292,58 @@ class ExternalCamera(object):
     pose.orientation.z = self.quat_z
     pose.orientation.w = self.quat_w
 
-    resp_sdf = spawn_proxy(self.name, self.getSDFString, "/",
-                           pose, 'world')
+    resp_sdf = spawn_proxy(self.name, self.getSDFString(), "/",
+                           pose, '')
 
 
   #Read in SDF string. See camera.sdf for an example of what will be generated.
   def getSDFString(self):
     sdf = ''
-    sdf += '''<?xml version="1.0"?>\n'''
-    sdf += '''<sdf version="1.6">\n'''
-    sdf += '''\t<model name='%s'>\n''' % self.name
-    sdf += '''\t\t<static>true</static>\n'''
-    sdf += '''\t\t<pose frame=''>0 0 0 0 0 0</pose>\n'''
-    sdf += '''\t\t<link name='link'>\n'''
-    sdf += '''\t\t\t<visual name='visual'>\n'''
-    sdf += '''\t\t\t\t<geometry>\n'''
-    sdf += '''\t\t\t\t\t<box>\n'''
-    sdf += '''\t\t\t\t\t\t<box>\n'''
-    sdf += '''\t\t\t\t\t<box>\n'''
-    sdf += '''\t\t\t\t<box>\n'''
-    sdf += '''\t\t\t</visual>\n'''
-    sdf += '''\t\t\t<sensor name='my_camera' type='camera'>\n'''
-    sdf += '''\t\t\t\t<camera>\n'''
-    sdf += '''\t\t\t\t\t<save enabled="true">\n'''
-    sdf += '''\t\t\t\t\t\t<path>~/Documents/camera_save</path>\n'''
-    sdf += '''\t\t\t\t\t</save>\n'''
-    sdf += '''\t\t\t\t\t<horizontal_fov>1.047</horizontal_fov>\n'''
-    sdf += '''\t\t\t\t\t<image>\n'''
-    sdf += '''\t\t\t\t\t\t<width>1920</width>\n'''
-    sdf += '''\t\t\t\t\t\t<height>1080</height>\n'''
-    sdf += '''\t\t\t\t\t</image>\n'''
-    sdf += '''\t\t\t\t\t<clip>\n'''
-    sdf += '''\t\t\t\t\t\t<near>0.1</near>\n'''
-    sdf += '''\t\t\t\t\t\t<far>100</far>\n'''
-    sdf += '''\t\t\t\t\t</clip>\n'''
-    sdf += '''\t\t\t\t</camera>\n'''
-    sdf += '''\t\t\t\t<always_on>1</always_on>\n'''
-    sdf += '''\t\t\t\t<update_rate>30</update_rate>\n'''
-    sdf += '''\t\t\t\t<plugin name="camera_controller" filename="libgazebo_ros_camera.so">\n'''
-    sdf += '''\t\t\t\t\t<alwaysOn>true</alwaysOn>\n'''
-    sdf += '''\t\t\t\t\t<updateRate>0.0</updateRate>\n'''
-    sdf += '''\t\t\t\t\t<cameraName>%s</cameraName>\n''' % self.name
-    sdf += '''\t\t\t\t\t<imageTopicName>/cameras/%s/image</imageTopicName>\n''' % self.name
-    sdf += '''\t\t\t\t\t<cameraInfoTopicName>/cameras/%s/camera_info</cameraInfoTopicName>\n''' % self.name
-    sdf += '''\t\t\t\t\t<frameName>camera_frame</frameName>\n'''
-    sdf += '''\t\t\t\t\t<hackBaseline>0.07</hackBaseline>\n'''
-    sdf += '''\t\t\t\t\t<distortionK1>0.0</distortionK1>\n'''
-    sdf += '''\t\t\t\t\t<distortionK2>0.0</distortionK2>\n'''
-    sdf += '''\t\t\t\t\t <distortionK3>0.0</distortionK3>\n'''
-    sdf += '''\t\t\t\t\t<distortionT1>0.0</distortionT1>\n'''
-    sdf += '''\t\t\t\t\t<distortionT2>0.0</distortionT2>\n'''
-    sdf += '''\t\t\t\t</plugin>\n'''
-    sdf += '''\t\t\t</sensor>\n'''
-    sdf += '''\t\t</link>\n'''
-    sdf += '''\t</model>\n'''
-    sdf ++ '''</sdf>'''
+    sdf += '<?xml version="1.0"?>'
+    sdf += '<sdf version="1.6">'
+    sdf += '\t<model name="%s">' % self.name
+    sdf += '\t\t<static>true</static>'
+    sdf += '<pose frame=''>0 0 0 0 0 0</pose>'
+    sdf += '<link name="%s_link">' % self.name
+    sdf += '\t\t\t<visual name="%s_visual">' % self.name
+    sdf += '\t\t\t\t<geometry>'
+    sdf += '\t\t\t\t\t<box>'
+    sdf += '\t\t\t\t\t\t<size>0.1 0.1 0.1</size>'
+    sdf += '\t\t\t\t\t</box>'
+    sdf += '\t\t\t\t</geometry>'
+    sdf += '\t\t\t</visual>'
+    sdf += '\t\t\t<sensor name="%s" type="camera">' % self.name
+    # sdf + '\t\t\t\t<camera>'
+    # sdf += '\t\t\t\t\t<save enabled="true">'
+    # sdf += '\t\t\t\t\t\t<path>~/catkin_ws/src/baxter_platform/baxter_sim_platform/images/camera_save</path>'
+    # sdf += '\t\t\t\t\t</save>'
+    # sdf += '\t\t\t\t\t<image>'
+    # sdf += '\t\t\t\t\t\t<width>1920</width>'
+    # sdf += '\t\t\t\t\t\t<height>1080</height>'
+    # sdf += '\t\t\t\t\t</image>'
+    # sdf += '\t\t\t\t</camera>'
+    sdf += '\t\t\t\t<always_on>1</always_on>'
+    sdf += '\t\t\t\t<update_rate>30</update_rate>'
+    sdf += '\t\t\t\t<plugin name="camera_controller" filename="libgazebo_ros_camera.so">'
+    sdf += '\t\t\t\t\t<alwaysOn>true</alwaysOn>'
+    sdf += '\t\t\t\t\t<updateRate>0.0</updateRate>'
+    sdf += '\t\t\t\t\t<cameraName>%s</cameraName>' % self.name
+    sdf += '\t\t\t\t\t<imageTopicName>/cameras/%s/image</imageTopicName>' % self.name
+    sdf += '\t\t\t\t\t<cameraInfoTopicName>/cameras/%s/camera_info</cameraInfoTopicName>' % self.name
+    sdf += '\t\t\t\t\t<frameName>%s_frame</frameName>' % self.name
+    sdf += '\t\t\t\t\t<hackBaseline>0.07</hackBaseline>'
+    sdf += '\t\t\t\t\t<distortionK1>0.0</distortionK1>'
+    sdf += '\t\t\t\t\t<distortionK2>0.0</distortionK2>'
+    sdf += '\t\t\t\t\t<distortionK3>0.0</distortionK3>'
+    sdf += '\t\t\t\t\t<distortionT1>0.0</distortionT1>'
+    sdf += '\t\t\t\t\t<distortionT2>0.0</distortionT2>'
+    sdf += '\t\t\t\t</plugin>'
+    sdf += '\t\t\t</sensor>'
+    sdf += '\t\t</link>'
+    sdf += '\t</model>'
+    sdf += '</sdf>'
     return sdf
+
 
 ####################################################################################################
 ############################################ Model Class ###########################################
@@ -397,7 +396,6 @@ class Model(object):
     self.roll = roll
     self.pitch = pitch
     self.yaw = yaw
-
 
   '''
   Calculates moments: [ixx, iyy, izz]
@@ -474,95 +472,6 @@ class Model(object):
     f = open('/home/infolab/catkin_ws/src/baxter_platform/baxter_sim_platform/models/delete_later.sdf', 'w+')
     f.write(sdf)
     return sdf
-
-  # #Returns SDF string
-  # def generateSDF(self):
-  #   sdf = ''
-  #   sdf += '<robot name="%s">\n' % self.name
-  #   sdf += '\t<link name="%s">\n' % self.name
-  #   sdf += '\t\t<inertial>\n'
-  #   # sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (0,0,0,0,0,0)
-  #   sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
-  #   sdf += '\t\t\t<mass value="%s" />\n' % self.mass
-  #   sdf += '\t\t\t<inertia  ixx="%f" ixy="%f"  ixz="%f"  iyy="%f"  iyz="%f"  izz="%f" />\n' % (self.ixx, self.ixy, self.ixz, self.iyy, self.iyz, self.izz)
-  #   sdf += '\t\t</inertial>\n'
-  #   sdf += '\t\t<visual>\n'
-  #   sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
-  #   sdf += '\t\t\t<geometry>\n'
-  #   if self.shape == 'box':
-  #     sdf += '\t\t\t\t<box size="%f %f %f" />\n' % (self.size_x, self.size_y, self.size_z)
-  #   elif self.shape == 'cylinder':
-  #     sdf += '\t\t\t\t<cylinder radius="%f" length="%f" />\n' % (self.size_r, self.size_z)
-  #   else:
-  #     sdf += '\t\t\t\t<sphere radius="%f" />\n' % (self.size_r)
-  #   sdf += '\t\t\t</geometry>\n'
-  #   sdf += '\t\t</visual>\n'
-  #   sdf += '\t\t<collision>\n'
-  #   sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
-  #   sdf += '\t\t\t<geometry>\n'
-  #   if self.shape == 'box':
-  #     sdf += '\t\t\t\t<box size="%f %f %f" />\n' % (self.size_x, self.size_y, self.size_z)
-  #   elif self.shape == 'cylinder':
-  #     sdf += '\t\t\t\t<cylinder radius="%f" length="%f" />\n' % (self.size_r, self.size_z)
-  #   else:
-  #     sdf += '\t\t\t\t<sphere radius="%f" />\n' % (self.size_r)
-  #   sdf += '\t\t\t</geometry>\n'
-  #   sdf += '\t\t\t<surface>\n'
-  #   sdf += '\t\t\t\t<bounce>\n'
-  #   sdf += '\t\t\t\t\t<restitution_coefficient>%s</restitution_coefficient>\n' % self.COR
-  #   sdf += '\t\t\t\t\t<threshold>0</threshold>\n'
-  #   sdf += '\t\t\t\t</bounce>\n'
-  #   sdf += '\t\t\t\t<contact>\n'
-  #   sdf += '\t\t\t\t</contact>\n'
-  #   sdf += '\t\t\t</surface>\n'
-  #   sdf += '\t\t</collision>\n'
-  #   sdf += '\t</link>\n'
-  #   sdf += '\t<gazebo reference="%s">\n' % self.name
-  #   sdf += '\t\t<material>Gazebo/%s</material>\n' % self.color
-  #   sdf += '\t\t\t<mu1>%f</mu1>\n' % self.mu1
-  #   sdf += '\t\t\t<mu2>%f</mu1>\n' % self.mu2
-  #   sdf += '\t</gazebo>\n'
-  #   sdf += '</robot>\n'
-  #   return sdf
-
-  # # Return the SDF string for a model
-  # def generateSDFExperimental(self):
-  #   sdf = ''
-  #   sdf += '<?xml version="1.0" ?>\n'
-  #   sdf += '<sdf version="1.6">\n'
-  #   sdf += '\t<model name="%s">\n' % self.name
-  #   sdf += '\t\t<pose>%s %s %s %s %s %s</pose>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
-  #   sdf += '\t\t<link name="link_%s">\n' % self.name
-  #   sdf += '\t\t\t<inertial>\n'
-  #   sdf += '\t\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
-  #   sdf += '\t\t\t\t<mass value="%s" />\n' % self.mass
-  #   sdf += '\t\t\t\t<inertia  ixx="%f" ixy="%f"  ixz="%f"  iyy="%f"  iyz="%f"  izz="%f" />\n' % (self.ixx, self.ixy, self.ixz, self.iyy, self.iyz, self.izz)
-  #   sdf += '\t\t\t</inertial>\n'
-  #   sdf += '\t\t\t<collision name="collision_%s">\n' % self.name
-  #   sdf += self.generateGeometrySDF()
-  #   sdf += '\t\t\t\t</geometry>\n'
-  #   sdf += '\t\t\t\t<surface>\n'
-  #   sdf += '\t\t\t\t\t<bounce>\n'
-  #   sdf += '\t\t\t\t\t\t<restitution_coefficient>%d</restitution_coefficient>\n' % self.COR
-  #   sdf += '\t\t\t\t\t\t<threshold>0</threshold>\n'
-  #   sdf += '\t\t\t\t\t</bounce>\n'
-  #   sdf += '\t\t\t\t\t<contact>\n'
-  #   sdf += '\t\t\t\t\t\t<ode>\n'
-  #   sdf += '\t\t\t\t\t\t\t<max_vel>10000</max_vel>\n'
-  #   sdf += '\t\t\t\t\t\t</ode>\n'
-  #   sdf += '\t\t\t\t\t</contact>\n'
-  #   sdf += '\t\t\t\t</surface>\n'
-  #   sdf += '\t\t\t</collision>\n'
-  #   sdf += '\t\t\t<visual name="visual_%s"\n' % self.name
-  #   sdf += self.generateGeometrySDF()
-  #   sdf += '\t\t\t\t<material>\n'
-  #   sdf += '\t<gazebo reference="%s">\n' % self.name
-  #   sdf += '\t\t<material>Gazebo/%s</material>\n' % self.color
-  #   sdf += '\t\t\t<mu1>%f</mu1>\n' % self.mu1
-  #   sdf += '\t\t\t<mu2>%f</mu1>\n' % self.mu2
-  #   sdf += '\t</gazebo>\n'
-  #   sdf += '</sdf>'
-  #   return sdf
 
   # Helper method called by generateSDF()
   def generateGeometrySDF(self):
