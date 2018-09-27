@@ -72,7 +72,7 @@ class SceneController(object):
       reference_frame = model.reference_frame
       sdf = model.generateSDF().replace('\n', '').replace('\t', '')
       try:
-        print 'Loading model named: %s' % model.name
+        rospy.loginfo('Loading model named: %s' % model.name)
         resp_sdf = spawn_proxy(model.name, sdf, "/",
                              pose, reference_frame)
       except rospy.ServiceException, e:
@@ -95,6 +95,40 @@ class SceneController(object):
           self.scene_commander.add_sphere(model.name, pose, radius=model.size_r)
         else:
           rospy.logerr('MoveIt is ignoring model named %s of shape %s.' % (model.name, model.shape))
+
+  # Similar to spawnGazeboModels, but for only one model for which you pass in the name
+  def spawnGazeboModel(self, model_name, moveit=False):
+    for _model in self.models:
+      if _model.name == model_name:
+        model = _model
+    rospy.wait_for_service('/gazebo/spawn_sdf_model')
+    spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+    pose = model.pose
+    reference_frame = model.reference_frame
+    sdf = model.generateSDF().replace('\n', '').replace('\t', '')
+    try:
+      rospy.loginfo('Loading model named: %s' % model.name)
+      resp_sdf = spawn_proxy(model.name, sdf, "/",
+                           pose, reference_frame)
+    except rospy.ServiceException, e:
+        rospy.logerr("Spawn SDF service call failed: {0}".format(e))
+    if moveit:
+      pose = Pose()
+      pose.orientation = Quaternion(
+        tf_conversions.transformations.quaternion_from_euler(model.roll, model.pitch, model.yaw))
+      pose.position.x = model.x
+      pose.position.y = model.y
+      pose.position.z = model.z
+      model_msg = geometry_msgs.msg.PoseStamped()
+      model_msg.pose = pose
+      if model.shape == 'box':
+        self.scene_commander.add_box(
+          model.name, pose, size=(model.size_x, model.size_y, model.size_z))
+        success = waitForSpawn(model.name)
+      if model.shape == 'sphere':
+        self.scene_commander.add_sphere(model.name, pose, radius=model.size_r)
+      else:
+        rospy.logerr('MoveIt is ignoring model named %s of shape %s.' % (model.name, model.shape))
 
 
   '''
@@ -390,64 +424,6 @@ class Model(object):
       moments[0][2] = 0.5 * self.mass * self.size_r**2
 
     return moments.tolist()[0]
-
-#Takes in a Model object
-#Returns SDF string
-def generateSDF(model, index=0):
-  sdf = ''
-  name = model.name
-  model = self
-  sdf += '<robot name="%s">\n' % name
-  sdf += '\t<link name="%s">\n' % name
-  sdf += '\t\t<inertial>\n'
-  # sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (0,0,0,0,0,0)
-  sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (model.x, model.y, model.z, model.roll, model.pitch, model.yaw)
-  sdf += '\t\t\t<mass value="%s" />\n' % model.mass
-  sdf += '\t\t\t<inertia  ixx="%f" ixy="%f"  ixz="%f"  iyy="%f"  iyz="%f"  izz="%f" />\n' % (model.ixx, model.ixy, model.ixz, model.iyy, model.iyz, model.izz)
-  sdf += '\t\t</inertial>\n'
-  sdf += '\t\t<visual>\n'
-  sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (model.x, model.y, model.z, model.roll, model.pitch, model.yaw)
-  # sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (0,0,0,0,0,0)
-  sdf += '\t\t\t<geometry>\n'
-  if model.shape == 'box':
-    sdf += '\t\t\t\t<box size="%f %f %f" />\n' % (model.size_x, model.size_y, model.size_z)
-  elif model.shape == 'cylinder':
-    sdf += '\t\t\t\t<cylinder radius="%f" length="%f" />\n' % (model.size_r, model.size_z)
-  else:
-    sdf += '\t\t\t\t<sphere radius="%f" />\n' % (model.size_r)
-  sdf += '\t\t\t</geometry>\n'
-  sdf += '\t\t</visual>\n'
-  sdf += '\t\t<collision>\n'
-  # sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (0,0,0,0,0,0)
-  sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (model.x, model.y, model.z, model.roll, model.pitch, model.yaw)
-  sdf += '\t\t\t<geometry>\n'
-  if model.shape == 'box':
-    sdf += '\t\t\t\t<box size="%f %f %f" />\n' % (model.size_x, model.size_y, model.size_z)
-  elif model.shape == 'cylinder':
-    sdf += '\t\t\t\t<cylinder radius="%f" length="%f" />\n' % (model.size_r, model.size_z)
-  else:
-    sdf += '\t\t\t\t<sphere radius="%f" />\n' % (model.size_r)
-  sdf += '\t\t\t</geometry>\n'
-  sdf += '\t\t\t<surface>\n'
-  sdf += '\t\t\t\t<bounce>\n'
-  sdf += '\t\t\t\t\t<restitution_coefficient>%s</restitution_coefficient>\n' % model.COR
-  sdf += '\t\t\t\t\t<threshold>0</threshold>\n'
-  sdf += '\t\t\t\t</bounce>\n'
-  sdf += '\t\t\t\t<contact>\n'
-  # sdf += '\t\t\t\t\t<ode>\n'
-  # sdf += '\t\t\t\t\t\t<max_vel>10000</max_vel>\n'
-  # sdf += '\t\t\t\t\t</ode>\n'
-  sdf += '\t\t\t\t</contact>\n'
-  sdf += '\t\t\t</surface>\n'
-  sdf += '\t\t</collision>\n'
-  sdf += '\t</link>\n'
-  sdf += '\t<gazebo reference="%s">\n' % name
-  sdf += '\t\t<material>Gazebo/%s</material>\n' % model.color
-  sdf += '\t\t\t<mu1>%f</mu1>\n' % model.mu1
-  sdf += '\t\t\t<mu2>%f</mu1>\n' % model.mu2
-  sdf += '\t</gazebo>\n'
-  sdf += '</robot>\n'
-  return sdf
 
   #Returns SDF string
   def generateSDF(self):
