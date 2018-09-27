@@ -77,10 +77,24 @@ class Manager(object):
     self.scene_controller.shutdown()
 
 
+def spawn():
+    rospy.wait_for_service('/gazebo/spawn_sdf_model')
+    spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+    pose = Pose(position=Point(x=1, y=1, z=1))
+    reference_frame = ''
+    path = '/home/infolab/catkin_ws/src/baxter_platform/baxter_sim_platform/models/example_block.sdf'
+    sdf = open(path, 'r').read().replace('\n', '')
+    resp_sdf = spawn_proxy('example_block', sdf, "/",
+                         pose, reference_frame)
+
+def delete():
+  delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+  resp_delete = delete_model("example_block")
 
 def main():
   manager = Manager()
   rospy.on_shutdown(manager.shutdown)
+  # rospy.on_shutdown(delete)
   position1 = {'left_w0': 0.6699952259595108,
                    'left_w1': 1.030009435085784,
                    'left_w2': -0.4999997247485215,
@@ -102,16 +116,18 @@ def main():
   # manager.robot_controller.followMoveItTrajectoryWithJointAngles(trajectory)
   # print ("done now")
   # manager.robot_controller.followTrajectoryFromJointAngles(trajectory)
-
+  #SAVE THIS
+  # manager.scene_controller.makeModel(name='table', shape='box', roll=0., pitch=0., yaw=0., restitution_coeff=0., size_x=.7, size_y=1.5, size_z=.7, x=.4, y=0.1, z=0., mass=5000, color_r=0.1, color_g=0.1, color_b=0.1, color_a=0.1, mu1=1, mu2=1, reference_frame='')
 
  
 
   print "going now"
-  manager.scene_controller.makeModel(name='table', shape='box', roll=0., pitch=0., yaw=0., restitution_coeff=0., size_x=.7, size_y=1.5, size_z=.7, x=.4, y=0.1, z=0., mass=5000, color='Grey', mu1=1, mu2=1, reference_frame='')
-  manager.scene_controller.makeModel(name='example_block', shape='box', size_x=0.1, size_y=0.2, size_z=0.3, x=0.4, y=0.2, z=0.3, mass=0.1, color='red', mu1=1000, mu2=2000, restitution_coeff=0.5, roll=0.1, pitch=0.2, yaw=0.3)
-  import pdb; pdb.set_trace()
+  manager.scene_controller.makeModel(name='table', shape='box', roll=0., pitch=0., yaw=0., restitution_coeff=0., size_x=.7, size_y=1.5, size_z=.7, x=.8, y=0., z=.35, mass=5000, color_r=0.1, color_g=0.1, color_b=0.1, color_a=0.1, mu1=1, mu2=1, reference_frame='')
+  manager.scene_controller.makeModel(name='example_block', shape='box', size_x=0.1, size_y=0.1, size_z=0.1, x=0.8, y=0.3, z=0.75, mass=0.1, mu1=1000, mu2=2000, restitution_coeff=0.5, roll=0.1, pitch=0.2, yaw=0.3)
   manager.scene_controller.spawnGazeboModel('table')
   manager.scene_controller.spawnGazeboModel('example_block')
+  import pdb; pdb.set_trace()
+
 
 
 

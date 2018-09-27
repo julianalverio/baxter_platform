@@ -107,9 +107,10 @@ class SceneController(object):
     reference_frame = model.reference_frame
     sdf = model.generateSDF().replace('\n', '').replace('\t', '')
     try:
-      rospy.loginfo('Loading model named: %s' % model.name)
+      rospy.loginfo('Loading model named: %s...' % model.name)
       resp_sdf = spawn_proxy(model.name, sdf, "/",
                            pose, reference_frame)
+      rospy.loginfo(resp_sdf)
     except rospy.ServiceException, e:
         rospy.logerr("Spawn SDF service call failed: {0}".format(e))
     if moveit:
@@ -213,16 +214,16 @@ class SceneController(object):
 
   def makeModel(self, shape='box', size_x=0.5, size_y=0.5, 
                size_z=0.5, size_r=0.5, x=None, y=None, z=None, 
-               mass=0.5, color=None, mu1=1000, mu2=1000,
+               mass=0.5, color_r=0, color_g=1, color_b=0, color_a=1, mu1=1000, mu2=1000,
                reference_frame='world',
                restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
                name=None):
     if not name:
       name = 'object_' + str(len(self.models))
     model = Model(shape=shape, size_x=size_x, size_y=size_y,
-      size_z=size_z, size_r=size_r, x=x, y=y, z=z, mass=mass, color=color,
-      mu1=mu1, mu2=mu2, reference_frame=reference_frame, restitution_coeff=restitution_coeff,
-      roll=roll, pitch=pitch, yaw=yaw, name=name)
+      size_z=size_z, size_r=size_r, x=x, y=y, z=z, mass=mass, color_r=color_r, color_g=color_g,
+      color_b=color_b, color_a=color_a, mu1=mu1, mu2=mu2, reference_frame=reference_frame, 
+      restitution_coeff=restitution_coeff, roll=roll, pitch=pitch, yaw=yaw, name=name)
     self.models.append(model)
     self.checkUniqueModelNames()
     return model
@@ -350,11 +351,9 @@ class ExternalCamera(object):
 ####################################################################################################
 
 class Model(object):
-  def __init__(self, shape='box', size_x=0.5, size_y=0.5, 
-               size_z=0.5, size_r=0.5, x=None, y=None, z=None, 
-               mass=0.5, color=None, mu1=1000, mu2=1000,
-               reference_frame='world',
-               restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
+  def __init__(self, shape='box', size_x=0.5, size_y=0.5, size_z=0.5, size_r=0.5, x=None, y=None, 
+               z=None, mass=0.5, color_r=0, color_g=1, color_b=0, color_a=0, mu1=1000, mu2=1000,
+               reference_frame='world', restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
                name=None):
     self.shape = shape
     if self.shape not in ['box', 'cylinder', 'sphere']:
@@ -375,10 +374,10 @@ class Model(object):
       print 'I found size_z == None'
       self.z = -size_z/2.0
     self.mass = mass
-    self.color = color
-    self.COLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo'  'purple', 'grey', 'black']
-    if self.color not in self.COLORS:
-      self.color = random.sample(self.COLORS, 1)
+    self.color_r = color_r
+    self.color_g = color_g
+    self.color_b = color_b
+    self.color_a = color_a
     self.mu1 = mu1
     self.mu2 = mu2
 
@@ -398,7 +397,6 @@ class Model(object):
     self.roll = roll
     self.pitch = pitch
     self.yaw = yaw
-
 
 
   '''
@@ -425,55 +423,107 @@ class Model(object):
 
     return moments.tolist()[0]
 
-  #Returns SDF string
+  #Returns SDF representation of a model
   def generateSDF(self):
     sdf = ''
-    sdf += '<robot name="%s">\n' % self.name
-    sdf += '\t<link name="%s">\n' % self.name
-    sdf += '\t\t<inertial>\n'
-    # sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (0,0,0,0,0,0)
-    sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
-    sdf += '\t\t\t<mass value="%s" />\n' % self.mass
-    sdf += '\t\t\t<inertia  ixx="%f" ixy="%f"  ixz="%f"  iyy="%f"  iyz="%f"  izz="%f" />\n' % (self.ixx, self.ixy, self.ixz, self.iyy, self.iyz, self.izz)
-    sdf += '\t\t</inertial>\n'
-    sdf += '\t\t<visual>\n'
-    sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
-    sdf += '\t\t\t<geometry>\n'
-    if self.shape == 'box':
-      sdf += '\t\t\t\t<box size="%f %f %f" />\n' % (self.size_x, self.size_y, self.size_z)
-    elif self.shape == 'cylinder':
-      sdf += '\t\t\t\t<cylinder radius="%f" length="%f" />\n' % (self.size_r, self.size_z)
-    else:
-      sdf += '\t\t\t\t<sphere radius="%f" />\n' % (self.size_r)
-    sdf += '\t\t\t</geometry>\n'
-    sdf += '\t\t</visual>\n'
-    sdf += '\t\t<collision>\n'
-    sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
-    sdf += '\t\t\t<geometry>\n'
-    if self.shape == 'box':
-      sdf += '\t\t\t\t<box size="%f %f %f" />\n' % (self.size_x, self.size_y, self.size_z)
-    elif self.shape == 'cylinder':
-      sdf += '\t\t\t\t<cylinder radius="%f" length="%f" />\n' % (self.size_r, self.size_z)
-    else:
-      sdf += '\t\t\t\t<sphere radius="%f" />\n' % (self.size_r)
-    sdf += '\t\t\t</geometry>\n'
-    sdf += '\t\t\t<surface>\n'
-    sdf += '\t\t\t\t<bounce>\n'
-    sdf += '\t\t\t\t\t<restitution_coefficient>%s</restitution_coefficient>\n' % self.COR
-    sdf += '\t\t\t\t\t<threshold>0</threshold>\n'
-    sdf += '\t\t\t\t</bounce>\n'
-    sdf += '\t\t\t\t<contact>\n'
-    sdf += '\t\t\t\t</contact>\n'
-    sdf += '\t\t\t</surface>\n'
-    sdf += '\t\t</collision>\n'
-    sdf += '\t</link>\n'
-    sdf += '\t<gazebo reference="%s">\n' % self.name
-    sdf += '\t\t<material>Gazebo/%s</material>\n' % self.color
-    sdf += '\t\t\t<mu1>%f</mu1>\n' % self.mu1
-    sdf += '\t\t\t<mu2>%f</mu1>\n' % self.mu2
-    sdf += '\t</gazebo>\n'
-    sdf += '</robot>\n'
+    sdf += '<?xml version="1.0"?>\n'
+    sdf += '<sdf version="1.6">\n'
+    sdf += '\t<model name="%s">\n' % self.name
+    sdf += '\t\t<pose>%s %s %s %s %s %s</pose>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
+    sdf += '\t\t<link name="%s_link">\n' % self.name
+    sdf += '\t\t\t<inertial>\n'
+    sdf += '\t\t\t\t<mass>%s</mass>\n' % self.mass
+    sdf += '\t\t\t\t<inertia>\n'
+    sdf += '\t\t\t\t\t<ixx>%s</ixx>\n' % self.ixx
+    sdf += '\t\t\t\t\t<ixy>%s</ixy>\n' % self.ixy
+    sdf += '\t\t\t\t\t<ixz>%s</ixz>\n' % self.ixz
+    sdf += '\t\t\t\t\t<iyy>%s</iyy>\n' % self.iyy
+    sdf += '\t\t\t\t\t<iyz>%s</iyz>\n' % self.iyz
+    sdf += '\t\t\t\t\t<izz>%s</izz>\n' % self.izz
+    sdf += '\t\t\t\t</inertia>\n'
+    sdf += '\t\t\t</inertial>\n'
+    sdf += '\t\t\t<collision name="%s_collision">\n' % self.name
+    sdf += self.generateGeometrySDF()
+    sdf += '\t\t\t\t<surface>\n'
+    sdf += '\t\t\t\t\t<bounce>\n'
+    sdf += '\t\t\t\t\t\t<restitution_coefficient>%s</restitution_coefficient>\n' % self.COR
+    sdf += '\t\t\t\t\t\t<threshold>0</threshold>\n'
+    sdf += '\t\t\t\t\t</bounce>\n'
+    sdf += '\t\t\t\t\t<contact>\n'
+    sdf += '\t\t\t\t\t\t<ode>\n'
+    sdf += '\t\t\t\t\t\t\t<max_vel>10000</max_vel>\n'
+    sdf += '\t\t\t\t\t\t</ode>\n'
+    sdf += '\t\t\t\t\t</contact>\n'
+    sdf += '\t\t\t\t\t<friction>\n'
+    sdf += '\t\t\t\t\t\t<ode>\n'
+    sdf += '\t\t\t\t\t\t\t<mu>%s</mu>\n' % self.mu1
+    sdf += '\t\t\t\t\t\t\t<mu2>%s</mu2>\n' % self.mu2
+    sdf += '\t\t\t\t\t\t</ode>\n'
+    sdf += '\t\t\t\t\t</friction>\n'
+    sdf += '\t\t\t\t</surface>\n'
+    sdf += '\t\t\t</collision>\n'
+    sdf += '\t\t\t<visual name="%s_visual">\n' % self.name
+    sdf += self.generateGeometrySDF()
+    sdf += '\t\t\t\t<material>\n'
+    sdf += '\t\t\t\t\t<ambient> %s %s %s %s</ambient>\n' % (self.color_r, self.color_g, self.color_b, self.color_a)
+    sdf += '\t\t\t\t</material>\n'
+    sdf += '\t\t\t</visual>\n'
+    sdf += '\t\t</link>\n'
+    sdf += '\t</model>\n'
+    sdf += '</sdf>'
+    f = open('/home/infolab/catkin_ws/src/baxter_platform/baxter_sim_platform/models/delete_later.sdf', 'w+')
+    f.write(sdf)
     return sdf
+
+  # #Returns SDF string
+  # def generateSDF(self):
+  #   sdf = ''
+  #   sdf += '<robot name="%s">\n' % self.name
+  #   sdf += '\t<link name="%s">\n' % self.name
+  #   sdf += '\t\t<inertial>\n'
+  #   # sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (0,0,0,0,0,0)
+  #   sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f" />\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
+  #   sdf += '\t\t\t<mass value="%s" />\n' % self.mass
+  #   sdf += '\t\t\t<inertia  ixx="%f" ixy="%f"  ixz="%f"  iyy="%f"  iyz="%f"  izz="%f" />\n' % (self.ixx, self.ixy, self.ixz, self.iyy, self.iyz, self.izz)
+  #   sdf += '\t\t</inertial>\n'
+  #   sdf += '\t\t<visual>\n'
+  #   sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
+  #   sdf += '\t\t\t<geometry>\n'
+  #   if self.shape == 'box':
+  #     sdf += '\t\t\t\t<box size="%f %f %f" />\n' % (self.size_x, self.size_y, self.size_z)
+  #   elif self.shape == 'cylinder':
+  #     sdf += '\t\t\t\t<cylinder radius="%f" length="%f" />\n' % (self.size_r, self.size_z)
+  #   else:
+  #     sdf += '\t\t\t\t<sphere radius="%f" />\n' % (self.size_r)
+  #   sdf += '\t\t\t</geometry>\n'
+  #   sdf += '\t\t</visual>\n'
+  #   sdf += '\t\t<collision>\n'
+  #   sdf += '\t\t\t<origin xyz="%f %f %f" rpy="%f %f %f"/>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
+  #   sdf += '\t\t\t<geometry>\n'
+  #   if self.shape == 'box':
+  #     sdf += '\t\t\t\t<box size="%f %f %f" />\n' % (self.size_x, self.size_y, self.size_z)
+  #   elif self.shape == 'cylinder':
+  #     sdf += '\t\t\t\t<cylinder radius="%f" length="%f" />\n' % (self.size_r, self.size_z)
+  #   else:
+  #     sdf += '\t\t\t\t<sphere radius="%f" />\n' % (self.size_r)
+  #   sdf += '\t\t\t</geometry>\n'
+  #   sdf += '\t\t\t<surface>\n'
+  #   sdf += '\t\t\t\t<bounce>\n'
+  #   sdf += '\t\t\t\t\t<restitution_coefficient>%s</restitution_coefficient>\n' % self.COR
+  #   sdf += '\t\t\t\t\t<threshold>0</threshold>\n'
+  #   sdf += '\t\t\t\t</bounce>\n'
+  #   sdf += '\t\t\t\t<contact>\n'
+  #   sdf += '\t\t\t\t</contact>\n'
+  #   sdf += '\t\t\t</surface>\n'
+  #   sdf += '\t\t</collision>\n'
+  #   sdf += '\t</link>\n'
+  #   sdf += '\t<gazebo reference="%s">\n' % self.name
+  #   sdf += '\t\t<material>Gazebo/%s</material>\n' % self.color
+  #   sdf += '\t\t\t<mu1>%f</mu1>\n' % self.mu1
+  #   sdf += '\t\t\t<mu2>%f</mu1>\n' % self.mu2
+  #   sdf += '\t</gazebo>\n'
+  #   sdf += '</robot>\n'
+  #   return sdf
 
   # # Return the SDF string for a model
   # def generateSDFExperimental(self):
@@ -525,5 +575,6 @@ class Model(object):
       sdf += '\t\t\t\t\t\t<height>%s</height>\n' % self.size_z
     if self.shape == 'box':
       sdf += '\t\t\t\t\t\t<size>%s %s %s</size>\n' % (self.size_x, self.size_y, self.size_z)
+    sdf += '\t\t\t\t\t</%s>\n' % self.shape
     sdf += '\t\t\t\t</geometry>\n'
     return sdf
