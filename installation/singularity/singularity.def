@@ -7,4 +7,4 @@ From: singularityhub/ubuntu
 AUTHOR jalverio@mit.edu
 
 %post
-apt-get update && apt-get upgrade && apt-get -y install git wget python
+apt-get update && apt-get upgrade && apt-get -y install git wget python nano
