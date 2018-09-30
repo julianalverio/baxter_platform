@@ -1,0 +1,10 @@
+Bootstrap: shub
+OSVersion: xenial
+MirrorURL: http://ca.archive.ubuntu.com/ubuntu/
+From: singularityhub/ubuntu
+
+%labels
+AUTHOR jalverio@mit.edu
+
+%post
+apt-get update && apt-get upgrade && apt-get -y install git wget python
