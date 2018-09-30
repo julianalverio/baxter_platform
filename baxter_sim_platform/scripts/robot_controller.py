@@ -40,7 +40,7 @@ from gazebo_msgs.msg import ContactsState
 
 
 class RobotController(object):
-  def __init__(self, tolerance=0.008726646):
+  def __init__(self, use_moveit=False, tolerance=0.008726646):
     baxter_interface.JOINT_ANGLE_TOLERANCE = tolerance
     self._left_limb = baxter_interface.Limb('left')
     self._right_limb = baxter_interface.Limb('right')
@@ -62,14 +62,17 @@ class RobotController(object):
     
     self.server_pid_path = None
 
-    # moveit_commander.roscpp_initialize(sys.argv)
-    # self.robot_commander = moveit_commander.RobotCommander()
-    # self.left_commander = moveit_commander.MoveGroupCommander('left_arm')
-    # self.right_commander = moveit_commander.MoveGroupCommander('right_arm')
-    # print("Sleeping to allow RVIZ to start up")
-    # rospy.sleep(10)
-    # import pdb; pdb.set_trace()
+    if use_moveit:
+      moveit_commander.roscpp_initialize(sys.argv)
+      self.robot_commander = moveit_commander.RobotCommander()
+      self.left_commander = moveit_commander.MoveGroupCommander('left_arm')
+      self.right_commander = moveit_commander.MoveGroupCommander('right_arm')
 
+  def getJointNames(self, limb='left'):
+    if limb == 'left':
+      return self._left_limb.joint_names()
+    else:
+      return self._right_limb.joint_names()
 
   # Shut down MoveIt!
   def shutdown(self):
@@ -140,7 +143,9 @@ class RobotController(object):
       rs.joint_state.position = traj_point
       result = StateValidity().getStateValidity(rs, group)
       if not result.valid: # if one point is not valid, the trajectory is not valid!! :-(
+        print("COLLISION FOUND IN TRAJECTORY >:(")
         return False
+    print("TRAJECTORY IS COLLISION-FREE :D")
     return True
 
   '''
@@ -169,13 +174,15 @@ class RobotController(object):
   Input: trajectory is a list of lists of joint angles, where each list of joint angles has length 7
   Angles must be in the same order as self._limb.joint_names()
   '''
-  def followMoveItTrajectoryWithJointAngles(self, trajectory, group='left_arm'):
-    template = group.get_current_joint_values()
+  def followMoveItTrajectoryWithJointAngles(self, trajectory, group_str='left_arm'):
+    if group_str == 'left_arm':
+      group = self.left_commander
+    else:
+      group = self.right_commander
     for angle_position in trajectory:
-      waypoint = copy.deepcopy(template)
-      for i in xrange(7):
-        waypoint[i] = angle_position[i]
-      group.go(joint_goal, wait=True)
+      import pdb; pdb.set_trace()
+      waypoint = copy.deepcopy(angle_position)
+      group.go(waypoint, wait=True)
       group.stop()
 
 
