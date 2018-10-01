@@ -1,7 +1,6 @@
-Bootstrap: shub
+Bootstrap: debootstrap
 OSVersion: xenial
 MirrorURL: http://ca.archive.ubuntu.com/ubuntu/
-From: singularityhub/ubuntu
 
 %labels
 AUTHOR jalverio@mit.edu
