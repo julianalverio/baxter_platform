@@ -113,13 +113,34 @@ class screenHandler(object):
     width, height = pil_image.size
 
     cropped = pil_image.crop((0, 300, width, height))
+    print dir(image)
+    assert False
     # cropped.show()
     self.most_recent = cropped
     self.initialized = True
     self.getGreenBlockLocation()
 
+  def findGreenPixels(self, threshold=100):
+    image = self.most_recent
+    newimdata = []
+    whitecolor = (255, 255, 255)
+    greencolor = (0, 255, 0)
+    blackcolor = (0,0,0)
+    for color in image.getdata():
+      if color == greencolor:
+        newimdata.append(whitecolor)
+      else:
+        newimdata.append(blackcolor)
+    newim = Image.new(image.mode, image.size)
+    newim.putdata(newimdata)
+    newim.show()
+
+
+
   def getGreenBlockLocation(self):
     image = self.most_recent
+    for 
+
     green_x = []
     green_y = []
     green_intensities = []
@@ -140,6 +161,19 @@ class screenHandler(object):
 
     # return mean_x, mean_y
 
+    def redOrBlack(im):
+      newimdata = []
+      redcolor = (255,0,0)
+      blackcolor = (0,0,0)
+      for color in im.getdata():
+          if color == redcolor:
+              newimdata.append( redcolor )
+          else:
+              newimdata.append( blackcolor )
+      newim = Image.new(im.mode,im.size)
+      newim.putdata(newimdata)
+      return newim
+
 
 
 
@@ -153,28 +187,28 @@ class screenHandler(object):
 
 
 
-def get_screen():
-    screen = env.render(mode='rgb_array').transpose(
-        (2, 0, 1))  # transpose into torch order (CHW)
-    # Strip off the top and bottom of the screen
-    screen = screen[:, 160:320]
-    view_width = 320
-    cart_location = get_cart_location()
-    if cart_location < view_width // 2:
-        slice_range = slice(view_width)
-    elif cart_location > (screen_width - view_width // 2):
-        slice_range = slice(-view_width, None)
-    else:
-        slice_range = slice(cart_location - view_width // 2,
-                            cart_location + view_width // 2)
-    # Strip off the edges, so that we have a square image centered on a cart
-    screen = screen[:, :, slice_range]
-    # Convert to float, rescare, convert to torch tensor
-    # (this doesn't require a copy)
-    screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
-    screen = torch.from_numpy(screen)
-    # Resize, and add a batch dimension (BCHW)
-    return resize(screen).unsqueeze(0).to(device)
+# def get_screen():
+#     screen = env.render(mode='rgb_array').transpose(
+#         (2, 0, 1))  # transpose into torch order (CHW)
+#     # Strip off the top and bottom of the screen
+#     screen = screen[:, 160:320]
+#     view_width = 320
+#     cart_location = get_cart_location()
+#     if cart_location < view_width // 2:
+#         slice_range = slice(view_width)
+#     elif cart_location > (screen_width - view_width // 2):
+#         slice_range = slice(-view_width, None)
+#     else:
+#         slice_range = slice(cart_location - view_width // 2,
+#                             cart_location + view_width // 2)
+#     # Strip off the edges, so that we have a square image centered on a cart
+#     screen = screen[:, :, slice_range]
+#     # Convert to float, rescare, convert to torch tensor
+#     # (this doesn't require a copy)
+#     screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
+#     screen = torch.from_numpy(screen)
+#     # Resize, and add a batch dimension (BCHW)
+#     return resize(screen).unsqueeze(0).to(device)
 
 
 # env.reset()
