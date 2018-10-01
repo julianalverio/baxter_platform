@@ -19,7 +19,7 @@ import sys
 import rospy
 import cv2
 from std_msgs.msg import String
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image as RosImage
 from cv_bridge import CvBridge, CvBridgeError
 
 
@@ -88,82 +88,70 @@ class DQN(nn.Module):
 
 
 
-class screenHandler(Object):
-
+class screenHandler(object):
   def __init__(self):
     self.bridge = CvBridge()
-    self.image_sub = rospy.Subscriber('/cameras/head_camera/image', Image, self.callback)
+    self.image_sub = rospy.Subscriber('/cameras/head_camera/image', RosImage, self.callback)
     self.most_recent = None
     self.initialized = False
 
   def getScreen(self):
     if not self.initialized:
-      print("screenHandler not yet initialized")
+      print("screenHandler is not yet initialized. Hanging.")
     while not self.initialized:
       rospy.sleep(1)
+    print("Initialized.")
     return self.most_recent
 
   def callback(self, data):
     try:
-      cv_image = self.bridge.imgmsg_to_cv2(data, "rgb8")
+      cv_image = self.bridge.imgmsg_to_cv2(data)
     except CvBridgeError as e:
       print(e)
 
     pil_image = Image.fromarray(cv_image)
-    pil_image.show()
-    import pdb; pdb.set_trace()
-    self.most_recent = pil_image
+    width, height = pil_image.size
+
+    cropped = pil_image.crop((0, 300, width, height))
+    # cropped.show()
+    self.most_recent = cropped
     self.initialized = True
+    self.getGreenBlockLocation()
 
-
-    #some more stuff for the conversion to opencv
-    # (rows,cols,channels) = cv_image.shape
-    # if cols > 60 and rows > 60 :
-    #   cv2.circle(cv_image, (50,50), 10, 255)
-
-    # cv2.imshow("Image window", cv_image)
-    # cv2.waitKey(3)
-
-    ##FROM OPENCV TO PIL
-
-
-
-    # color convertion with open cv to prepare for pil
-    # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-
-
-
-
-
-
-## image extraction
-
-def getImageCallBack():
-
-
-resize = T.Compose([T.ToPILImage(),
-                    T.Resize(40, interpolation=Image.CUBIC),
-                    T.ToTensor()])
-
-# This is based on the code from gym.
-screen_width = 600
-
-
-def getBlockLocation(image, color='green'):
+  def getGreenBlockLocation(self):
+    image = self.most_recent
     green_x = []
     green_y = []
-    im = Image.open(image_path)
-    width, height = im.size
-    for x in range(width):
-        for y in range(height):
-            r,g,b = im.getpixel((x,y))
-            if r < 10 and g > 150 and b < 10:
-                green_x.append(x)
-                green_y.append(y)
-    mean_x = sum(green_x)/len(green_x)
-    mean_y = sum(green_y)/len(green_y)
-    return mean_x, mean_y
+    green_intensities = []
+    width, height = image.size
+    for x in xrange(width):
+        for y in xrange(height):
+            r,g,b = image.getpixel((x,y))
+            if g > 50: green_intensities.append(g)
+    #         if r < 10 and g > 150 and b < 10:
+    #             green_x.append(x)
+    #             green_y.append(y)
+    # mean_x = sum(green_x)/len(green_x)
+    # mean_y = sum(green_y)/len(green_y)
+    # print max(green_intensities), min(green_intensities)
+    unique = list(set(green_intensities))
+    sorted(unique)
+    print unique
+
+    # return mean_x, mean_y
+
+
+
+
+# resize = T.Compose([T.ToPILImage(),
+#                     T.Resize(40, interpolation=Image.CUBIC),
+#                     T.ToTensor()])
+
+# # This is based on the code from gym.
+# screen_width = 600
+
+
+
 
 def get_screen():
     screen = env.render(mode='rgb_array').transpose(
@@ -189,12 +177,12 @@ def get_screen():
     return resize(screen).unsqueeze(0).to(device)
 
 
-env.reset()
-plt.figure()
-plt.imshow(get_screen().cpu().squeeze(0).permute(1, 2, 0).numpy(),
-           interpolation='none')
-plt.title('Example extracted screen')
-plt.show()
+# env.reset()
+# plt.figure()
+# plt.imshow(get_screen().cpu().squeeze(0).permute(1, 2, 0).numpy(),
+#            interpolation='none')
+# plt.title('Example extracted screen')
+# plt.show()
 
 
 ######################################################################
@@ -219,23 +207,23 @@ plt.show()
 #    episode.
 #
 
-BATCH_SIZE = 128
-GAMMA = 0.999
-EPS_START = 0.9
-EPS_END = 0.05
-EPS_DECAY = 200
-TARGET_UPDATE = 10
+# BATCH_SIZE = 128
+# GAMMA = 0.999
+# EPS_START = 0.9
+# EPS_END = 0.05
+# EPS_DECAY = 200
+# TARGET_UPDATE = 10
 
-policy_net = DQN().to(device)
-target_net = DQN().to(device)
-target_net.load_state_dict(policy_net.state_dict())
-target_net.eval()
+# policy_net = DQN().to(device)
+# target_net = DQN().to(device)
+# target_net.load_state_dict(policy_net.state_dict())
+# target_net.eval()
 
-optimizer = optim.RMSprop(policy_net.parameters())
-memory = ReplayMemory(10000)
+# optimizer = optim.RMSprop(policy_net.parameters())
+# memory = ReplayMemory(10000)
 
 
-steps_done = 0
+# steps_done = 0
 
 
 def select_action(state):
@@ -342,45 +330,55 @@ def optimize_model():
 # the notebook and run lot more epsiodes.
 #
 
-num_episodes = 50
-for i_episode in range(num_episodes):
-    # Initialize the environment and state
-    env.reset()
-    last_screen = get_screen()
-    current_screen = get_screen()
-    state = current_screen - last_screen
-    for t in count():
-        # Select and perform an action
-        action = select_action(state)
-        _, reward, done, _ = env.step(action.item())
-        reward = torch.tensor([reward], device=device)
+# num_episodes = 50
+# for i_episode in range(num_episodes):
+#     # Initialize the environment and state
+#     env.reset()
+#     last_screen = get_screen()
+#     current_screen = get_screen()
+#     state = current_screen - last_screen
+#     for t in count():
+#         # Select and perform an action
+#         action = select_action(state)
+#         _, reward, done, _ = env.step(action.item())
+#         reward = torch.tensor([reward], device=device)
 
-        # Observe new state
-        last_screen = current_screen
-        current_screen = get_screen()
-        if not done:
-            next_state = current_screen - last_screen
-        else:
-            next_state = None
+#         # Observe new state
+#         last_screen = current_screen
+#         current_screen = get_screen()
+#         if not done:
+#             next_state = current_screen - last_screen
+#         else:
+#             next_state = None
 
-        # Store the transition in memory
-        memory.push(state, action, next_state, reward)
+#         # Store the transition in memory
+#         memory.push(state, action, next_state, reward)
 
-        # Move to the next state
-        state = next_state
+#         # Move to the next state
+#         state = next_state
 
-        # Perform one step of the optimization (on the target network)
-        optimize_model()
-        if done:
-            episode_durations.append(t + 1)
-            plot_durations()
-            break
-    # Update the target network
-    if i_episode % TARGET_UPDATE == 0:
-        target_net.load_state_dict(policy_net.state_dict())
+#         # Perform one step of the optimization (on the target network)
+#         optimize_model()
+#         if done:
+#             episode_durations.append(t + 1)
+#             plot_durations()
+#             break
+#     # Update the target network
+#     if i_episode % TARGET_UPDATE == 0:
+#         target_net.load_state_dict(policy_net.state_dict())
 
-print('Complete')
-env.render()
-env.close()
-plt.ioff()
-plt.show()
+# print('Complete')
+# env.render()
+# env.close()
+# plt.ioff()
+# plt.show()
+
+
+def main():
+  rospy.init_node('something', anonymous=True)
+  x = screenHandler()
+  x.getScreen()
+
+
+
+main()
