@@ -88,12 +88,20 @@ class DQN(nn.Module):
 
 
 
-####image conversion
-class image_converter:
+class screenHandler(Object):
 
   def __init__(self):
     self.bridge = CvBridge()
     self.image_sub = rospy.Subscriber('/cameras/head_camera/image', Image, self.callback)
+    self.most_recent = None
+    self.initialized = False
+
+  def getScreen(self):
+    if not self.initialized:
+      print("screenHandler not yet initialized")
+    while not self.initialized:
+      rospy.sleep(1)
+    return self.most_recent
 
   def callback(self, data):
     try:
@@ -102,6 +110,10 @@ class image_converter:
       print(e)
 
     pil_image = Image.fromarray(cv_image)
+    pil_image.show()
+    import pdb; pdb.set_trace()
+    self.most_recent = pil_image
+    self.initialized = True
 
 
     #some more stuff for the conversion to opencv
@@ -118,9 +130,7 @@ class image_converter:
 
     # color convertion with open cv to prepare for pil
     # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    pil_image.show()
-    import pdb; pdb.set_trace()
-    return pil_image
+
 
 
 
