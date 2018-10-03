@@ -46,6 +46,7 @@
 				</geometry>
 				<material>
 					<ambient> 0 1 0 1</ambient>
+					<diffuse> 0 1 0 1</diffuse>
 				</material>
 			</visual>
 		</link>

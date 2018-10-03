@@ -75,6 +75,7 @@ class SceneController(object):
         rospy.loginfo('Loading model named: %s' % model.name)
         resp_sdf = spawn_proxy(model.name, sdf, "/",
                              pose, reference_frame)
+        print("Success!")
       except rospy.ServiceException, e:
           rospy.logerr("Spawn SDF service call failed: {0}".format(e))
     if moveit:
@@ -217,16 +218,17 @@ class SceneController(object):
 
   def makeModel(self, shape='box', size_x=0.5, size_y=0.5, 
                size_z=0.5, size_r=0.5, x=None, y=None, z=None, 
-               mass=0.5, color_r=0, color_g=1, color_b=0, color_a=1, mu1=1000, mu2=1000,
+               mass=0.5, ambient_r=0, ambient_g=1, ambient_b=0, ambient_a=1, mu1=1000, mu2=1000,
                reference_frame='world',
                restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
-               name=None):
+               name=None, diffuse_r=1, diffuse_g=1, diffuse_b=1, diffuse_a=0):
     if not name:
       name = 'object_' + str(len(self.models))
     model = Model(shape=shape, size_x=size_x, size_y=size_y,
-      size_z=size_z, size_r=size_r, x=x, y=y, z=z, mass=mass, color_r=color_r, color_g=color_g,
-      color_b=color_b, color_a=color_a, mu1=mu1, mu2=mu2, reference_frame=reference_frame, 
-      restitution_coeff=restitution_coeff, roll=roll, pitch=pitch, yaw=yaw, name=name)
+      size_z=size_z, size_r=size_r, x=x, y=y, z=z, mass=mass, ambient_r=ambient_r, ambient_g=ambient_g,
+      ambient_b=ambient_b, ambient_a=ambient_a, mu1=mu1, mu2=mu2, reference_frame=reference_frame, 
+      restitution_coeff=restitution_coeff, roll=roll, pitch=pitch, yaw=yaw, name=name, diffuse_r=diffuse_r,
+      diffuse_g=diffuse_g, diffuse_b=diffuse_b, diffuse_a=diffuse_a)
     self.models.append(model)
     self.checkUniqueModelNames()
     return model
@@ -351,9 +353,9 @@ class ExternalCamera(object):
 
 class Model(object):
   def __init__(self, shape='box', size_x=0.5, size_y=0.5, size_z=0.5, size_r=0.5, x=None, y=None, 
-               z=None, mass=0.5, color_r=0, color_g=1, color_b=0, color_a=0, mu1=1000, mu2=1000,
+               z=None, mass=0.5, ambient_r=0, ambient_g=1, ambient_b=0, ambient_a=0, mu1=1000, mu2=1000,
                reference_frame='world', restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
-               name=None):
+               name=None, diffuse_r=1, diffuse_g=1, diffuse_b=1, diffuse_a=0):
     self.shape = shape
     if self.shape not in ['box', 'cylinder', 'sphere']:
       self.shape = 'box'
@@ -373,10 +375,14 @@ class Model(object):
       print 'I found size_z == None'
       self.z = -size_z/2.0
     self.mass = mass
-    self.color_r = color_r
-    self.color_g = color_g
-    self.color_b = color_b
-    self.color_a = color_a
+    self.ambient_r = ambient_r
+    self.ambient_g = ambient_g
+    self.ambient_b = ambient_b
+    self.ambient_a = ambient_a
+    self.diffuse_r = diffuse_r
+    self.diffuse_g = diffuse_g
+    self.diffuse_b = diffuse_b
+    self.diffuse_a = diffuse_a
     self.mu1 = mu1
     self.mu2 = mu2
 
@@ -463,7 +469,8 @@ class Model(object):
     sdf += '\t\t\t<visual name="%s_visual">\n' % self.name
     sdf += self.generateGeometrySDF()
     sdf += '\t\t\t\t<material>\n'
-    sdf += '\t\t\t\t\t<ambient> %s %s %s %s</ambient>\n' % (self.color_r, self.color_g, self.color_b, self.color_a)
+    sdf += '\t\t\t\t\t<ambient> %s %s %s %s</ambient>\n' % (self.ambient_r, self.ambient_g, self.ambient_b, self.ambient_a)
+    sdf += '\t\t\t\t\t<diffuse> %s %s %s %s</diffuse>\n' % (self.diffuse_r, self.diffuse_g, self.diffuse_b, self.diffuse_a)
     sdf += '\t\t\t\t</material>\n'
     sdf += '\t\t\t</visual>\n'
     sdf += '\t\t</link>\n'

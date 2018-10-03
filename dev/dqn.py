@@ -113,66 +113,69 @@ class screenHandler(object):
     width, height = pil_image.size
 
     cropped = pil_image.crop((0, 300, width, height))
-    print dir(image)
-    assert False
     # cropped.show()
     self.most_recent = cropped
     self.initialized = True
-    self.getGreenBlockLocation()
+    self.findGreenPixels()
 
-  def findGreenPixels(self, threshold=100):
+  def findGreenPixels(self, threshold=20):
     image = self.most_recent
+    edges = cv2.Canny(image, 100, 200)
+    import pdb; pdb.set_trace()
     newimdata = []
     whitecolor = (255, 255, 255)
     greencolor = (0, 255, 0)
     blackcolor = (0,0,0)
     for color in image.getdata():
-      if color == greencolor:
+      r,g,b = color
+      if b > 100 and r<100 and g<100:
+        # if color == greencolor:
         newimdata.append(whitecolor)
       else:
         newimdata.append(blackcolor)
     newim = Image.new(image.mode, image.size)
     newim.putdata(newimdata)
     newim.show()
+    import pdb; pdb.set_trace()
 
 
 
-  def getGreenBlockLocation(self):
-    image = self.most_recent
-    for 
+  # def getGreenBlockLocation(self):
+  #   image = self.most_recent
+  #   for 
 
-    green_x = []
-    green_y = []
-    green_intensities = []
-    width, height = image.size
-    for x in xrange(width):
-        for y in xrange(height):
-            r,g,b = image.getpixel((x,y))
-            if g > 50: green_intensities.append(g)
-    #         if r < 10 and g > 150 and b < 10:
-    #             green_x.append(x)
-    #             green_y.append(y)
-    # mean_x = sum(green_x)/len(green_x)
-    # mean_y = sum(green_y)/len(green_y)
-    # print max(green_intensities), min(green_intensities)
-    unique = list(set(green_intensities))
-    sorted(unique)
-    print unique
+  #   green_x = []
+  #   green_y = []
+  #   green_intensities = []
+  #   width, height = image.size
+  #   for x in xrange(width):
+  #       for y in xrange(height):
+  #           r,g,b = image.getpixel((x,y))
+  #           if g > 50: green_intensities.append(g)
+  #   #         if r < 10 and g > 150 and b < 10:
+  #   #             green_x.append(x)
+  #   #             green_y.append(y)
+  #   # mean_x = sum(green_x)/len(green_x)
+  #   # mean_y = sum(green_y)/len(green_y)
+  #   # print max(green_intensities), min(green_intensities)
+  #   unique = list(set(green_intensities))
+  #   sorted(unique)
+  #   print unique
 
-    # return mean_x, mean_y
+  #   # return mean_x, mean_y
 
-    def redOrBlack(im):
-      newimdata = []
-      redcolor = (255,0,0)
-      blackcolor = (0,0,0)
-      for color in im.getdata():
-          if color == redcolor:
-              newimdata.append( redcolor )
-          else:
-              newimdata.append( blackcolor )
-      newim = Image.new(im.mode,im.size)
-      newim.putdata(newimdata)
-      return newim
+  #   def redOrBlack(im):
+  #     newimdata = []
+  #     redcolor = (255,0,0)
+  #     blackcolor = (0,0,0)
+  #     for color in im.getdata():
+  #         if color == redcolor:
+  #             newimdata.append( redcolor )
+  #         else:
+  #             newimdata.append( blackcolor )
+  #     newim = Image.new(im.mode,im.size)
+  #     newim.putdata(newimdata)
+  #     return newim
 
 
 
