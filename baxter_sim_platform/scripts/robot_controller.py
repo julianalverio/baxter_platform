@@ -48,7 +48,7 @@ from moveit_commander.conversions import pose_to_list
 
 
 class RobotController(object):
-  def __init__(self, use_moveit=False, tolerance=0.008726646):
+  def __init__(self, moveit=False, tolerance=0.008726646):
     baxter_interface.JOINT_ANGLE_TOLERANCE = tolerance
     self._left_limb = baxter_interface.Limb('left')
     self._right_limb = baxter_interface.Limb('right')
@@ -70,7 +70,7 @@ class RobotController(object):
     
     self.server_pid_path = None
 
-    if use_moveit:
+    if moveit:
       moveit_commander.roscpp_initialize(sys.argv)
       self.robot_commander = moveit_commander.RobotCommander()
       self.left_commander = moveit_commander.MoveGroupCommander('left_arm')
