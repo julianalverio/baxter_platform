@@ -44,3 +44,5 @@ echo "alias set_stuff='rosparam set /robot_description_semantic -t ~/catkin_ws/s
 echo "alias load_stuff='rosparam load ~/catkin_ws/src/baxter_platform/moveit_robots/baxter/baxter_moveit_config/config/kinematics.yaml'" >> ~/.bashrc
 echo "alias setup='set_stuff; load_stuff; rosrun moveit_ros_move_group move_group'" >> ~/.bashrc
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
+sudo chmod -R 777 ~/.ros
+sudo chmod -R 777 ~
