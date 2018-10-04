@@ -13,7 +13,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-import torchvision.transforms as T
+# import torchvision.transforms as T
 
 import sys
 import rospy
@@ -21,6 +21,8 @@ import cv2
 from std_msgs.msg import String
 from sensor_msgs.msg import Image as RosImage
 from cv_bridge import CvBridge, CvBridgeError
+
+from scene_generator import *
 
 
 
@@ -94,6 +96,8 @@ class screenHandler(object):
     self.image_sub = rospy.Subscriber('/cameras/head_camera/image', RosImage, self.callback)
     self.most_recent = None
     self.initialized = False
+    self.green_x = None
+    self.green_y = None
 
   def getScreen(self):
     if not self.initialized:
@@ -116,67 +120,53 @@ class screenHandler(object):
     # cropped.show()
     self.most_recent = cropped
     self.initialized = True
-    self.findGreenPixels()
+    self.green_x, self.green_y = self.findGreenPixels()
+
+  def getReward(self):
+    width, _ = self.most_recent.size()
+    if self.green_x > width/2.:
+      return 1
+    return 0
+
 
   def findGreenPixels(self, threshold=20):
+    found = False
+    while not found:
+      x_coords = []
+      y_coords = []
+      image = self.most_recent
+      pixels = image.getdata()
+      width, height = image.size
+      found = False
+      for idx, (r,g,b) in enumerate(pixels):
+        x_coord = idx % width
+        y_coord = idx // width
+        if g>100 and r<50 and b<50:
+          found = True
+          x_coords.append(x_coord)
+          y_coords.append(y_coord)
+        if not found:
+          rospy.sleep(0.1)
+          continue
+        return sum(x_coords)/len(x_coords), sum(y_coords)/len(y_coords) 
+
+
+  def showGreenPixels(self, threshold=20):
     image = self.most_recent
-    edges = cv2.Canny(image, 100, 200)
-    import pdb; pdb.set_trace()
     newimdata = []
     whitecolor = (255, 255, 255)
     greencolor = (0, 255, 0)
     blackcolor = (0,0,0)
     for color in image.getdata():
       r,g,b = color
-      if b > 100 and r<100 and g<100:
-        # if color == greencolor:
+      if g > 100 and r<50 and b<50:
         newimdata.append(whitecolor)
       else:
         newimdata.append(blackcolor)
     newim = Image.new(image.mode, image.size)
     newim.putdata(newimdata)
+    image.show()
     newim.show()
-    import pdb; pdb.set_trace()
-
-
-
-  # def getGreenBlockLocation(self):
-  #   image = self.most_recent
-  #   for 
-
-  #   green_x = []
-  #   green_y = []
-  #   green_intensities = []
-  #   width, height = image.size
-  #   for x in xrange(width):
-  #       for y in xrange(height):
-  #           r,g,b = image.getpixel((x,y))
-  #           if g > 50: green_intensities.append(g)
-  #   #         if r < 10 and g > 150 and b < 10:
-  #   #             green_x.append(x)
-  #   #             green_y.append(y)
-  #   # mean_x = sum(green_x)/len(green_x)
-  #   # mean_y = sum(green_y)/len(green_y)
-  #   # print max(green_intensities), min(green_intensities)
-  #   unique = list(set(green_intensities))
-  #   sorted(unique)
-  #   print unique
-
-  #   # return mean_x, mean_y
-
-  #   def redOrBlack(im):
-  #     newimdata = []
-  #     redcolor = (255,0,0)
-  #     blackcolor = (0,0,0)
-  #     for color in im.getdata():
-  #         if color == redcolor:
-  #             newimdata.append( redcolor )
-  #         else:
-  #             newimdata.append( blackcolor )
-  #     newim = Image.new(im.mode,im.size)
-  #     newim.putdata(newimdata)
-  #     return newim
-
 
 
 
@@ -244,59 +234,52 @@ class screenHandler(object):
 #    episode.
 #
 
-# BATCH_SIZE = 128
-# GAMMA = 0.999
-# EPS_START = 0.9
-# EPS_END = 0.05
-# EPS_DECAY = 200
-# TARGET_UPDATE = 10
+BATCH_SIZE = 128
+GAMMA = 0.999
+EPS_START = 0.9
+EPS_END = 0.05
+EPS_DECAY = 200
+TARGET_UPDATE = 10
 
-# policy_net = DQN().to(device)
-# target_net = DQN().to(device)
-# target_net.load_state_dict(policy_net.state_dict())
-# target_net.eval()
+policy_net = DQN().to(device)
+target_net = DQN().to(device)
+target_net.load_state_dict(policy_net.state_dict())
+target_net.eval()
 
-# optimizer = optim.RMSprop(policy_net.parameters())
-# memory = ReplayMemory(10000)
-
-
-# steps_done = 0
+optimizer = optim.RMSprop(policy_net.parameters())
+memory = ReplayMemory(10000)
 
 
-def select_action(state):
+steps_done = 0
+
+
+# reference http://sdk.rethinkrobotics.com/wiki/Hardware_Specifications#Range_of_Motion_-_Bend_Joints
+def getRandomState():
+  joint_angles = []
+  # joint_angles.append(random.uniform(-97.494, 97.494)) #s0
+  joint_angles.append(random.uniform(-60, 60)) #s0
+  joint_angles.append(random.uniform(-60, 30)) #s1
+  joint_angles.append(random.uniform(-80, 80)) #e0
+  joint_angles.append(random.uniform(0, 70)) #e1
+  joint_angles.append(random.uniform(-80, 80)) #w0
+  joint_angles.append(random.uniform(-40, 60)) #w1
+  joint_angles.append(random.uniform(-80, 80)) #w2
+  return joint_angles
+
+
+def selectAction(state):
     global steps_done
     sample = random.random()
     eps_threshold = EPS_END + (EPS_START - EPS_END) * \
-        math.exp(-1. * steps_done / EPS_DECAY)
+      math.exp(-1. * steps_done / EPS_DECAY)
     steps_done += 1
     if sample > eps_threshold:
-        with torch.no_grad():
-            return policy_net(state).max(1)[1].view(1, 1)
+      with torch.no_grad():
+        import pdb; pdb.set_trace()
+        return policy_net(state).max(1)[1].view(1, 1)
     else:
-        return torch.tensor([[random.randrange(2)]], device=device, dtype=torch.long)
-
-
-episode_durations = []
-
-
-def plot_durations():
-    plt.figure(2)
-    plt.clf()
-    durations_t = torch.tensor(episode_durations, dtype=torch.float)
-    plt.title('Training...')
-    plt.xlabel('Episode')
-    plt.ylabel('Duration')
-    plt.plot(durations_t.numpy())
-    # Take 100 episode averages and plot them too
-    if len(durations_t) >= 100:
-        means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
-        means = torch.cat((torch.zeros(99), means))
-        plt.plot(means.numpy())
-
-    plt.pause(0.001)  # pause a bit so that plots are updated
-    if is_ipython:
-        display.clear_output(wait=True)
-        display.display(plt.gcf())
+      return getRandomState()
+      # return torch.tensor(getRandomState(), device=device, dtype=torch.long)
 
 
 ######################################################################
@@ -355,67 +338,56 @@ def optimize_model():
     optimizer.step()
 
 
-######################################################################
-#
-# Below, you can find the main training loop. At the beginning we reset
-# the environment and initialize the ``state`` Tensor. Then, we sample
-# an action, execute it, observe the next screen and the reward (always
-# 1), and optimize our model once. When the episode ends (our model
-# fails), we restart the loop.
-#
-# Below, `num_episodes` is set small. You should download
-# the notebook and run lot more epsiodes.
-#
-
-# num_episodes = 50
-# for i_episode in range(num_episodes):
-#     # Initialize the environment and state
-#     env.reset()
-#     last_screen = get_screen()
-#     current_screen = get_screen()
-#     state = current_screen - last_screen
-#     for t in count():
-#         # Select and perform an action
-#         action = select_action(state)
-#         _, reward, done, _ = env.step(action.item())
-#         reward = torch.tensor([reward], device=device)
-
-#         # Observe new state
-#         last_screen = current_screen
-#         current_screen = get_screen()
-#         if not done:
-#             next_state = current_screen - last_screen
-#         else:
-#             next_state = None
-
-#         # Store the transition in memory
-#         memory.push(state, action, next_state, reward)
-
-#         # Move to the next state
-#         state = next_state
-
-#         # Perform one step of the optimization (on the target network)
-#         optimize_model()
-#         if done:
-#             episode_durations.append(t + 1)
-#             plot_durations()
-#             break
-#     # Update the target network
-#     if i_episode % TARGET_UPDATE == 0:
-#         target_net.load_state_dict(policy_net.state_dict())
-
-# print('Complete')
-# env.render()
-# env.close()
-# plt.ioff()
-# plt.show()
-
-
-def main():
-  rospy.init_node('something', anonymous=True)
-  x = screenHandler()
-  x.getScreen()
+def resetScene(manager):
+  manager.scene_controller.deleteAllGazeboModels()
+  manager.scene_controller.makeModel(name='table', shape='box', roll=0., pitch=0., yaw=0., restitution_coeff=0., size_x=.7, size_y=1.5, size_z=.7, x=.8, y=0., z=.35, mass=5000, ambient_r=0.1, ambient_g=0.1, ambient_b=0.1, ambient_a=0.1, mu1=1, mu2=1, reference_frame='')
+  manager.scene_controller.makeModel(name='testObject', shape='box', size_x=0.1, size_y=0.1, size_z=0.1, x=0.8, y=0.3, z=0.75, mass=20000, mu1=1000, mu2=2000, restitution_coeff=0.5, roll=0.1, pitch=0.2, yaw=0.3, ambient_r=0, ambient_g=1, ambient_b=0, ambient_a=1, diffuse_r=0, diffuse_g=1, diffuse_b=0, diffuse_a=1)
+  manager.scene_controller.spawnGazeboModels()
 
 
 
-main()
+
+manager = Manager()
+rospy.on_shutdown(manager.shutdown)
+screen_handler = screenHandler()
+num_episodes = 1000
+for i_episode in xrange(num_episodes):
+  print "beginning episode: ", i_episode
+  # Initialize the environment and state
+  start = rospy.Time.now()
+  resetScene(manager)
+  state = screen_handler.getScreen()
+  for t in count():
+    # Select and perform an action
+    action = selectAction(state)
+    manager.robot_controller.followTrajectoryFromJointAngles([action])
+    print("Done moving at time: " + str(rospy.Time.now()))
+    reward = screen_handler.getReward()
+
+    # Observe new state
+    done = reward or (rospy.Time.now() - start > rospy.Time(10))
+    if not reward:
+      next_state = screen_handler.getScreen()
+    else:
+      next_state = None
+
+    reward = torch.tensor([reward], device=device)
+    action = torch.tensor([action], device=device)
+    next_state = torch.tensor([next_state], device=device)
+
+    # Store the transition in memory
+    memory.push(state, action, next_state, reward)
+
+    # Move to the next state
+    state = next_state
+
+    # Perform one step of the optimization (on the target network)
+    optimize_model()
+    if done:
+      break
+    # Update the target network
+    if i_episode % TARGET_UPDATE == 0:
+      target_net.load_state_dict(policy_net.state_dict())
+
+torch.save(policy_net, "policy_net.pth")
+torch.save(target_net, "target_net.pth")

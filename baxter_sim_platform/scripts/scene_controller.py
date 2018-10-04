@@ -221,7 +221,7 @@ class SceneController(object):
                mass=0.5, ambient_r=0, ambient_g=1, ambient_b=0, ambient_a=1, mu1=1000, mu2=1000,
                reference_frame='world',
                restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
-               name=None, diffuse_r=1, diffuse_g=1, diffuse_b=1, diffuse_a=0):
+               name=None, diffuse_r=1, diffuse_g=1, diffuse_b=1, diffuse_a=1):
     if not name:
       name = 'object_' + str(len(self.models))
     model = Model(shape=shape, size_x=size_x, size_y=size_y,
@@ -355,7 +355,7 @@ class Model(object):
   def __init__(self, shape='box', size_x=0.5, size_y=0.5, size_z=0.5, size_r=0.5, x=None, y=None, 
                z=None, mass=0.5, ambient_r=0, ambient_g=1, ambient_b=0, ambient_a=0, mu1=1000, mu2=1000,
                reference_frame='world', restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
-               name=None, diffuse_r=1, diffuse_g=1, diffuse_b=1, diffuse_a=0):
+               name=None, diffuse_r=1, diffuse_g=1, diffuse_b=1, diffuse_a=1):
     self.shape = shape
     if self.shape not in ['box', 'cylinder', 'sphere']:
       self.shape = 'box'
