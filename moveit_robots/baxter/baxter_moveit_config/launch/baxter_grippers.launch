@@ -38,6 +38,5 @@
     <param name="publish_frequency" type="double" value="30.0" />
     <rosparam param="/source_list"> [/robot/joint_states] </rosparam>
   </node>
-
-  <include file="$(find baxter_moveit_config)/launch/default_warehouse_db.launch" />
+  <!-- <include file="$(find baxter_moveit_config)/launch/default_warehouse_db.launch" /> -->
 </launch>
