@@ -36,6 +36,14 @@ from baxter_core_msgs.msg import (
 )
 from gazebo_msgs.msg import ContactsState
 
+import rospy
+import moveit_commander
+import moveit_msgs.msg
+import geometry_msgs.msg
+from math import pi
+from std_msgs.msg import String
+from moveit_commander.conversions import pose_to_list
+
 
 
 
@@ -180,10 +188,9 @@ class RobotController(object):
     else:
       group = self.right_commander
     for angle_position in trajectory:
-      import pdb; pdb.set_trace()
-      waypoint = copy.deepcopy(angle_position)
-      group.go(waypoint, wait=True)
-      group.stop()
+      print(group.get_current_joint_values())
+      group.go(angle_position, wait=True)
+    group.stop()
 
 
   '''
