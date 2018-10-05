@@ -25,6 +25,7 @@ from std_msgs.msg import (
 )
 
 from std_srvs.srv import Empty as placeholder
+import tf_conversions
 
 
   
@@ -36,10 +37,11 @@ class SceneController(object):
     self.pause_proxy = rospy.ServiceProxy('/gazebo/pause_physics', placeholder)
     self.unpause_proxy = rospy.ServiceProxy('/gazebo/unpause_physics', placeholder)
     self.scene_commander = moveit_commander.PlanningSceneInterface()
+    rospy.wait_for_service('/gazebo/spawn_sdf_model')
+    self.spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+    rospy.wait_for_service('/gazebo/spawn_sdf_model')
+    self.delete_proxy = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 
-  def shutdown(self):
-    self.deleteAllGazeboModels()
-    self.deleteAllMoveItModels()
 
 ####################################################################################################
 ################################# Pause/Unpause Simulation Methods #################################
@@ -64,73 +66,41 @@ class SceneController(object):
   NOTE: MoveIt! Currently only supports boxes, spheres, and meshes -- NOT cylinders.
   http://docs.ros.org/jade/api/moveit_commander/html/planning__scene__interface_8py_source.html 
   '''
-  def spawnGazeboModels(self, moveit=False):
-    rospy.wait_for_service('/gazebo/spawn_sdf_model')
-    spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-    for model in self.models:
-      pose = model.pose
-      reference_frame = model.reference_frame
-      sdf = model.generateSDF().replace('\n', '').replace('\t', '')
-      try:
-        rospy.loginfo('Loading model named: %s' % model.name)
-        resp_sdf = spawn_proxy(model.name, sdf, "/",
-                             pose, reference_frame)
-        print("Success!")
-      except rospy.ServiceException, e:
-          rospy.logerr("Spawn SDF service call failed: {0}".format(e))
-    if moveit:
-      for model in models:
-        pose = Pose()
-        pose.orientation = Quaternion(
-          tf_conversions.transformations.quaternion_from_euler(model.roll, model.pitch, model.yaw))
-        pose.position.x = model.x
-        pose.position.y = model.y
-        pose.position.z = model.z
-        model_msg = geometry_msgs.msg.PoseStamped()
-        model_msg.pose = pose
-        if model.shape == 'box':
-          self.scene_commander.add_box(
-            model.name, pose, size=(model.size_x, model.size_y, model.size_z))
-          success = waitForSpawn(model.name)
-        if model.shape == 'sphere':
-          self.scene_commander.add_sphere(model.name, pose, radius=model.size_r)
-        else:
-          rospy.logerr('MoveIt is ignoring model named %s of shape %s.' % (model.name, model.shape))
-
-  # Similar to spawnGazeboModels, but for only one model for which you pass in the name
-  def spawnGazeboModel(self, model_name, moveit=False):
-    for _model in self.models:
-      if _model.name == model_name:
-        model = _model
-    rospy.wait_for_service('/gazebo/spawn_sdf_model')
-    spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+  def spawnModel(self, model, moveit=False):
     pose = model.pose
     reference_frame = model.reference_frame
     sdf = model.generateSDF().replace('\n', '').replace('\t', '')
     try:
-      rospy.loginfo('Loading model named: %s...' % model.name)
+      rospy.loginfo('Loading model named: %s' % model.name)
       resp_sdf = spawn_proxy(model.name, sdf, "/",
                            pose, reference_frame)
-      rospy.loginfo(resp_sdf)
+      print("Success!")
     except rospy.ServiceException, e:
         rospy.logerr("Spawn SDF service call failed: {0}".format(e))
     if moveit:
       pose = Pose()
-      pose.orientation = Quaternion(
-        tf_conversions.transformations.quaternion_from_euler(model.roll, model.pitch, model.yaw))
-      pose.position.x = model.x
+      quat_x, quat_y, quat_z, quat_w = tf_conversions.transformations.quaternion_from_euler(model.roll, model.pitch, model.yaw)
+      pose.orientation = Quaternion(quat_x, quat_y, quat_z, quat_w)
+      pose.position.x = model.x #TODO modify to align
       pose.position.y = model.y
       pose.position.z = model.z
       model_msg = geometry_msgs.msg.PoseStamped()
       model_msg.pose = pose
+      model_msg.header.frame_id = 'base'
       if model.shape == 'box':
         self.scene_commander.add_box(
-          model.name, pose, size=(model.size_x, model.size_y, model.size_z))
-        success = waitForSpawn(model.name)
-      if model.shape == 'sphere':
+          model.name, model_msg, size=(model.size_x, model.size_y, model.size_z))
+        self.waitForMoveItObject(model.name)
+      elif model.shape == 'sphere':
         self.scene_commander.add_sphere(model.name, pose, radius=model.size_r)
+        self.waitForMoveItObject(model.name)
       else:
         rospy.logerr('MoveIt is ignoring model named %s of shape %s.' % (model.name, model.shape))
+
+  # Similar to spawnModels, but for only one model for which you pass in the name
+  def spawnModels(self, moveit=False):
+    for model in self.models:
+      spawnModel(model, moveit=moveit)
 
 
   '''
@@ -144,8 +114,8 @@ class SceneController(object):
   def waitForMoveItObject(self, name, end='scene', timeout=5):
     start = rospy.get_time()
     while (rospy.get_time() - start < timeout) and not rospy.is_shutdown():
-      in_scene = name in scene.get_known_object_names()
-      attached_objects = scene.get_attached_objects([box_name])
+      in_scene = name in self.scene_commander.get_known_object_names()
+      attached_objects = self.scene_commander.get_attached_objects([name])
       is_attached = len(attached_objects.keys()) > 0
 
       if in_scene and is_attached:
@@ -155,31 +125,18 @@ class SceneController(object):
       if end == 'scene' and in_scene:
         return
 
-      if end == 'attached' and is_attached:
-        return
-
     rospy.logerr('Yikes -- timed out while adding object to MoveIt! scene. A node must have failed')
-    rospy.shutdown()
+    rospy.signal_shutdown("Failed to Generate MoveIt Object")
 
 
   '''
-  Will be called upon ROS Exit. Deletes Gazebo models
-  Do not wait for the Gazebo Delete Model service, since
-  Gazebo should already be running. If the service is not
-  available since Gazebo has been killed, it is fine to error out
+  Will be called upon ROS Exit. 
+  Deletes all Gazebo (and potentiall MoveIt!) models
   This will also delete any cameras you make
   '''
-  def deleteAllGazeboModels(self):
-    try:
-        delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
-    except rospy.ServiceException, _:
-        print 'FAILED TO CONTACT SERVICE PROXY: /gazebo/delete_model'
-
+  def deleteAllModels(self, moveit=False):
     for model in self.models:
-      try:
-        resp_delete = delete_model(model.name)
-      except rospy.ServiceException, _:
-        print 'FAILED TO DELETE MODEL: %s' % model.name
+      self.deleteModel(model.name, moveit=moveit)
     for camera_idx in xrange(self.cameras):
       camera_name = 'camera_' + str(camera_idx)
       try:
@@ -187,33 +144,20 @@ class SceneController(object):
       except rospy.ServiceException, _:
         print 'FAILED TO DELETE CAMERA: %s' % camera_name
     self.cameras = 0
-    self.models = []
 
 
-  # Delete a particular Gazebo model
-  def deleteGazeboModel(self, model_name):
+  # Delete a particular model instance
+  def deleteModel(self, model_name, moveit=False):
     try:
-      delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+      resp_delete = self.delete_proxy(model_name)
     except rospy.ServiceException, _:
-      print 'FAILED TO CONTACT SERVICE PROXY: /gazebo/delete_model'
-    try:
-      resp_delete = delete_model(model.name)
-    except rospy.ServiceException, _:
-      print 'FAILED TO DELETE MODEL: %s' % model.name
-    for idx, model in self.models:
-      if  model.name == model_name:
+      print 'FAILED TO DELETE MODEL: %s' % model_name
+    if moveit:
+      self.scene_commander.remove_world_object(model_name)
+    for idx, model in enumerate(self.models):
+      if model.name == model_name:
         self.models.pop(idx)
 
-
-  # Deletes a particular MoveIt object
-  def deleteMoveItModel(self, object_name):
-    scene_commander.remove_world_object(object_name)
-
-
-  # Deletes all MoveIt! objects
-  def deleteAllMoveItModels(self):
-    for object_name in [model.name for model in self.models]:
-      self.scene_commander.remove_world_object(object_name)
   
 
   def makeModel(self, shape='box', size_x=0.5, size_y=0.5, 

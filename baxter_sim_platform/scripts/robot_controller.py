@@ -46,7 +46,6 @@ from moveit_commander.conversions import pose_to_list
 
 
 
-
 class RobotController(object):
   def __init__(self, moveit=False, tolerance=0.008726646):
     baxter_interface.JOINT_ANGLE_TOLERANCE = tolerance
@@ -325,13 +324,16 @@ class RobotController(object):
   Input: a pose for the end effector
   Output: a joint angle dictionary
   '''
-  def solveIK(self, pose, verbose=True):
+  def solveIK(self, pose, verbose=True, limb='left'):
     #the header content doesn't matter but you need to have one
     header = Header(stamp=rospy.Time.now(), frame_id='base')
     ikreq = SolvePositionIKRequest()
     ikreq.pose_stamp.append(PoseStamped(header=header, pose=pose))
     try:
-      resp = self._iksvc(ikreq)
+      if limb == 'left':
+        resp = self.left_iksvc(ikreq)
+      else:
+        resp = self.right_iksvc(ikreq)
     except (rospy.ServiceException, rospy.ROSException), e:
       rospy.logerr("Service call failed: %s" % (e,))
       return
