@@ -1,0 +1,15 @@
+Press and hold power button until the button lights up
+Wait while the baxter initializes
+
+# disable sonar
+rostopic pub /robot/sonar/head_sonar/set_sonars_enabled std_msgs/UInt16 0
+
+#modify catkin_ws/baxter.sh orion@csail.mit.edu
+./baxter.sh
+
+#make sure the e-stop is close by
+
+#enable the robot
+rosrun baxter_tools enable_robot.py -e
+
+#Use the baxter_sim_platform normally. robot_controller.py should have full functionality
