@@ -6,4 +6,10 @@ MirrorURL: http://ca.archive.ubuntu.com/ubuntu/
 AUTHOR jalverio@mit.edu
 
 %post
+# Get keys for Gazebo
+sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable xenial main" > /etc/apt/sources.list.d/gazebo-stable.list'
+wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
+# Get keys for ROS Kinetic
+sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
+apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 apt-get update && apt-get upgrade && apt-get -y install git wget python nano
