@@ -6,7 +6,7 @@ MirrorURL: http://ca.archive.ubuntu.com/ubuntu/
 AUTHOR jalverio@mit.edu
 
 %post
-apt install wget
+apt install wget -y
 # Get keys for Gazebo
 sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable xenial main" > /etc/apt/sources.list.d/gazebo-stable.list'
 wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
