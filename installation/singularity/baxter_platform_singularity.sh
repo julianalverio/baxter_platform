@@ -10,18 +10,15 @@ apt-get update
 apt-get install ros-kinetic-desktop-full -y
 rosdep init
 rosdep update
-source ~/.bashrc
-source /opt/ros/kinetic/setup.bash
 apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
 # Install pip and pyassimp package
 apt install python-pip -y
 pip install --upgrade pip
-pip install pyassimp==3.3
+#pip install pyassimp==3.3
 # Prerequisites for Baxter Platfor
 apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-moveit-commander -y
 # Install MoveIt!
 apt-get install ros-kinetic-moveit -y
-cd ~/catkin_ws/src/baxter_platform/installation
 
 echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
@@ -39,3 +36,5 @@ echo "alias setup='set_stuff; load_stuff; rosrun moveit_ros_move_group move_grou
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
 chmod 777 ~/.ros
 chmod -R 777 ~
+
+#install pyassimp, source ~/.bashrc, catkin_make
