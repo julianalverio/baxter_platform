@@ -1,3 +1,5 @@
+echo "deb http://ca.archive.ubuntu.com/ubuntu xenial main universe" > /etc/apt/sources.list
+apt-get update
 # Get keys for Gazebo
 sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable xenial main" > /etc/apt/sources.list.d/gazebo-stable.list'
 wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
@@ -6,6 +8,12 @@ sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sour
 apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 
 apt-get update
+
+locale-gen en_US.UTF-8
+echo 'LC_CTYPE="en_US.UTF-8"' > /etc/default/locale
+echo 'LC_ALL="en_US.UTF-8"' >> /etc/default/locale
+echo 'LANG="en_US.UTF-8"' >> /etc/default/locale
+update-locale
 
 # Install ROS Kinetic and other prereqs
 apt-get install ros-kinetic-desktop-full -y
