@@ -15,11 +15,11 @@ wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
 sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
 #this is a test below
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 421C365BD9FF1F717815A3895523BAEEB01FA116
-echo "the test has completed"
-apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 
 apt-get update && apt-get upgrade
 
+echo "deb http://ca.archive.ubuntu.com/ubuntu xenial main universe" > /etc/apt/sources.list
+cat /etc/apt/sources.list
 apt-get install ros-kinetic-desktop-full -y
 rosdep init
 rosdep update
