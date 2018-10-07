@@ -19,7 +19,3 @@ apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD
 echo "deb http://ca.archive.ubuntu.com/ubuntu xenial main universe" > /etc/apt/sources.list
 
 apt-get update
-
-
-
-
