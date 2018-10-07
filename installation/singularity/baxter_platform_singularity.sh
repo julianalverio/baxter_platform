@@ -41,12 +41,12 @@ echo "alias load_stuff='rosparam load ~/catkin_ws/src/baxter_platform/moveit_rob
 echo "alias setup='set_stuff; load_stuff; rosrun moveit_ros_move_group move_group'" >> ~/.bashrc
 
 
-#pip install pyassimp==3.3
+# pip install pyassimp==3.3
 #install pyassimp, source ~/.bashrc, catkin_make
 
 
 
-# apt-get install ros-kinetic-desktop-full -y
+#  
 # rosdep init
 # rosdep update
 # apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
