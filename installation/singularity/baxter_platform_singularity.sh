@@ -18,11 +18,14 @@ apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-
 
 # Install pip and upgrade
 apt install python-pip -y
-pip install --upgrade pip
+pip install --upgrade pip==9.0.3
+pip install pyassimp
 
 # Install MoveIt!
 apt-get install ros-kinetic-moveit -y
 
+mkdir -p catkin_ws/src; cd catkin_ws/src
+git clone https://github.com/julianalverio/baxter_platform
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
 chmod 777 ~/.ros
 chmod -R 777 ~
