@@ -361,7 +361,6 @@ for i_episode in xrange(num_episodes):
   for t in count():
     # Select and perform an action
     action = selectAction(state)
-    move_to_joint_positions(self, positions, timeout=15.0, threshold=0.008726646)
     manager.robot_controller._left_limb.move_to_joint_positions(action, timeout=8., threshold=0.02)
     print("Done moving at time: " + str(rospy.Time.now()))
     reward = screen_handler.getReward_slide_right()
