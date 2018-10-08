@@ -420,8 +420,6 @@ class Model(object):
     sdf += '\t\t</link>\n'
     sdf += '\t</model>\n'
     sdf += '</sdf>'
-    f = open('/home/infolab/catkin_ws/src/baxter_platform/baxter_sim_platform/models/delete_later.sdf', 'w+')
-    f.write(sdf)
     return sdf
 
   # Helper method called by generateSDF()
