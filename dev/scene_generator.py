@@ -59,7 +59,8 @@ from gazebo_msgs.srv import GetLinkState
 from gazebo_msgs.msg import ContactsState, ModelStates
 import csv
 
-sys.path.append(os.getcwd()+'/../baxter_sim_platform/scripts')
+platform_path = rospkg.RosPack().get_path('baxter_sim_platform')
+sys.path.append(platform_path+'/scripts')
 
 from trajectory import *
 from robot_controller import *
