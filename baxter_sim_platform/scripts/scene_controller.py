@@ -100,7 +100,7 @@ class SceneController(object):
   # Similar to spawnModels, but for only one model for which you pass in the name
   def spawnAllModels(self, moveit=False):
     for model in self.models:
-      spawnModel(model, moveit=moveit)
+      self.spawnModel(model, moveit=moveit)
 
 
   '''
