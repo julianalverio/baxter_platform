@@ -373,7 +373,7 @@ for i_episode in xrange(num_episodes):
     reward = screen_handler.getReward_slide_right()
 
     # Observe new state
-    done = reward or (rospy.Time.now() - start > rospy.Time(TIMEOUT))
+    done = reward or (rospy.Time.now() - start > rospy.Duration(TIMEOUT))
     if not reward:
       next_state = screen_handler.getScreen()
     else:
