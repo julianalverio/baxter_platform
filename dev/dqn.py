@@ -122,7 +122,8 @@ class screenHandler(object):
     self.initialized = True
     self.green_x, self.green_y = self.findGreenPixels()
 
-  def getReward(self):
+
+  def getReward_slide_right(self):
     width, _ = self.most_recent.size()
     if self.green_x > width/2.:
       return 1
@@ -256,14 +257,14 @@ steps_done = 0
 # reference http://sdk.rethinkrobotics.com/wiki/Hardware_Specifications#Range_of_Motion_-_Bend_Joints
 def getRandomState():
   joint_angles = []
-  # joint_angles.append(random.uniform(-97.494, 97.494)) #s0
-  joint_angles.append(random.uniform(-60, 60)) #s0
-  joint_angles.append(random.uniform(-60, 30)) #s1
-  joint_angles.append(random.uniform(-80, 80)) #e0
-  joint_angles.append(random.uniform(0, 70)) #e1
-  joint_angles.append(random.uniform(-80, 80)) #w0
-  joint_angles.append(random.uniform(-40, 60)) #w1
-  joint_angles.append(random.uniform(-80, 80)) #w2
+  joint_angles.append(random.uniform(-97.4, 97.4)) #s0
+  joint_angles.append(random.uniform(-97, 97)) #s0
+  joint_angles.append(random.uniform(-123, 60)) #s1
+  joint_angles.append(random.uniform(--174, 174)) #e0
+  joint_angles.append(random.uniform(-2.8, 150)) #e1
+  joint_angles.append(random.uniform(--175, 175)) #w0
+  joint_angles.append(random.uniform(-90, 120)) #w1
+  joint_angles.append(random.uniform(-175, 175)) #w2
   return joint_angles
 
 
@@ -346,7 +347,7 @@ def resetScene(manager):
 
 
 
-
+TIMEOUT = 10 #seconds
 manager = Manager()
 rospy.on_shutdown(manager.shutdown)
 screen_handler = screenHandler()
@@ -360,12 +361,13 @@ for i_episode in xrange(num_episodes):
   for t in count():
     # Select and perform an action
     action = selectAction(state)
-    manager.robot_controller.followTrajectoryFromJointAngles([action])
+    move_to_joint_positions(self, positions, timeout=15.0, threshold=0.008726646)
+    manager.robot_controller._left_limb.move_to_joint_positions(action, timeout=8., threshold=0.02)
     print("Done moving at time: " + str(rospy.Time.now()))
-    reward = screen_handler.getReward()
+    reward = screen_handler.getReward_slide_right()
 
     # Observe new state
-    done = reward or (rospy.Time.now() - start > rospy.Time(10))
+    done = reward or (rospy.Time.now() - start > rospy.Time(TIMEOUT))
     if not reward:
       next_state = screen_handler.getScreen()
     else:

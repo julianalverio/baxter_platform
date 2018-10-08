@@ -5,7 +5,7 @@ MirrorURL: http://ca.archive.ubuntu.com/ubuntu/
 %labels
 AUTHOR jalverio@mit.edu
 
-%post
+%post3
 apt install wget -y
 apt-get -y install git wget python nano
 # Get keys for Gazebo
