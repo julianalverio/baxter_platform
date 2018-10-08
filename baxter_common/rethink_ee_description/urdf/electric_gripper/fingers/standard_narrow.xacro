@@ -3,7 +3,10 @@
   <xacro:macro name="finger_xacro" params="gripper_side finger_side reflect finger_tip finger_grasp">
   <xacro:property name="finger_length" value="0.075" scope="global"/>
   <xacro:property name="finger_width" value="0.01725" scope="local"/>
-    <link name="${gripper_side}_gripper_${finger_side}_finger">
+  <xacro:property name="link_name" value="${gripper_side}_gripper_${finger_side}_finger" scope="local"/>
+  <xacro:property name="collision_name" value="${link_name}_collision" scope="local"/>
+  <xacro:property name="sensor_name" value="${link_name}_contact_sensor" scope="local"/>
+    <link name="${link_name}">
       <visual>
         <origin rpy="0 0 ${-pi/2*(reflect+1)}" xyz="0 0 0"/>
         <geometry>
@@ -13,7 +16,7 @@
       <xacro:property name="finger_box_height" value="0.01" scope="local"/>
       <xacro:property name="finger_box_width" value="0.0135" scope="local"/>
       <xacro:property name="finger_box_length" value="0.04" scope="local"/>
-      <collision>
+      <collision name="${collision_name}">
         <origin rpy="0 0 ${-pi/2*(reflect+1)}" xyz="0 ${finger_width*reflect} ${finger_box_length}"/>
         <geometry>
           <box size="${finger_box_height} ${finger_box_width} ${finger_length}"/>
@@ -35,12 +38,23 @@
       </inertial>
     </link>
 
-    <gazebo reference="${gripper_side}_gripper_${finger_side}_finger">
+    <gazebo reference="${link_name}">
       <mu1>1000</mu1>
       <mu2>1000</mu2>
       <fdir1>0.0 0.0 1.0</fdir1>
       <kp>1e5</kp>
       <kd>1.0</kd>
+      <sensor name="${sensor_name}" type="contact">
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <contact>
+          <collision>${collision_name}_collision</collision>
+        </contact>
+        <plugin name="${link_name}_bumper" filename="libgazebo_ros_bumper.so">
+          <bumperTopicName>${gripper_side}_side_gripper_contact_sensor_state</bumperTopicName>
+          <frameName>${link_name}_frame</frameName>
+        </plugin>
+      </sensor>
     </gazebo>
 
    <xacro:property name="none" value="[none, false, null, empty]" scope="local"/>
@@ -48,7 +62,7 @@
      <xacro:property name="finger_tip" value="none" scope="local"/>
    </xacro:if>
    <xacro:include filename="$(find rethink_ee_description)/urdf/electric_gripper/fingers/${finger_tip}.xacro" />
-   <xacro:finger_tip_xacro parent_link="${gripper_side}_gripper_${finger_side}_finger" reflect="${reflect}" grasp="${finger_grasp}">
+   <xacro:finger_tip_xacro parent_link="${link_name}" reflect="${reflect}" grasp="${finger_grasp}">
        <origin rpy="0 0 0" xyz="0.0 ${reflect*finger_width} ${finger_length}"/>
    </xacro:finger_tip_xacro>
 
