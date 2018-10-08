@@ -72,7 +72,7 @@ class SceneController(object):
     sdf = model.generateSDF().replace('\n', '').replace('\t', '')
     try:
       rospy.loginfo('Loading model named: %s' % model.name)
-      resp_sdf = spawn_proxy(model.name, sdf, "/",
+      resp_sdf = self.spawn_proxy(model.name, sdf, "/",
                            pose, reference_frame)
       print("Success!")
     except rospy.ServiceException, e:
@@ -228,7 +228,7 @@ class ExternalCamera(object):
 
   def render(self):
     rospy.wait_for_service('/gazebo/spawn_sdf_model')
-    spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+    self.spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
     pose = Pose()
     pose.position.x = self.x
     pose.position.y = self.y
@@ -238,7 +238,7 @@ class ExternalCamera(object):
     pose.orientation.z = self.quat_z
     pose.orientation.w = self.quat_w
 
-    resp_sdf = spawn_proxy(self.name, self.getSDFString(), "/",
+    resp_sdf = self.spawn_proxy(self.name, self.getSDFString(), "/",
                            pose, '')
 
 
