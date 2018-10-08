@@ -98,7 +98,7 @@ class SceneController(object):
         rospy.logerr('MoveIt is ignoring model named %s of shape %s.' % (model.name, model.shape))
 
   # Similar to spawnModels, but for only one model for which you pass in the name
-  def spawnModels(self, moveit=False):
+  def spawnAllModels(self, moveit=False):
     for model in self.models:
       spawnModel(model, moveit=moveit)
 
