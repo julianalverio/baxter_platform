@@ -76,7 +76,7 @@ class Manager(object):
 
   def shutdown(self):
     self.robot_controller.shutdown()
-    self.scene_controller.shutdown()
+    self.scene_controller.deleteAllModels()
 
 
 def startup():
@@ -91,7 +91,7 @@ def spawnObjects():
 
 
 def deleteObjects():
-  manager.scene_controller.deleteAllGazeboModels()
+  manager.scene_controller.deleteAllModels()
 
 
 
