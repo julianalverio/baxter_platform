@@ -257,15 +257,22 @@ steps_done = 0
 # reference http://sdk.rethinkrobotics.com/wiki/Hardware_Specifications#Range_of_Motion_-_Bend_Joints
 def getRandomState():
   joint_angles = []
+  joint_angles_dict = dict()
   joint_angles.append(random.uniform(-97.4, 97.4)) #s0
-  joint_angles.append(random.uniform(-97, 97)) #s0
+  joint_angles_dict['left_s0'] = joint_angles[-1]
   joint_angles.append(random.uniform(-123, 60)) #s1
+  joint_angles_dict['left_s1'] = joint_angles[-1]
   joint_angles.append(random.uniform(--174, 174)) #e0
+  joint_angles_dict['left_e0'] = joint_angles[-1]
   joint_angles.append(random.uniform(-2.8, 150)) #e1
+  joint_angles_dict['left_e1'] = joint_angles[-1]
   joint_angles.append(random.uniform(--175, 175)) #w0
+  joint_angles_dict['left_w0'] = joint_angles[-1]
   joint_angles.append(random.uniform(-90, 120)) #w1
+  joint_angles_dict['left_w1'] = joint_angles[-1]
   joint_angles.append(random.uniform(-175, 175)) #w2
-  return joint_angles
+  joint_angles_dict['left_w2'] = joint_angles[-1]
+  return joint_angles, joint_angles_dict
 
 
 def selectAction(state):
@@ -360,8 +367,8 @@ for i_episode in xrange(num_episodes):
   state = screen_handler.getScreen()
   for t in count():
     # Select and perform an action
-    action = selectAction(state)
-    manager.robot_controller._left_limb.move_to_joint_positions(action, timeout=8., threshold=0.02)
+    action, action_dict = selectAction(state)
+    manager.robot_controller._left_limb.move_to_joint_positions(action_dict, timeout=8., threshold=0.02)
     print("Done moving at time: " + str(rospy.Time.now()))
     reward = screen_handler.getReward_slide_right()
 
