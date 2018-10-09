@@ -13,7 +13,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-# import torchvision.transforms as T
+import torchvision.transforms as T
 
 import sys
 import rospy
@@ -375,13 +375,13 @@ for i_episode in xrange(num_episodes):
     # Observe new state
     done = reward or (rospy.Time.now() - start > rospy.Duration(TIMEOUT))
     if not reward:
-      next_state = screen_handler.getScreen()
+      next_state = T.ToTensor(screen_handler.getScreen())
     else:
       next_state = None
 
     reward = torch.tensor([reward], device=device)
     action = torch.tensor([action], device=device)
-    next_state = torch.tensor([next_state], device=device)
+    # next_state = torch.tensor([next_state], device=device)
 
     # Store the transition in memory
     memory.push(state, action, next_state, reward)
