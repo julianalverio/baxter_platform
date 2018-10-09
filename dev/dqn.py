@@ -377,7 +377,7 @@ for i_episode in xrange(num_episodes):
     action, action_dict = selectAction(state)
     print("Started moving")
     manager.robot_controller._left_limb.move_to_joint_positions(action_dict, timeout=8., threshold=0.02)
-    print("Done moving at time: " + str(rospy.Time.now()))
+    print("Done moving")
     reward = screen_handler.getReward_slide_right()
 
     # Observe new state
