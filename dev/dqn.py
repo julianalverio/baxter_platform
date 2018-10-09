@@ -366,6 +366,7 @@ print(manager.robot_controller._left_limb.joint_names())
 rospy.on_shutdown(manager.shutdown)
 screen_handler = screenHandler()
 num_episodes = 1000
+converter = T.ToTensor()
 for i_episode in xrange(num_episodes):
   print "beginning episode: ", i_episode
   # Initialize the environment and state
@@ -383,9 +384,8 @@ for i_episode in xrange(num_episodes):
     # Observe new state
     done = reward or (rospy.Time.now() - start > rospy.Duration(TIMEOUT))
     if not reward:
-      converter = T.ToTensor()
-      next_state = converter(screen_handler.getScreen())
-      # next_state = T.ToTensor(screen_handler.getScreen())
+      next_state = converter(screen_handler.getScreen()).unsqueeze(0).to(device)
+
     else:
       next_state = None
 
