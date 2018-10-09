@@ -27,6 +27,7 @@ sudo apt install python-pip -y
 pip install --upgrade pip
 sudo -H pip install pyassimp==3.3
 sudo pip install torch
+sudo pip install torchvision
 # Prerequisites for Baxter Platform
 sudo apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-moveit-commander -y
 # Install MoveIt!
