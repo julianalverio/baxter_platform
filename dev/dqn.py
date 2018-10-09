@@ -119,7 +119,7 @@ class screenHandler(object):
     cropped = pil_image.crop((0, 300, width, height))
     # cropped.show()
     self.most_recent = cropped
-    print(copped.shape)
+    print(cropped.shape)
     cropped.save("robot_image.jpg")
     assert False
     self.initialized = True
