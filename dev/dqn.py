@@ -354,7 +354,7 @@ def resetScene(manager):
 
 
 
-TIMEOUT = 10 #seconds
+TIMEOUT = 5 #seconds
 manager = Manager()
 rospy.on_shutdown(manager.shutdown)
 screen_handler = screenHandler()

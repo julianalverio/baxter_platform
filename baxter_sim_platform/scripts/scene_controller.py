@@ -135,6 +135,7 @@ class SceneController(object):
   This will also delete any cameras you make
   '''
   def deleteAllModels(self, moveit=False):
+    import pdb; pdb.set_trace()
     for model in self.models:
       self.deleteModel(model.name, moveit=moveit)
     for camera_idx in xrange(self.cameras):
