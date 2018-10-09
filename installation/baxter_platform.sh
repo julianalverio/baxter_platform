@@ -32,12 +32,18 @@ sudo pip install torchvision
 sudo apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-moveit-commander -y
 # Install MoveIt!
 sudo apt-get install ros-kinetic-moveit -y
+# Install Xvfb for Image Rendering
+sudo apt-get install xorg -y
+sudo apt-get install xvfb -y
+sudo apt-get install xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic -y
+
 cd ~/catkin_ws/src/baxter_platform/installation
 
 echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 echo "alias resource='source ~/.bashrc'" >> ~/.bashrc
 echo "alias sim_shell='cd ~/catkin_ws; ./baxter.sh sim'" >> ~/.bashrc
 echo "alias sim='roslaunch baxter_gazebo baxter_world.launch'" >> ~/.bashrc
+echo "alias sim_headless='roslaunch baxter_gazebo baxter_world.launch gui:=false recording:=true'" >> ~/.bashrc
 echo "alias sim_headless='roslaunch baxter_gazebo baxter_world.launch gui:=false recording:=true'" >> ~/.bashrc
 echo "alias velocity_server='rosrun baxter_interface joint_trajectory_action_server.py --mode velocity'" >> ~/.bashrc
 echo "alias position_server='rosrun baxter_interface joint_trajectory_action_server.py --mode position'" >> ~/.bashrc
