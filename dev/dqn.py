@@ -120,7 +120,11 @@ class screenHandler(object):
     # cropped.show()
     self.most_recent = cropped
     self.initialized = True
-    self.green_x, self.green_y = self.findGreenPixels()
+    result = self.findGreenPixels()
+    if result == False:
+    	print("not enough green pixels found. Resetting")
+    else:
+      self.green_x, self.green_y = result
 
 
   def getReward_slide_right(self):
@@ -149,6 +153,7 @@ class screenHandler(object):
         if not found:
           rospy.sleep(0.1)
           continue
+        if len(x_coords) < 50: return False
         return sum(x_coords)/len(x_coords), sum(y_coords)/len(y_coords) 
 
 
@@ -258,7 +263,8 @@ steps_done = 0
 def getRandomState():
   joint_angles = []
   joint_angles_dict = dict()
-  joint_angles.append(random.uniform(-97.4, 97.4)) #s0
+  # joint_angles.append(random.uniform(-97.4, 97.4)) #s0
+  joint_angles.append(random.uniform(-30, 30)) #s0
   joint_angles_dict['left_s0'] = joint_angles[-1]
   joint_angles.append(random.uniform(-123, 60)) #s1
   joint_angles_dict['left_s1'] = joint_angles[-1]
@@ -347,15 +353,16 @@ def optimize_model():
 
 
 def resetScene(manager):
+  manager.robot_controller.moveToStart(threshold=0.1)
   manager.scene_controller.deleteAllModels()
   manager.scene_controller.makeModel(name='table', shape='box', roll=0., pitch=0., yaw=0., restitution_coeff=0., size_x=.7, size_y=1.5, size_z=.7, x=.8, y=0., z=.35, mass=5000, ambient_r=0.1, ambient_g=0.1, ambient_b=0.1, ambient_a=0.1, mu1=1, mu2=1, reference_frame='')
   manager.scene_controller.makeModel(name='testObject', shape='box', size_x=0.1, size_y=0.1, size_z=0.1, x=0.8, y=0.3, z=0.75, mass=20000, mu1=1000, mu2=2000, restitution_coeff=0.5, roll=0.1, pitch=0.2, yaw=0.3, ambient_r=0, ambient_g=1, ambient_b=0, ambient_a=1, diffuse_r=0, diffuse_g=1, diffuse_b=0, diffuse_a=1)
   manager.scene_controller.spawnAllModels()
 
 
-
 TIMEOUT = 5 #seconds
 manager = Manager()
+print(manager.robot_controller._left_limb.joint_names())
 rospy.on_shutdown(manager.shutdown)
 screen_handler = screenHandler()
 num_episodes = 1000
