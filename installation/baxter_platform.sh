@@ -39,6 +39,7 @@ echo "alias resource='source ~/.bashrc'" >> ~/.bashrc
 echo "alias sim_shell='cd ~/catkin_ws; ./baxter.sh sim'" >> ~/.bashrc
 echo "alias sim='roslaunch baxter_gazebo baxter_world.launch'" >> ~/.bashrc
 echo "alias sim_headless='roslaunch baxter_gazebo baxter_world.launch gui:=false recording:=true'" >> ~/.bashrc
+echo "alias sim_headless='roslaunch baxter_gazebo baxter_world.launch gui:=false recording:=true'" >> ~/.bashrc
 echo "alias velocity_server='rosrun baxter_interface joint_trajectory_action_server.py --mode velocity'" >> ~/.bashrc
 echo "alias position_server='rosrun baxter_interface joint_trajectory_action_server.py --mode position'" >> ~/.bashrc
 echo "alias run='rosrun baxter_sim_platform scripts/main.py'" >> ~/.bashrc
