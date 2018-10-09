@@ -362,7 +362,6 @@ def resetScene(manager):
 
 TIMEOUT = 5 #seconds
 manager = Manager()
-print(manager.robot_controller._left_limb.joint_names())
 rospy.on_shutdown(manager.shutdown)
 screen_handler = screenHandler()
 num_episodes = 1000
