@@ -100,7 +100,7 @@ class RobotController(object):
     rospy.sleep(1.0)
 
   # Move arm to position where it's ready to manipulate objects
-  def moveToStart(self, start_angles=None, limb='left'):
+  def moveToStart(self, start_angles=None, limb='left', threshold=0.009):
     print("Moving the %s arm to start pose..." % limb)
     starting_angles = {'left_w0': 0.6699952259595108,
                        'left_w1': 1.030009435085784,
@@ -112,12 +112,12 @@ class RobotController(object):
     if not start_angles and limb == 'left':
       joints = self._left_limb.joint_names()
       start_angles = dict(zip(joints, [starting_angles[joint] for joint in joints]))
-      self._left_limb.move_to_joint_positions(start_angles)
+      self._left_limb.move_to_joint_positions(start_angles, threshold=threshold)
       self._left_gripper.open()
     elif not start_angles:
       joints = self._right_limb.joint_names()
       start_angles = dict(zip(joints, [starting_angles[joint] for joint in joints]))
-      self._right_limb.move_to_joint_positions(start_angles)
+      self._right_limb.move_to_joint_positions(start_angles, threshold=threshold)
       self._right_gripper.open()
 
 ####################################################################################################

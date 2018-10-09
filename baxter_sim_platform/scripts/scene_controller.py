@@ -26,7 +26,7 @@ from std_msgs.msg import (
 
 from std_srvs.srv import Empty as placeholder
 import tf_conversions
-
+import copy
 
   
 class SceneController(object):
@@ -135,8 +135,8 @@ class SceneController(object):
   This will also delete any cameras you make
   '''
   def deleteAllModels(self, moveit=False):
-    import pdb; pdb.set_trace()
-    for model in self.models:
+    models_copy = copy.deepcopy(self.models)
+    for model in models_copy:
       self.deleteModel(model.name, moveit=moveit)
     for camera_idx in xrange(self.cameras):
       camera_name = 'camera_' + str(camera_idx)
