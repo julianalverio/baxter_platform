@@ -372,7 +372,7 @@ for i_episode in xrange(num_episodes):
   # Initialize the environment and state
   start = rospy.Time.now()
   resetScene(manager)
-  state = screen_handler.getScreen()
+  state = converter(screen_handler.getScreen()).unsqueeze(0).to(device)
   for t in count():
     # Select and perform an action
     action, action_dict = selectAction(state)
