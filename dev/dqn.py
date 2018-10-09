@@ -104,7 +104,7 @@ class screenHandler(object):
       print("screenHandler is not yet initialized. Hanging.")
     while not self.initialized:
       rospy.sleep(1)
-    print("Initialized.")
+    print("Grabbed most recent screen.")
     return self.most_recent
 
   def callback(self, data):
@@ -119,6 +119,9 @@ class screenHandler(object):
     cropped = pil_image.crop((0, 300, width, height))
     # cropped.show()
     self.most_recent = cropped
+    print(copped.shape)
+    cropped.save("robot_image.jpg")
+    assert False
     self.initialized = True
     result = self.findGreenPixels()
     if result == False:
@@ -371,7 +374,8 @@ for i_episode in xrange(num_episodes):
   # Initialize the environment and state
   start = rospy.Time.now()
   resetScene(manager)
-  state = converter(screen_handler.getScreen()).unsqueeze(0).to(device)
+  # state = converter(screen_handler.getScreen()).unsqueeze(0).to(device)
+  state = screen_handler.getScreen()
   for t in count():
     # Select and perform an action
     action, action_dict = selectAction(state)
