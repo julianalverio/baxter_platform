@@ -125,7 +125,6 @@ class screenHandler(object):
       image = self.most_recent
       pixels = image.getdata()
       width, height = image.size
-      found = False
       for idx, (r,g,b) in enumerate(pixels):
         x_coord = idx % width
         y_coord = idx // width
@@ -133,11 +132,8 @@ class screenHandler(object):
           found = True
           x_coords.append(x_coord)
           y_coords.append(y_coord)
-        if not found:
-          rospy.sleep(0.1)
-          continue
-        if len(x_coords) < 50: return False
-        return sum(x_coords)/len(x_coords), sum(y_coords)/len(y_coords) 
+      if len(x_coords) < 50: return None, None
+      return sum(x_coords)/len(x_coords), sum(y_coords)/len(y_coords)
 
 
   def showGreenPixels(self):
@@ -246,6 +242,7 @@ class Trainer(object):
             if g > 100 and r < 50 and b < 50:
               green_pixels += 1
         if green_pixels < 50:
+          image.show()
             self.resetScene(sleep=True)
 
 
