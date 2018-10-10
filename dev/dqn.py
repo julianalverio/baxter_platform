@@ -181,7 +181,7 @@ def getRandomState():
   joint_angles_dict['left_w1'] = joint_angles[-1]
   joint_angles.append(random.uniform(-175, 175)) #w2
   joint_angles_dict['left_w2'] = joint_angles[-1]
-  return joint_angles, joint_angles_dict
+  return torch.from_numpy(joint_angles).view(1, 7)
 
 
 
@@ -261,11 +261,10 @@ class Trainer(object):
         if sample > eps_threshold:
           with torch.no_grad():
             import pdb; pdb.set_trace()
-            return self.policy_net(state).max(1)[1].view(1, 1)
+            return self.policy_net(state).view(1, 7)
         else:
           import pdb; pdb.set_trace()
           return getRandomState()
-          # return torch.tensor(getRandomState(), device=device, dtype=torch.long)
 
 
     # This first samples a batch, concatenates
