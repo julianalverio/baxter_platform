@@ -311,11 +311,12 @@ class Trainer(object):
 
 
     def train(self):
+        self.manager.scene_controller.testExternalCamera()
         for i_episode in xrange(self.num_episodes):
           print "Beginning episode: ", i_episode
           # Initialize the environment and state
           start = rospy.Time.now()
-          self.manager.scene_controller.externalCamera(quat_x=0, quat_y=0, quat_z=1, quat_w=0)
+          # self.manager.scene_controller.externalCamera(quat_x=0, quat_y=0, quat_z=1, quat_w=0)
           self.resetScene(self.manager)
           state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
           state = self.screen_handler.getScreen()

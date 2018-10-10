@@ -27,6 +27,8 @@ from std_msgs.msg import (
 from std_srvs.srv import Empty as placeholder
 import tf_conversions
 import copy
+import rospkg
+
 
   
 class SceneController(object):
@@ -101,6 +103,25 @@ class SceneController(object):
   def spawnAllModels(self, moveit=False):
     for model in self.models:
       self.spawnModel(model, moveit=moveit)
+
+  def testExternalCamera(self):
+    rospy.wait_for_service('/gazebo/spawn_sdf_model')
+    spawn_proxy = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+    pose = Pose()
+    pose.position.x = 2
+    pose.position.y = 0
+    pose.position.z = 1
+    pose.orientation.x = 0
+    pose.orientation.y = 0
+    pose.orientation.z = 1
+    pose.orientation.w = 0
+    name = 'external_camera'
+
+    sdf_path = rospkg.RosPack().get_path('baxter_sim_platform') + '/models/camera.sdf'
+    sdf = open(sdf_path, 'r').read().replace('\t', '').replace('/n', '')
+
+    resp_sdf = spawn_proxy(name, sdf, "/", pose, '')
+    
 
 
   '''
@@ -250,8 +271,8 @@ class ExternalCamera(object):
     sdf += '<sdf version="1.6">'
     sdf += '\t<model name="%s">' % self.name
     sdf += '\t\t<static>true</static>'
-    sdf += '<pose frame=''>0 0 0 0 0 0</pose>'
-    sdf += '<link name="%s_link">' % self.name
+    sdf += '\t\t<pose frame=''>0 0 0 0 0 0</pose>'
+    sdf += '\t\t<link name="%s_link">' % self.name
     sdf += '\t\t\t<visual name="%s_visual">' % self.name
     sdf += '\t\t\t\t<geometry>'
     sdf += '\t\t\t\t\t<box>'
@@ -259,7 +280,7 @@ class ExternalCamera(object):
     sdf += '\t\t\t\t\t</box>'
     sdf += '\t\t\t\t</geometry>'
     sdf += '\t\t\t</visual>'
-    sdf += '\t\t\t<sensor name="%s" type="camera">' % self.name
+    sdf += '\t\t\t<sensor name="%s_sensor" type="camera">' % self.name
     # sdf + '\t\t\t\t<camera>'
     # sdf += '\t\t\t\t\t<save enabled="true">'
     # sdf += '\t\t\t\t\t\t<path>~/catkin_ws/src/baxter_platform/baxter_sim_platform/images/camera_save</path>'
