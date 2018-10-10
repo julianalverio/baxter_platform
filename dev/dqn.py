@@ -174,7 +174,7 @@ def getRandomState():
   joint_angles_dict['left_w1'] = joint_angles[-1]
   joint_angles.append(random.uniform(-175, 175)) #w2
   joint_angles_dict['left_w2'] = joint_angles[-1]
-  return torch.from_numpy(joint_angles).view(1, 7)
+  return torch.from_numpy(np.array(joint_angles)).view(1, 7)
 
 
 
@@ -243,7 +243,7 @@ class Trainer(object):
               green_pixels += 1
         if green_pixels < 50:
           image.show()
-            self.resetScene(sleep=True)
+          self.resetScene(sleep=True)
 
 
 
@@ -315,6 +315,7 @@ class Trainer(object):
           print "Beginning episode: ", i_episode
           # Initialize the environment and state
           start = rospy.Time.now()
+          self.manager.scene_controller.externalCamera(quat_x=0, quat_y=0, quat_z=1, quat_w=0)
           self.resetScene(self.manager)
           state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
           state = self.screen_handler.getScreen()

@@ -141,7 +141,7 @@ class SceneController(object):
     for camera_idx in xrange(self.cameras):
       camera_name = 'camera_' + str(camera_idx)
       try:
-        resp_delete = delete_model(camera_name)
+        resp_delete = self.deleteModel(camera_name)
       except rospy.ServiceException, _:
         print 'FAILED TO DELETE CAMERA: %s' % camera_name
     self.cameras = 0
