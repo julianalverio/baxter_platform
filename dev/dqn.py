@@ -370,7 +370,7 @@ screen_handler = screenHandler()
 num_episodes = 1000
 converter = T.ToTensor()
 for i_episode in xrange(num_episodes):
-  print "beginning episode: ", i_episode
+  print "Beginning episode: ", i_episode
   # Initialize the environment and state
   start = rospy.Time.now()
   resetScene(manager)
