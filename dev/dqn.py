@@ -78,7 +78,7 @@ class DQN(nn.Module):
 class screenHandler(object):
   def __init__(self):
     self.bridge = CvBridge()
-    self.image_sub = rospy.Subscriber('/cameras/head_camera/image', RosImage, self.callback)
+    self.image_sub = rospy.Subscriber('/cameras/camera_0/image', RosImage, self.callback)
     self.most_recent = None
     self.initialized = False
     self.green_x = None
@@ -254,10 +254,10 @@ class Trainer(object):
         self.steps_done += 1
         if sample > eps_threshold:
           with torch.no_grad():
-            import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
             return self.policy_net(state).view(1, 7)
         else:
-          import pdb; pdb.set_trace()
+          # import pdb; pdb.set_trace()
           return getRandomState()
 
 
@@ -311,7 +311,8 @@ class Trainer(object):
 
 
     def train(self):
-        self.manager.scene_controller.testExternalCamera()
+        # self.manager.scene_controller.testExternalCamera()
+        self.manager.scene_controller.externalCamera()
         for i_episode in xrange(self.num_episodes):
           print "Beginning episode: ", i_episode
           # Initialize the environment and state
@@ -322,9 +323,12 @@ class Trainer(object):
           state = self.screen_handler.getScreen()
           for _ in count():
             # Select and perform an action
-            action, action_dict = self.selectAction(state)
+            action_tensor = self.selectAction(state)
+            angles_list = list(action_tensor.eval())
+            joints = self.manager.robot_controller.getJointNames()
+            angles_dict = dict(zip(joints, angles_list))
             print("Started moving")
-            self.manager.robot_controller._left_limb.move_to_joint_positions(action_dict, timeout=self.one_move_timeout, threshold=self.move_precision)
+            self.manager.robot_controller._left_limb.move_to_joint_positions(angles_dict, timeout=self.one_move_timeout, threshold=self.move_precision)
             print("Done moving")
 
             reward = self.screen_handler.getReward_slide_right()
