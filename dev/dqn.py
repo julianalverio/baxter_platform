@@ -26,14 +26,6 @@ from scene_generator import *
 
 
 
-# # set up matplotlib
-# is_ipython = 'inline' in matplotlib.get_backend()
-# if is_ipython:
-#     from IPython import display
-
-# plt.ion()
-
-# if gpu is to be used
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -62,13 +54,6 @@ class ReplayMemory(object):
         return len(self.memory)
 
 
-# :math:`R_{t_0} = \sum_{t=t_0}^{\infty} \gamma^{t - t_0} r_t`, where
-# :math:`R_{t_0}` is also known as the *return*. The discount,
-# :math:`\gamma`, should be a constant between :math:`0` and :math:`1`
-# that ensures the sum converges. It makes rewards from the uncertain far
-# future less important for our agent than the ones in the near future
-# that it can be fairly confident about.
-#
 
 class DQN(nn.Module):
 
@@ -183,65 +168,7 @@ class screenHandler(object):
 #                     T.Resize(40, interpolation=Image.CUBIC),
 #                     T.ToTensor()])
 
-# # This is based on the code from gym.
-# screen_width = 600
 
-
-
-
-# def get_screen():
-#     screen = env.render(mode='rgb_array').transpose(
-#         (2, 0, 1))  # transpose into torch order (CHW)
-#     # Strip off the top and bottom of the screen
-#     screen = screen[:, 160:320]
-#     view_width = 320
-#     cart_location = get_cart_location()
-#     if cart_location < view_width // 2:
-#         slice_range = slice(view_width)
-#     elif cart_location > (screen_width - view_width // 2):
-#         slice_range = slice(-view_width, None)
-#     else:
-#         slice_range = slice(cart_location - view_width // 2,
-#                             cart_location + view_width // 2)
-#     # Strip off the edges, so that we have a square image centered on a cart
-#     screen = screen[:, :, slice_range]
-#     # Convert to float, rescare, convert to torch tensor
-#     # (this doesn't require a copy)
-#     screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
-#     screen = torch.from_numpy(screen)
-#     # Resize, and add a batch dimension (BCHW)
-#     return resize(screen).unsqueeze(0).to(device)
-
-
-# env.reset()
-# plt.figure()
-# plt.imshow(get_screen().cpu().squeeze(0).permute(1, 2, 0).numpy(),
-#            interpolation='none')
-# plt.title('Example extracted screen')
-# plt.show()
-
-
-######################################################################
-# Training
-# --------
-#
-# Hyperparameters and utilities
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# This cell instantiates our model and its optimizer, and defines some
-# utilities:
-#
-# -  ``select_action`` - will select an action accordingly to an epsilon
-#    greedy policy. Simply put, we'll sometimes use our model for choosing
-#    the action, and sometimes we'll just sample one uniformly. The
-#    probability of choosing a random action will start at ``EPS_START``
-#    and will decay exponentially towards ``EPS_END``. ``EPS_DECAY``
-#    controls the rate of the decay.
-# -  ``plot_durations`` - a helper for plotting the durations of episodes,
-#    along with an average over the last 100 episodes (the measure used in
-#    the official evaluations). The plot will be underneath the cell
-#    containing the main training loop, and will update after every
-#    episode.
-#
 
 BATCH_SIZE = 128
 GAMMA = 0.999
@@ -299,14 +226,7 @@ def selectAction(state):
       # return torch.tensor(getRandomState(), device=device, dtype=torch.long)
 
 
-######################################################################
-# Training loop
-# ^^^^^^^^^^^^^
-#
-# Finally, the code for training our model.
-#
-# Here, you can find an ``optimize_model`` function that performs a
-# single step of the optimization. It first samples a batch, concatenates
+# This first samples a batch, concatenates
 # all the tensors into a single one, computes :math:`Q(s_t, a_t)` and
 # :math:`V(s_{t+1}) = \max_a Q(s_{t+1}, a)`, and combines them into our
 # loss. By defition we set :math:`V(s) = 0` if :math:`s` is a terminal

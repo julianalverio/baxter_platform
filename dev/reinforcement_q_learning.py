@@ -214,6 +214,7 @@ class DQN(nn.Module):
         self.head = nn.Linear(448, 2)
 
     def forward(self, x):
+        import pdb; pdb.set_trace()
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
@@ -323,7 +324,8 @@ def select_action(state):
     eps_threshold = EPS_END + (EPS_START - EPS_END) * \
         math.exp(-1. * steps_done / EPS_DECAY)
     steps_done += 1
-    if sample > eps_threshold:
+    if 1:
+    # if sample > eps_threshold:
         with torch.no_grad():
             return policy_net(state).max(1)[1].view(1, 1)
     else:
