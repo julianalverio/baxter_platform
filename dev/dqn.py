@@ -105,9 +105,6 @@ class screenHandler(object):
     cropped = pil_image.crop((0, 300, width, height))
     # cropped.show()
     self.most_recent = cropped
-    print(cropped.size)
-    cropped.save("robot_image.jpg")
-    assert False
     self.initialized = True
     self.green_x, self.green_y = self.findGreenPixels()
     self.updated = True
@@ -360,3 +357,7 @@ class Trainer(object):
 
         torch.save(self.policy_net, "policy_net.pth")
         torch.save(self.target_net, "target_net.pth")
+
+
+trainer = Trainer()
+trainer.train()
