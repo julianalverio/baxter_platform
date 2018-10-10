@@ -304,56 +304,6 @@ class ExternalCamera(object):
     return sdf
 
 
-
-
-  # def getSDFString(self):
-  #   sdf = ''
-  #   sdf += '<?xml version="1.0"?>'
-  #   sdf += '<sdf version="1.6">'
-  #   sdf += '\t<model name="%s">' % self.name
-  #   sdf += '\t\t<static>true</static>'
-  #   sdf += '\t\t<pose frame=''>0 0 0 0 0 0</pose>'
-  #   sdf += '\t\t<link name="%s_link">' % self.name
-  #   sdf += '\t\t\t<visual name="%s_visual">' % self.name
-  #   sdf += '\t\t\t\t<geometry>'
-  #   sdf += '\t\t\t\t\t<box>'
-  #   sdf += '\t\t\t\t\t\t<size>0.1 0.1 0.1</size>'
-  #   sdf += '\t\t\t\t\t</box>'
-  #   sdf += '\t\t\t\t</geometry>'
-  #   sdf += '\t\t\t</visual>'
-  #   sdf += '\t\t\t<sensor name="%s_sensor" type="camera">' % self.name
-  #   # sdf + '\t\t\t\t<camera>'
-  #   # sdf += '\t\t\t\t\t<save enabled="true">'
-  #   # sdf += '\t\t\t\t\t\t<path>~/catkin_ws/src/baxter_platform/baxter_sim_platform/images/camera_save</path>'
-  #   # sdf += '\t\t\t\t\t</save>'
-  #   # sdf += '\t\t\t\t\t<image>'
-  #   # sdf += '\t\t\t\t\t\t<width>1920</width>'
-  #   # sdf += '\t\t\t\t\t\t<height>1080</height>'
-  #   # sdf += '\t\t\t\t\t</image>'
-  #   # sdf += '\t\t\t\t</camera>'
-  #   sdf += '\t\t\t\t<always_on>1</always_on>'
-  #   sdf += '\t\t\t\t<update_rate>30</update_rate>'
-  #   sdf += '\t\t\t\t<plugin name="camera_controller" filename="libgazebo_ros_camera.so">'
-  #   sdf += '\t\t\t\t\t<alwaysOn>true</alwaysOn>'
-  #   sdf += '\t\t\t\t\t<updateRate>0.0</updateRate>'
-  #   sdf += '\t\t\t\t\t<cameraName>%s</cameraName>' % self.name
-  #   sdf += '\t\t\t\t\t<imageTopicName>/cameras/%s/image</imageTopicName>' % self.name
-  #   sdf += '\t\t\t\t\t<cameraInfoTopicName>/cameras/%s/camera_info</cameraInfoTopicName>' % self.name
-  #   sdf += '\t\t\t\t\t<frameName>%s_frame</frameName>' % self.name
-  #   sdf += '\t\t\t\t\t<hackBaseline>0.07</hackBaseline>'
-  #   sdf += '\t\t\t\t\t<distortionK1>0.0</distortionK1>'
-  #   sdf += '\t\t\t\t\t<distortionK2>0.0</distortionK2>'
-  #   sdf += '\t\t\t\t\t<distortionK3>0.0</distortionK3>'
-  #   sdf += '\t\t\t\t\t<distortionT1>0.0</distortionT1>'
-  #   sdf += '\t\t\t\t\t<distortionT2>0.0</distortionT2>'
-  #   sdf += '\t\t\t\t</plugin>'
-  #   sdf += '\t\t\t</sensor>'
-  #   sdf += '\t\t</link>'
-  #   sdf += '\t</model>'
-  #   sdf += '</sdf>'
-  #   return sdf
-
-
 ####################################################################################################
 ############################################ Model Class ###########################################
 ####################################################################################################
