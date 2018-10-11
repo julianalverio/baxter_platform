@@ -73,6 +73,7 @@ class DQN(nn.Module):
         x = F.relu(self.bn3(self.conv3(x)))
         if self.head == None:
             input_dim = x.size(0)*x.size(1)*x.size(2)*x.size(3)
+            print 'showing input dim', input_dim
             self.head = nn.Linear(input_dim, 8)
         return self.head(x.view(x.size(0), -1))
 
@@ -116,7 +117,7 @@ class screenHandler(object):
   def getReward_slide_right(self):
     width, _ = self.most_recent.size
     if self.green_x <= width/2.:
-      print("I GOT A REWARD")
+      print("I GOT A REWARD :D")
       return 1
     return 0
 
@@ -376,7 +377,6 @@ class Trainer(object):
             # Perform one step of the optimization (on the target network)
             self.optimize_model()
             if done:
-              print("I HIT THE BREAK STATEMENT")
               break
             # Update the target network
             if i_episode % self.TARGET_UPDATE == 0:
