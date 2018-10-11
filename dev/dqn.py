@@ -102,9 +102,9 @@ class screenHandler(object):
     pil_image = Image.fromarray(cv_image)
     width, height = pil_image.size
 
-    cropped = pil_image.crop((0, 300, width, height))
+    # cropped = pil_image.crop((0, 300, width, height))
     # cropped.show()
-    self.most_recent = cropped
+    self.most_recent = pil_image
     self.initialized = True
     self.green_x, self.green_y = self.findGreenPixels()
     self.updated = True
@@ -217,7 +217,7 @@ class Trainer(object):
         self.num_episodes = num_episodes
 
     def resetScene(self, sleep=False):
-        self.manager.scene_controller.deleteAllModels()
+        self.manager.scene_controller.deleteAllModels(cameras=False)
         self.manager.scene_controller.makeModel(name='table', shape='box', roll=0., pitch=0., yaw=0.,
                                                 restitution_coeff=0., size_x=.7, size_y=1.5, size_z=.7, x=.8, y=0.,
                                                 z=.35, mass=5000, ambient_r=0.1, ambient_g=0.1, ambient_b=0.1,
@@ -242,6 +242,7 @@ class Trainer(object):
             if g > 100 and r < 50 and b < 50:
               green_pixels += 1
         if green_pixels < 50:
+          print("I did not find enough green pixels.")
           image.show()
           self.resetScene(sleep=True)
 
@@ -324,7 +325,7 @@ class Trainer(object):
           for _ in count():
             # Select and perform an action
             action_tensor = self.selectAction(state)
-            angles_list = list(action_tensor.eval())
+            angles_list = np.array(action_tensor).tolist()[0]
             joints = self.manager.robot_controller.getJointNames()
             angles_dict = dict(zip(joints, angles_list))
             print("Started moving")

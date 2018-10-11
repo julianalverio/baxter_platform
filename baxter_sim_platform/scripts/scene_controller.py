@@ -155,10 +155,11 @@ class SceneController(object):
   Deletes all Gazebo (and potentiall MoveIt!) models
   This will also delete any cameras you make
   '''
-  def deleteAllModels(self, moveit=False):
+  def deleteAllModels(self, moveit=False, cameras=True):
     models_copy = copy.deepcopy(self.models)
     for model in models_copy:
       self.deleteModel(model.name, moveit=moveit)
+    if not cameras: return
     for camera_idx in xrange(self.cameras):
       camera_name = 'camera_' + str(camera_idx)
       try:
