@@ -4,7 +4,7 @@ import math
 import random
 import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from collections import namedtuple
 from itertools import count
 from PIL import Image
@@ -293,6 +293,7 @@ class Trainer(object):
     #
 
     def optimize_model(self):
+        import pdb; pdb.set_trace
         if len(self.memory) < self.BATCH_SIZE:
             return
         transitions = self.memory.sample(self.BATCH_SIZE)
