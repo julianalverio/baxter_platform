@@ -279,6 +279,7 @@ class Trainer(object):
         self.steps_done += 1
         if sample > eps_threshold:
           with torch.no_grad():
+            import pdb; pdb.set_trace()
             return self.policy_net(state).view(1, 8)
         else:
           return getRandomState()
@@ -324,6 +325,7 @@ class Trainer(object):
 
         # Compute Huber loss
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
+        print('Loss: ', loss)
 
         # Optimize the model
         self.optimizer.zero_grad()
