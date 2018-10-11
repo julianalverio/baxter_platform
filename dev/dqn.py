@@ -24,6 +24,8 @@ from cv_bridge import CvBridge, CvBridgeError
 
 from scene_generator import *
 import yagmail
+import traceback
+
 
 
 MACHINE = 1
@@ -240,7 +242,7 @@ class Trainer(object):
                                                 z=.35, mass=5000, ambient_r=0.1, ambient_g=0.1, ambient_b=0.1,
                                                 ambient_a=0.1, mu1=1, mu2=1, reference_frame='')
         self.manager.scene_controller.makeModel(name='testObject', shape='box', size_x=0.1, size_y=0.1, size_z=0.1,
-                                                x=0.8, y=0.1, z=0.75, mass=20000, mu1=1000, mu2=2000,
+                                                x=0.8, y=0.1, z=0.75, mass=1, mu1=1000, mu2=2000,
                                                 restitution_coeff=0.5, roll=0.1, pitch=0.2, yaw=0.3, ambient_r=0,
                                                 ambient_g=1, ambient_b=0, ambient_a=1, diffuse_r=0, diffuse_g=1,
                                                 diffuse_b=0, diffuse_a=1)
@@ -396,6 +398,11 @@ class Trainer(object):
 
 
 
+try:
+    trainer = Trainer()
+    trainer.train()
+except Exception as e:
+    with open('log.txt', 'a') as f:
+        f.write(str(e))
+        f.write(traceback.format_exc())
 
-trainer = Trainer()
-trainer.train()
