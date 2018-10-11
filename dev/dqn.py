@@ -275,10 +275,10 @@ class Trainer(object):
         if sample > eps_threshold:
           with torch.no_grad():
             action = self.policy_net(state).view(1, 8)
-            return tf.cast(action, tf.int64)
+            return action.type(torch.DoubleTensor)
         else:
           action = getRandomState()
-          return tf.case(action, tf.int64)
+          return action.type(torch.DoubleTensor)
 
 
     # This first samples a batch, concatenates
