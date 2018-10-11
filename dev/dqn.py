@@ -184,8 +184,8 @@ def getRandomState():
 
 class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
-    def __init__(self, interpolation=Image.BILINEAR, batch_size=128, gamma=0.999, eps_start=0.9, eps_end=0.05,
-                 eps_decay=200, target_update=10, replay_memory_size=10000, timeout=5, num_episodes=1000, resize=40,
+    def __init__(self, interpolation=Image.BILINEAR, batch_size=64, gamma=0.999, eps_start=0.9, eps_end=0.05,
+                 eps_decay=200, target_update=10, replay_memory_size=1000, timeout=5, num_episodes=1000, resize=40,
                  one_move_timeout=4., move_precision=0.02):
         self.params_dict = {
         'interpolation' : interpolation,
