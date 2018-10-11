@@ -26,7 +26,7 @@ from scene_generator import *
 import yagmail
 
 
-
+MACHINE = 1
 
 
 class ReplayMemory(object):
@@ -156,9 +156,9 @@ class screenHandler(object):
 
 
 def completionEmail(dictionary_string):
-  message = ['Training completed. Dictionary:' + dictionary_string]
+  message = 'Training completed on machine %s. Dictionary: %s' % (MACHINE, dictionary_string) 
   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
-  yag.send('julian.a.alverio@gmail.com', 'Training Completed', message)
+  yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
 
 
 
@@ -332,7 +332,6 @@ class Trainer(object):
     def train(self):
         self.manager.scene_controller.externalCamera(quat_x=0., quat_y=0., quat_z=1., quat_w=0., x=1.7, y=0., z=1.)
         for i_episode in xrange(self.num_episodes):
-          break ##remove
           print "Beginning episode: ", i_episode
           # Initialize the environment and state
           self.resetScene(self.manager)
