@@ -37,6 +37,7 @@ sudo apt-get install ros-kinetic-moveit -y
 sudo apt-get install xorg -y
 sudo apt-get install xvfb -y
 sudo apt-get install xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic -y
+sudo apt-get install screen
 
 cd ~/catkin_ws/src/baxter_platform/installation
 
