@@ -23,6 +23,7 @@ from sensor_msgs.msg import Image as RosImage
 from cv_bridge import CvBridge, CvBridgeError
 
 from scene_generator import *
+import yagmail
 
 
 
@@ -154,6 +155,13 @@ class screenHandler(object):
     newim.show()
 
 
+def completionEmail(dictionary_string):
+  message = ['Training completed. Dictionary:' + dictionary_string]
+  yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
+  yag.send('julian.a.alverio@gmail.com', 'Training Completed', message)
+
+
+
 
 # reference http://sdk.rethinkrobotics.com/wiki/Hardware_Specifications#Range_of_Motion_-_Bend_Joints
 def getRandomState():
@@ -176,7 +184,22 @@ class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
     def __init__(self, interpolation=Image.BILINEAR, batch_size=128, gamma=0.999, eps_start=0.9, eps_end=0.05,
                  eps_decay=200, target_update=10, replay_memory_size=10000, timeout=5, num_episodes=1000, resize=40,
-                 one_move_timeout=4., move_precision=0.02, ):
+                 one_move_timeout=4., move_precision=0.02):
+        self.params_dict = {
+        'interpolation' : interpolation,
+        'batch_size' : batch_size,
+        'gamma' : gamma,
+        'eps_start' : eps_start,
+        'eps_end' : eps_end,
+        'eps_decay' : eps_decay,
+        'target_update' : target_update,
+        'replay_memory_size' : replay_memory_size,
+        'timeout' : timeout,
+        'num_episodes' : num_episodes,
+        'resize' : resize,
+        'one_move_timeout' : one_move_timeout,
+        'move_precision' : move_precision
+        }
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.Transition = namedtuple('Transition',
@@ -194,7 +217,6 @@ class Trainer(object):
 
         self.policy_net = DQN().to(self.device)
         self.target_net = DQN().to(self.device)
-        import pdb; pdb.set_trace()
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
 
@@ -310,6 +332,7 @@ class Trainer(object):
     def train(self):
         self.manager.scene_controller.externalCamera(quat_x=0., quat_y=0., quat_z=1., quat_w=0., x=1.7, y=0., z=1.)
         for i_episode in xrange(self.num_episodes):
+          break ##remove
           print "Beginning episode: ", i_episode
           # Initialize the environment and state
           self.resetScene(self.manager)
@@ -320,15 +343,13 @@ class Trainer(object):
             action_tensor = self.selectAction(state)
             action_list = np.array(action_tensor).tolist()[0]
             angles_list = action_list[:-1]
-            print "unrounded gripper action", action_list[-1]
-            gripper_action = int(round(action_list[-1]))
-            print 'gripper action:', gripper_action
+            gripper_action = action_list[-1]
             joints = self.manager.robot_controller.getJointNames()
             angles_dict = dict(zip(joints, angles_list))
             print("Started moving")
-            if gripper_action == 1:
+            if gripper_action >= 0.5:
               self.manager.robot_controller.gripperOpen()
-            elif gripper_action == 0:
+            elif gripper_action < 0.5:
               self.manager.robot_controller.gripperClose()
             else:
               assert False, "invalid gripper command"
@@ -360,8 +381,21 @@ class Trainer(object):
             if i_episode % self.TARGET_UPDATE == 0:
               self.target_net.load_state_dict(self.policy_net.state_dict())
 
-        torch.save(self.policy_net, "policy_net.pth")
-        torch.save(self.target_net, "target_net.pth")
+        torch.save(self.target_net.state_dict(), 'target_net_state')
+        torch.save(self.target_net, 'target_net')
+
+        f = open('params.txt', 'w+')
+        f.write(str(self.params_dict))
+        completionEmail(str(self.params_dict))
+
+
+    def loadModel(path):
+      target_net = DQN()
+      target_net.load_state_dict(torch.load(path))
+      target_net.eval()
+
+
+
 
 
 trainer = Trainer()
