@@ -182,7 +182,7 @@ class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
     def __init__(self, interpolation=Image.BILINEAR, batch_size=128, gamma=0.999, eps_start=0.9, eps_end=0.05,
                  eps_decay=200, target_update=10, replay_memory_size=10000, timeout=5, num_episodes=1000, resize=40,
-                 one_move_timeout=8., move_precision=0.02, ):
+                 one_move_timeout=4., move_precision=0.02, ):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.Transition = namedtuple('Transition',
@@ -223,16 +223,16 @@ class Trainer(object):
                                                 z=.35, mass=5000, ambient_r=0.1, ambient_g=0.1, ambient_b=0.1,
                                                 ambient_a=0.1, mu1=1, mu2=1, reference_frame='')
         self.manager.scene_controller.makeModel(name='testObject', shape='box', size_x=0.1, size_y=0.1, size_z=0.1,
-                                                x=0.8, y=0.3, z=0.75, mass=20000, mu1=1000, mu2=2000,
+                                                x=0.8, y=0.1, z=0.75, mass=20000, mu1=1000, mu2=2000,
                                                 restitution_coeff=0.5, roll=0.1, pitch=0.2, yaw=0.3, ambient_r=0,
                                                 ambient_g=1, ambient_b=0, ambient_a=1, diffuse_r=0, diffuse_g=1,
                                                 diffuse_b=0, diffuse_a=1)
         self.manager.scene_controller.spawnAllModels()
         self.manager.robot_controller.moveToStart(threshold=0.1)
-        self.screen_handler.updated = False
+        self.screen_handler.most_recent = None
         if sleep:
             rospy.sleep(1.)
-        while not self.screen_handler.updated:
+        while not self.screen_handler.most_recent:
           print('Waiting for scene to re-render')
           rospy.sleep(0.1)
         image = self.screen_handler.most_recent
@@ -245,6 +245,9 @@ class Trainer(object):
           print("I did not find enough green pixels.")
           image.show()
           self.resetScene(sleep=True)
+        else:
+          print("I found green pixels!")
+          image.show()
 
 
 
@@ -255,10 +258,8 @@ class Trainer(object):
         self.steps_done += 1
         if sample > eps_threshold:
           with torch.no_grad():
-            # import pdb; pdb.set_trace()
             return self.policy_net(state).view(1, 7)
         else:
-          # import pdb; pdb.set_trace()
           return getRandomState()
 
 
@@ -312,16 +313,13 @@ class Trainer(object):
 
 
     def train(self):
-        # self.manager.scene_controller.testExternalCamera()
-        self.manager.scene_controller.externalCamera()
+        self.manager.scene_controller.externalCamera(quat_x=0., quat_y=0., quat_z=1., quat_w=0., x=1.7, y=0., z=1.)
         for i_episode in xrange(self.num_episodes):
           print "Beginning episode: ", i_episode
           # Initialize the environment and state
-          start = rospy.Time.now()
-          # self.manager.scene_controller.externalCamera(quat_x=0, quat_y=0, quat_z=1, quat_w=0)
           self.resetScene(self.manager)
           state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
-          state = self.screen_handler.getScreen()
+          start = rospy.Time.now()
           for _ in count():
             # Select and perform an action
             action_tensor = self.selectAction(state)
@@ -342,11 +340,9 @@ class Trainer(object):
               next_state = None
 
             reward = torch.tensor([reward], device=self.device)
-            action = torch.tensor([action], device=self.device)
-            # next_state = torch.tensor([next_state], device=device)
 
             # Store the transition in memory
-            self.memory.push(state, action, next_state, reward)
+            self.memory.push(state, action_tensor, next_state, reward)
 
             # Move to the next state
             state = next_state
