@@ -112,7 +112,9 @@ class screenHandler(object):
 
   def getReward_slide_right(self):
     width, _ = self.most_recent.size
-    if self.green_x > width/2.:
+    print("green position: ", self.green_x)
+    print("middle:", width/2)
+    if self.green_x <= width/2.:
       return 1
     return 0
 
