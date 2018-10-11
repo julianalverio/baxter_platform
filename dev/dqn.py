@@ -181,10 +181,8 @@ def getRandomState():
 class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
     def __init__(self, interpolation=Image.BILINEAR, batch_size=128, gamma=0.999, eps_start=0.9, eps_end=0.05,
-                 eps_decay=200,
-                 target_update=10, replay_memory_size=10000, timeout=5, num_episodes=1000, resize=40,
-                 one_move_timeout=8.,
-                 move_precision=0.02, ):
+                 eps_decay=200, target_update=10, replay_memory_size=10000, timeout=5, num_episodes=1000, resize=40,
+                 one_move_timeout=8., move_precision=0.02, ):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.Transition = namedtuple('Transition',
@@ -215,6 +213,8 @@ class Trainer(object):
         rospy.on_shutdown(self.manager.shutdown)
         self.screen_handler = screenHandler()
         self.num_episodes = num_episodes
+        self.one_move_timeout = one_move_timeout
+        self.move_precision = move_precision
 
     def resetScene(self, sleep=False):
         self.manager.scene_controller.deleteAllModels(cameras=False)
