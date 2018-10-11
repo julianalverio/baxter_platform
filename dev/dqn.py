@@ -70,7 +70,7 @@ class DQN(nn.Module):
         x = F.relu(self.bn3(self.conv3(x)))
         if self.head == None:
             input_dim = x.size(0)*x.size(1)*x.size(2)*x.size(3)
-            self.head = nn.Linear(input_dim, 7)
+            self.head = nn.Linear(input_dim, 8)
         return self.head(x.view(x.size(0), -1))
 
 
@@ -112,8 +112,6 @@ class screenHandler(object):
 
   def getReward_slide_right(self):
     width, _ = self.most_recent.size
-    print("green position: ", self.green_x)
-    print("middle:", width/2)
     if self.green_x <= width/2.:
       return 1
     return 0
@@ -163,20 +161,14 @@ def getRandomState():
   joint_angles_dict = dict()
   # joint_angles.append(random.uniform(-97.4, 97.4)) #s0
   joint_angles.append(random.uniform(-30, 30)) #s0
-  joint_angles_dict['left_s0'] = joint_angles[-1]
   joint_angles.append(random.uniform(-123, 60)) #s1
-  joint_angles_dict['left_s1'] = joint_angles[-1]
   joint_angles.append(random.uniform(--174, 174)) #e0
-  joint_angles_dict['left_e0'] = joint_angles[-1]
   joint_angles.append(random.uniform(-2.8, 150)) #e1
-  joint_angles_dict['left_e1'] = joint_angles[-1]
   joint_angles.append(random.uniform(--175, 175)) #w0
-  joint_angles_dict['left_w0'] = joint_angles[-1]
   joint_angles.append(random.uniform(-90, 120)) #w1
-  joint_angles_dict['left_w1'] = joint_angles[-1]
   joint_angles.append(random.uniform(-175, 175)) #w2
-  joint_angles_dict['left_w2'] = joint_angles[-1]
-  return torch.from_numpy(np.array(joint_angles)).view(1, 7)
+  joint_angles.append(random.random()) # gripper. 0 = close, 1 = open
+  return torch.from_numpy(np.array(joint_angles)).view(1, 8)
 
 
 
@@ -202,6 +194,7 @@ class Trainer(object):
 
         self.policy_net = DQN().to(self.device)
         self.target_net = DQN().to(self.device)
+        import pdb; pdb.set_trace()
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
 
@@ -245,11 +238,11 @@ class Trainer(object):
               green_pixels += 1
         if green_pixels < 50:
           print("I did not find enough green pixels.")
-          image.show()
+          # image.show()
           self.resetScene(sleep=True)
-        else:
-          print("I found green pixels!")
-          image.show()
+        # else:
+        #   print("I found green pixels!")
+          # image.show()
 
 
 
@@ -260,7 +253,7 @@ class Trainer(object):
         self.steps_done += 1
         if sample > eps_threshold:
           with torch.no_grad():
-            return self.policy_net(state).view(1, 7)
+            return self.policy_net(state).view(1, 8)
         else:
           return getRandomState()
 
@@ -325,10 +318,20 @@ class Trainer(object):
           for _ in count():
             # Select and perform an action
             action_tensor = self.selectAction(state)
-            angles_list = np.array(action_tensor).tolist()[0]
+            action_list = np.array(action_tensor).tolist()[0]
+            angles_list = action_list[:-1]
+            print "unrounded gripper action", action_list[-1]
+            gripper_action = int(round(action_list[-1]))
+            print 'gripper action:', gripper_action
             joints = self.manager.robot_controller.getJointNames()
             angles_dict = dict(zip(joints, angles_list))
             print("Started moving")
+            if gripper_action == 1:
+              self.manager.robot_controller.gripperOpen()
+            elif gripper_action == 0:
+              self.manager.robot_controller.gripperClose()
+            else:
+              assert False, "invalid gripper command"
             self.manager.robot_controller._left_limb.move_to_joint_positions(angles_dict, timeout=self.one_move_timeout, threshold=self.move_precision)
             print("Done moving")
 
