@@ -116,6 +116,7 @@ class screenHandler(object):
   def getReward_slide_right(self):
     width, _ = self.most_recent.size
     if self.green_x <= width/2.:
+      print("I GOT A REWARD")
       return 1
     return 0
 
@@ -352,8 +353,6 @@ class Trainer(object):
               self.manager.robot_controller.gripperOpen()
             elif gripper_action < 0.5:
               self.manager.robot_controller.gripperClose()
-            else:
-              assert False, "invalid gripper command"
             self.manager.robot_controller._left_limb.move_to_joint_positions(angles_dict, timeout=self.one_move_timeout, threshold=self.move_precision)
             print("Done moving")
 
@@ -377,6 +376,7 @@ class Trainer(object):
             # Perform one step of the optimization (on the target network)
             self.optimize_model()
             if done:
+              print("I HIT THE BREAK STATEMENT")
               break
             # Update the target network
             if i_episode % self.TARGET_UPDATE == 0:
