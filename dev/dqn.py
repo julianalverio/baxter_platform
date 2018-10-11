@@ -64,17 +64,12 @@ class DQN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
-        self.head = None
-        # self.head = nn.Linear(448, 7)
+        self.head = nn.Linear(256, 8)
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        if self.head == None:
-            input_dim = x.size(0)*x.size(1)*x.size(2)*x.size(3)
-            print 'showing input dim', input_dim
-            self.head = nn.Linear(input_dim, 8)
         return self.head(x.view(x.size(0), -1))
 
 
@@ -279,7 +274,6 @@ class Trainer(object):
         self.steps_done += 1
         if sample > eps_threshold:
           with torch.no_grad():
-            import pdb; pdb.set_trace()
             return self.policy_net(state).view(1, 8)
         else:
           return getRandomState()
