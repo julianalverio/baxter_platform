@@ -5,7 +5,7 @@ MirrorURL: http://ca.archive.ubuntu.com/ubuntu/
 %labels
 AUTHOR jalverio@mit.edu
 
-%post3
+%post
 apt install wget -y
 apt-get -y install git wget python nano
 # Get keys for Gazebo
@@ -26,27 +26,39 @@ echo 'LC_ALL="en_US.UTF-8"' >> /etc/default/locale
 echo 'LANG="en_US.UTF-8"' >> /etc/default/locale
 update-locale
 
-
-# Install ROS Kinetic and other prereqs
+# Install ROS Kinetic Desktop Full Version
 apt-get install ros-kinetic-desktop-full -y
 rosdep init
 rosdep update
-apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
-
+echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+source /opt/ros/kinetic/setup.bash
+sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
+mkdir ~/catkin_ws/src -p;
+# Install pip and pyassimp package
+sudo apt install python-pip -y
+pip install --upgrade pip
+sudo -H pip install pyassimp==3.3
+sudo pip install torch
+sudo pip install torchvision
+sudo pip install yagmail
 # Prerequisites for Baxter Platform
-apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-moveit-commander -y
-
-# Install pip and upgrade
-apt install python-pip -y
-pip install --upgrade pip==9.0.3
-pip install pyassimp
-
+sudo apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-moveit-commander -y
 # Install MoveIt!
-apt-get install ros-kinetic-moveit -y
+sudo apt-get install ros-kinetic-moveit -y
+# Install Xvfb for Image Rendering
+sudo apt-get install xorg -y
+sudo apt-get install xvfb -y
+sudo apt-get install xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic -y
+sudo apt-get install screen
 
-mkdir -p catkin_ws/src; cd catkin_ws/src
-git clone https://github.com/julianalverio/baxter_platform
+
+cp ~/catkin_ws/src/baxter_platform/installation/baxter_platform_bashrc.bash ~/.bashrc
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
-chmod 777 ~/.ros
-chmod -R 777 ~
+sudo chmod -R 777 ~/.ros
+sudo chmod -R 777 ~
+
+source /opt/ros/kinetic/setup.bash
+catkin_make
+
 
