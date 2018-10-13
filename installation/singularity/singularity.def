@@ -38,25 +38,25 @@ mkdir ~/catkin_ws/src -p;
 # Install pip and pyassimp package
 sudo apt install python-pip -y
 pip install --upgrade pip
-sudo -H pip install pyassimp==3.3
-sudo pip install torch
-sudo pip install torchvision
-sudo pip install yagmail
+pip install pyassimp==3.3
+pip install torch
+pip install torchvision
+pip install yagmail
 # Prerequisites for Baxter Platform
-sudo apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-moveit-commander -y
+apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-moveit-commander -y
 # Install MoveIt!
-sudo apt-get install ros-kinetic-moveit -y
+apt-get install ros-kinetic-moveit -y
 # Install Xvfb for Image Rendering
-sudo apt-get install xorg -y
-sudo apt-get install xvfb -y
-sudo apt-get install xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic -y
-sudo apt-get install screen
+apt-get install xorg -y
+apt-get install xvfb -y
+apt-get install xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic -y
+apt-get install screen
 
 
 cp ~/catkin_ws/src/baxter_platform/installation/baxter_platform_bashrc.bash ~/.bashrc
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
-sudo chmod -R 777 ~/.ros
-sudo chmod -R 777 ~
+chmod -R 777 ~/.ros
+chmod -R 777 ~
 
 source /opt/ros/kinetic/setup.bash
 catkin_make
