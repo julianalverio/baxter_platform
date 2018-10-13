@@ -18,7 +18,6 @@ sudo apt-get update
 sudo apt-get install ros-kinetic-desktop-full -y
 sudo rosdep init
 rosdep update
-echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 source /opt/ros/kinetic/setup.bash
 sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
