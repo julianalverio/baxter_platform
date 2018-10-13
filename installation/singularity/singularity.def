@@ -14,8 +14,39 @@ wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
 # Get keys for ROS Kinetic
 sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
 apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
-# this was a test: apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 421C365BD9FF1F717815A3895523BAEEB01FA116
 
 echo "deb http://ca.archive.ubuntu.com/ubuntu xenial main universe" > /etc/apt/sources.list
 
 apt-get update
+
+#Set up locale to avoid errors later
+locale-gen en_US.UTF-8
+echo 'LC_CTYPE="en_US.UTF-8"' > /etc/default/locale
+echo 'LC_ALL="en_US.UTF-8"' >> /etc/default/locale
+echo 'LANG="en_US.UTF-8"' >> /etc/default/locale
+update-locale
+
+
+# Install ROS Kinetic and other prereqs
+apt-get install ros-kinetic-desktop-full -y
+rosdep init
+rosdep update
+apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
+
+# Prerequisites for Baxter Platform
+apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-moveit-commander -y
+
+# Install pip and upgrade
+apt install python-pip -y
+pip install --upgrade pip==9.0.3
+pip install pyassimp
+
+# Install MoveIt!
+apt-get install ros-kinetic-moveit -y
+
+mkdir -p catkin_ws/src; cd catkin_ws/src
+git clone https://github.com/julianalverio/baxter_platform
+cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
+chmod 777 ~/.ros
+chmod -R 777 ~
+

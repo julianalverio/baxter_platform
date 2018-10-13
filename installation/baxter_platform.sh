@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Install Terminator
 sudo apt-get install terminator -y
 #Install Sublime
