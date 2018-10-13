@@ -1,0 +1,56 @@
+ROS shutdown requestTraceback (most recent call last):
+  File "dqn.py", line 403, in <module>
+    trainer.train()
+  File "dqn.py", line 357, in train
+    self.manager.robot_controller._left_limb.move_to_joint_positions(angles_dict, timeout=self.one_move_timeout, threshold=self.move_precision)
+  File "/home/infolab/catkin_ws/src/baxter_platform/baxter_interface/src/baxter_interface/limb.py", line 449, in move_to_joint_positions
+    body=lambda: self.set_joint_positions(filtered_cmd())
+  File "/home/infolab/catkin_ws/src/baxter_platform/baxter_interface/src/baxter_dataflow/wait_for.py", line 59, in wait_for
+    rate.sleep()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/timer.py", line 103, in sleep
+    sleep(self._remaining(curr_time))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/timer.py", line 166, in sleep
+    raise rospy.exceptions.ROSInterruptException("ROS shutdown request")
+ROSInterruptException: ROS shutdown request
+ROS shutdown requestTraceback (most recent call last):
+  File "dqn.py", line 403, in <module>
+    trainer.train()
+  File "dqn.py", line 341, in train
+    self.resetScene(self.manager)
+  File "dqn.py", line 247, in resetScene
+    self.manager.robot_controller.moveToStart(threshold=0.1)
+  File "/home/infolab/catkin_ws/src/baxter_platform/baxter_sim_platform/scripts/robot_controller.py", line 120, in moveToStart
+    self._left_limb.move_to_joint_positions(start_angles, threshold=threshold)
+  File "/home/infolab/catkin_ws/src/baxter_platform/baxter_interface/src/baxter_interface/limb.py", line 449, in move_to_joint_positions
+    body=lambda: self.set_joint_positions(filtered_cmd())
+  File "/home/infolab/catkin_ws/src/baxter_platform/baxter_interface/src/baxter_dataflow/wait_for.py", line 59, in wait_for
+    rate.sleep()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/timer.py", line 103, in sleep
+    sleep(self._remaining(curr_time))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/timer.py", line 166, in sleep
+    raise rospy.exceptions.ROSInterruptException("ROS shutdown request")
+ROSInterruptException: ROS shutdown request
+ROS shutdown requestTraceback (most recent call last):
+  File "dqn.py", line 403, in <module>
+    trainer.train()
+  File "dqn.py", line 356, in train
+    self.manager.robot_controller.gripperClose()
+  File "/home/infolab/catkin_ws/src/baxter_platform/baxter_sim_platform/scripts/robot_controller.py", line 104, in gripperClose
+    rospy.sleep(0.5)
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/timer.py", line 166, in sleep
+    raise rospy.exceptions.ROSInterruptException("ROS shutdown request")
+ROSInterruptException: ROS shutdown request
+ROS shutdown requestTraceback (most recent call last):
+  File "dqn.py", line 403, in <module>
+    trainer.train()
+  File "dqn.py", line 357, in train
+    self.manager.robot_controller._left_limb.move_to_joint_positions(angles_dict, timeout=self.one_move_timeout, threshold=self.move_precision)
+  File "/home/infolab/catkin_ws/src/baxter_platform/baxter_interface/src/baxter_interface/limb.py", line 449, in move_to_joint_positions
+    body=lambda: self.set_joint_positions(filtered_cmd())
+  File "/home/infolab/catkin_ws/src/baxter_platform/baxter_interface/src/baxter_dataflow/wait_for.py", line 59, in wait_for
+    rate.sleep()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/timer.py", line 103, in sleep
+    sleep(self._remaining(curr_time))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/timer.py", line 166, in sleep
+    raise rospy.exceptions.ROSInterruptException("ROS shutdown request")
+ROSInterruptException: ROS shutdown request
