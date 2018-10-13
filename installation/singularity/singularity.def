@@ -54,7 +54,5 @@ cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
 chmod -R 777 ~/.ros
 chmod -R 777 ~
 
-. /opt/ros/kinetic/setup.bash
-catkin_make
 
 
