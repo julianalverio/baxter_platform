@@ -33,10 +33,10 @@ rosdep update
 echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 source /opt/ros/kinetic/setup.bash
-sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
+apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
 mkdir ~/catkin_ws/src -p;
 # Install pip and pyassimp package
-sudo apt install python-pip -y
+apt install python-pip -y
 pip install --upgrade pip
 pip install pyassimp==3.3
 pip install torch
