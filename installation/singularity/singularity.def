@@ -30,11 +30,8 @@ update-locale
 apt-get install ros-kinetic-desktop-full -y
 rosdep init
 rosdep update
-echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
-source ~/.bashrc
-source /opt/ros/kinetic/setup.bash
 apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
-mkdir ~/catkin_ws/src -p;
+mkdir ~/catkin_ws/src -p; cd ~/catkin_ws/src; git clone https://github.com/julianalverio/baxter_platform
 # Install pip and pyassimp package
 apt install python-pip -y
 pip install --upgrade pip
