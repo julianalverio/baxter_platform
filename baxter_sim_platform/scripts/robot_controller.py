@@ -52,7 +52,11 @@ class RobotController(object):
     self._left_limb = baxter_interface.Limb('left')
     self._right_limb = baxter_interface.Limb('right')
     self._left_gripper = baxter_interface.Gripper('left')
+    self._left_gripper.set_holding_force(100)
+    self._left_gripper.set_moving_force(100)
     self._right_gripper = baxter_interface.Gripper('right')
+    self._right_gripper.set_holding_force(100)
+    self._right_gripper.set_moving_force(100)
     left_ns = "ExternalTools/" + 'left' + "/PositionKinematicsNode/IKService"
     self.left_iksvc = rospy.ServiceProxy(left_ns, SolvePositionIK)
     rospy.wait_for_service(left_ns, 5.0)
@@ -90,14 +94,15 @@ class RobotController(object):
       self._left_gripper.open()
     else:
       self._right_gripper.open()
-    rospy.sleep(1.0)
+    rospy.sleep(0.5)
 
   def gripperClose(self, limb='left'):
     if limb == 'left':
       self._left_gripper.close()
     else:
       self._right_gripper.close()
-    rospy.sleep(1.0)
+    rospy.sleep(0.5)
+
 
   # Move arm to position where it's ready to manipulate objects
   def moveToStart(self, start_angles=None, limb='left', threshold=0.009):

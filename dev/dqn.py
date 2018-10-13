@@ -4,7 +4,7 @@ import math
 import random
 import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from collections import namedtuple
 from itertools import count
 from PIL import Image
@@ -23,9 +23,12 @@ from sensor_msgs.msg import Image as RosImage
 from cv_bridge import CvBridge, CvBridgeError
 
 from scene_generator import *
+import yagmail
+import traceback
 
 
 
+MACHINE = 1
 
 
 class ReplayMemory(object):
@@ -61,16 +64,12 @@ class DQN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
-        self.head = None
-        # self.head = nn.Linear(448, 7)
+        self.head = nn.Linear(256, 8)
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        if self.head == None:
-            input_dim = x.size(0)*x.size(1)*x.size(2)*x.size(3)
-            self.head = nn.Linear(input_dim, 7)
         return self.head(x.view(x.size(0), -1))
 
 
@@ -78,7 +77,7 @@ class DQN(nn.Module):
 class screenHandler(object):
   def __init__(self):
     self.bridge = CvBridge()
-    self.image_sub = rospy.Subscriber('/cameras/head_camera/image', RosImage, self.callback)
+    self.image_sub = rospy.Subscriber('/cameras/camera_0/image', RosImage, self.callback)
     self.most_recent = None
     self.initialized = False
     self.green_x = None
@@ -102,12 +101,9 @@ class screenHandler(object):
     pil_image = Image.fromarray(cv_image)
     width, height = pil_image.size
 
-    cropped = pil_image.crop((0, 300, width, height))
+    # cropped = pil_image.crop((0, 300, width, height))
     # cropped.show()
-    self.most_recent = cropped
-    print(cropped.size)
-    cropped.save("robot_image.jpg")
-    assert False
+    self.most_recent = pil_image
     self.initialized = True
     self.green_x, self.green_y = self.findGreenPixels()
     self.updated = True
@@ -115,7 +111,8 @@ class screenHandler(object):
 
   def getReward_slide_right(self):
     width, _ = self.most_recent.size
-    if self.green_x > width/2.:
+    if self.green_x <= width/2.:
+      print("I GOT A REWARD :D")
       return 1
     return 0
 
@@ -128,7 +125,6 @@ class screenHandler(object):
       image = self.most_recent
       pixels = image.getdata()
       width, height = image.size
-      found = False
       for idx, (r,g,b) in enumerate(pixels):
         x_coord = idx % width
         y_coord = idx // width
@@ -136,11 +132,8 @@ class screenHandler(object):
           found = True
           x_coords.append(x_coord)
           y_coords.append(y_coord)
-        if not found:
-          rospy.sleep(0.1)
-          continue
-        if len(x_coords) < 50: return False
-        return sum(x_coords)/len(x_coords), sum(y_coords)/len(y_coords) 
+      if len(x_coords) < 50: return None, None
+      return sum(x_coords)/len(x_coords), sum(y_coords)/len(y_coords)
 
 
   def showGreenPixels(self):
@@ -161,6 +154,13 @@ class screenHandler(object):
     newim.show()
 
 
+def completionEmail(dictionary_string):
+  message = 'Training completed on machine %s. Dictionary: %s' % (MACHINE, dictionary_string) 
+  yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
+  yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
+
+
+
 
 # reference http://sdk.rethinkrobotics.com/wiki/Hardware_Specifications#Range_of_Motion_-_Bend_Joints
 def getRandomState():
@@ -168,30 +168,37 @@ def getRandomState():
   joint_angles_dict = dict()
   # joint_angles.append(random.uniform(-97.4, 97.4)) #s0
   joint_angles.append(random.uniform(-30, 30)) #s0
-  joint_angles_dict['left_s0'] = joint_angles[-1]
   joint_angles.append(random.uniform(-123, 60)) #s1
-  joint_angles_dict['left_s1'] = joint_angles[-1]
   joint_angles.append(random.uniform(--174, 174)) #e0
-  joint_angles_dict['left_e0'] = joint_angles[-1]
   joint_angles.append(random.uniform(-2.8, 150)) #e1
-  joint_angles_dict['left_e1'] = joint_angles[-1]
   joint_angles.append(random.uniform(--175, 175)) #w0
-  joint_angles_dict['left_w0'] = joint_angles[-1]
   joint_angles.append(random.uniform(-90, 120)) #w1
-  joint_angles_dict['left_w1'] = joint_angles[-1]
   joint_angles.append(random.uniform(-175, 175)) #w2
-  joint_angles_dict['left_w2'] = joint_angles[-1]
-  return torch.from_numpy(joint_angles).view(1, 7)
+  joint_angles.append(random.random()) # gripper. 0 = close, 1 = open
+  return torch.from_numpy(np.array(joint_angles)).view(1, 8)
 
 
 
 class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
-    def __init__(self, interpolation=Image.BILINEAR, batch_size=128, gamma=0.999, eps_start=0.9, eps_end=0.05,
-                 eps_decay=200,
-                 target_update=10, replay_memory_size=10000, timeout=5, num_episodes=1000, resize=40,
-                 one_move_timeout=8.,
-                 move_precision=0.02, ):
+    def __init__(self, interpolation=Image.BILINEAR, batch_size=64, gamma=0.999, eps_start=0.9, eps_end=0.05,
+                 eps_decay=200, target_update=10, replay_memory_size=1000, timeout=5, num_episodes=1000, resize=40,
+                 one_move_timeout=4., move_precision=0.02):
+        self.params_dict = {
+        'interpolation' : interpolation,
+        'batch_size' : batch_size,
+        'gamma' : gamma,
+        'eps_start' : eps_start,
+        'eps_end' : eps_end,
+        'eps_decay' : eps_decay,
+        'target_update' : target_update,
+        'replay_memory_size' : replay_memory_size,
+        'timeout' : timeout,
+        'num_episodes' : num_episodes,
+        'resize' : resize,
+        'one_move_timeout' : one_move_timeout,
+        'move_precision' : move_precision
+        }
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.Transition = namedtuple('Transition',
@@ -222,24 +229,26 @@ class Trainer(object):
         rospy.on_shutdown(self.manager.shutdown)
         self.screen_handler = screenHandler()
         self.num_episodes = num_episodes
+        self.one_move_timeout = one_move_timeout
+        self.move_precision = move_precision
 
     def resetScene(self, sleep=False):
-        self.manager.scene_controller.deleteAllModels()
+        self.manager.scene_controller.deleteAllModels(cameras=False)
         self.manager.scene_controller.makeModel(name='table', shape='box', roll=0., pitch=0., yaw=0.,
                                                 restitution_coeff=0., size_x=.7, size_y=1.5, size_z=.7, x=.8, y=0.,
                                                 z=.35, mass=5000, ambient_r=0.1, ambient_g=0.1, ambient_b=0.1,
                                                 ambient_a=0.1, mu1=1, mu2=1, reference_frame='')
         self.manager.scene_controller.makeModel(name='testObject', shape='box', size_x=0.1, size_y=0.1, size_z=0.1,
-                                                x=0.8, y=0.3, z=0.75, mass=20000, mu1=1000, mu2=2000,
+                                                x=0.8, y=0.1, z=0.75, mass=1, mu1=1000, mu2=2000,
                                                 restitution_coeff=0.5, roll=0.1, pitch=0.2, yaw=0.3, ambient_r=0,
                                                 ambient_g=1, ambient_b=0, ambient_a=1, diffuse_r=0, diffuse_g=1,
                                                 diffuse_b=0, diffuse_a=1)
         self.manager.scene_controller.spawnAllModels()
         self.manager.robot_controller.moveToStart(threshold=0.1)
-        self.screen_handler.updated = False
+        self.screen_handler.most_recent = None
         if sleep:
             rospy.sleep(1.)
-        while not self.screen_handler.updated:
+        while not self.screen_handler.most_recent:
           print('Waiting for scene to re-render')
           rospy.sleep(0.1)
         image = self.screen_handler.most_recent
@@ -249,7 +258,12 @@ class Trainer(object):
             if g > 100 and r < 50 and b < 50:
               green_pixels += 1
         if green_pixels < 50:
-            self.resetScene(sleep=True)
+          print("I did not find enough green pixels.")
+          # image.show()
+          self.resetScene(sleep=True)
+        # else:
+        #   print("I found green pixels!")
+          # image.show()
 
 
 
@@ -260,11 +274,11 @@ class Trainer(object):
         self.steps_done += 1
         if sample > eps_threshold:
           with torch.no_grad():
-            import pdb; pdb.set_trace()
-            return self.policy_net(state).view(1, 7)
+            action = self.policy_net(state).view(1, 8)
+            return action.type(torch.DoubleTensor)
         else:
-          import pdb; pdb.set_trace()
-          return getRandomState()
+          action = getRandomState()
+          return action.type(torch.DoubleTensor)
 
 
     # This first samples a batch, concatenates
@@ -279,6 +293,7 @@ class Trainer(object):
     #
 
     def optimize_model(self):
+        import pdb; pdb.set_trace
         if len(self.memory) < self.BATCH_SIZE:
             return
         transitions = self.memory.sample(self.BATCH_SIZE)
@@ -292,21 +307,23 @@ class Trainer(object):
         non_final_next_states = torch.cat([s for s in batch.next_state
                                                     if s is not None])
         state_batch = torch.cat(batch.state)
+        import pdb; pdb.set_trace()
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken
-        state_action_values = self.policy_net(state_batch).gather(1, action_batch)
+        state_action_values = self.policy_net(state_batch)#.gather(1, action_batch)
 
         # Compute V(s_{t+1}) for all next states.
         next_state_values = torch.zeros(self.BATCH_SIZE, device=self.device)
-        next_state_values[non_final_mask] =self.target_net(non_final_next_states).max(1)[0].detach()
+        next_state_values[non_final_mask] = self.target_net(non_final_next_states).detach()
         # Compute the expected Q values
         expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
 
         # Compute Huber loss
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
+        print('Loss: ', loss)
 
         # Optimize the model
         self.optimizer.zero_grad()
@@ -317,18 +334,27 @@ class Trainer(object):
 
 
     def train(self):
+        self.manager.scene_controller.externalCamera(quat_x=0., quat_y=0., quat_z=1., quat_w=0., x=1.7, y=0., z=1.)
         for i_episode in xrange(self.num_episodes):
           print "Beginning episode: ", i_episode
           # Initialize the environment and state
-          start = rospy.Time.now()
           self.resetScene(self.manager)
           state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
-          state = self.screen_handler.getScreen()
+          start = rospy.Time.now()
           for _ in count():
             # Select and perform an action
-            action, action_dict = self.selectAction(state)
+            action_tensor = self.selectAction(state)
+            action_list = np.array(action_tensor).tolist()[0]
+            angles_list = action_list[:-1]
+            gripper_action = action_list[-1]
+            joints = self.manager.robot_controller.getJointNames()
+            angles_dict = dict(zip(joints, angles_list))
             print("Started moving")
-            self.manager.robot_controller._left_limb.move_to_joint_positions(action_dict, timeout=self.one_move_timeout, threshold=self.move_precision)
+            if gripper_action >= 0.5:
+              self.manager.robot_controller.gripperOpen()
+            elif gripper_action < 0.5:
+              self.manager.robot_controller.gripperClose()
+            self.manager.robot_controller._left_limb.move_to_joint_positions(angles_dict, timeout=self.one_move_timeout, threshold=self.move_precision)
             print("Done moving")
 
             reward = self.screen_handler.getReward_slide_right()
@@ -341,11 +367,9 @@ class Trainer(object):
               next_state = None
 
             reward = torch.tensor([reward], device=self.device)
-            action = torch.tensor([action], device=self.device)
-            # next_state = torch.tensor([next_state], device=device)
 
             # Store the transition in memory
-            self.memory.push(state, action, next_state, reward)
+            self.memory.push(state, action_tensor, next_state, reward)
 
             # Move to the next state
             state = next_state
@@ -358,5 +382,27 @@ class Trainer(object):
             if i_episode % self.TARGET_UPDATE == 0:
               self.target_net.load_state_dict(self.policy_net.state_dict())
 
-        torch.save(self.policy_net, "policy_net.pth")
-        torch.save(self.target_net, "target_net.pth")
+        torch.save(self.target_net.state_dict(), 'target_net_state')
+        torch.save(self.target_net, 'target_net')
+
+        f = open('params.txt', 'w+')
+        f.write(str(self.params_dict))
+        completionEmail(str(self.params_dict))
+
+
+    def loadModel(path):
+      target_net = DQN()
+      target_net.load_state_dict(torch.load(path))
+      target_net.eval()
+
+
+
+
+try:
+    trainer = Trainer()
+    trainer.train()
+except Exception as e:
+    with open('log.txt', 'a') as f:
+        f.write(str(e))
+        f.write(traceback.format_exc())
+
