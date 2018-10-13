@@ -33,7 +33,7 @@ rosdep update
 apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
 mkdir ~/catkin_ws/src -p; cd ~/catkin_ws/src; git clone https://github.com/julianalverio/baxter_platform
 # Install pip and pyassimp package
-apt install python-pip -y
+apt install python-pip==9.0.1 -y
 pip install --upgrade pip
 pip install pyassimp==3.3
 pip install torch
