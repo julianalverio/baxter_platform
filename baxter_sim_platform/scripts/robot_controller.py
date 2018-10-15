@@ -43,6 +43,8 @@ import geometry_msgs.msg
 from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
+from moveit_msgs.msg import RobotState
+from moveit_msgs.srv import GetStateValidityRequest, GetStateValidity
 
 
 
@@ -78,6 +80,8 @@ class RobotController(object):
       self.robot_commander = moveit_commander.RobotCommander()
       self.left_commander = moveit_commander.MoveGroupCommander('left_arm')
       self.right_commander = moveit_commander.MoveGroupCommander('right_arm')
+      self.collision_proxy = rospy.ServiceProxy('/check_state_validity', GetStateValidity)
+      self.collision_proxy.wait_for_service()
 
   def getJointNames(self, limb='left'):
     if limb == 'left':
@@ -135,25 +139,35 @@ class RobotController(object):
   Group can be 'left_arm' or 'right_arm'. Checks the limb for you, by default.
   Trajectory must be a list of length-7 lists.
   Each length-7 list must be a list of joint angles in the same order as self._limb.joint_names()
+  reference: https://answers.ros.org/question/203633/collision-detection-in-python/
   '''
-  def checkCollision(self, trajectory, num_points=20):
-    group = self._limb
-    if num_points_interpolated > 0:
+  def checkCollision(self, trajectory, num_points=20, limb='left'):
+    if limb == 'left':
+      group = self._left_limb
+    else:
+      group = self._right_limb
+    if num_points > 0:
       full_trajectory = []
       for waypoint_idx in xrange(len(trajectory) - 1):
-        trajectory.append(waypoint)
-        for idx in xrange(num_points_interpolated):
+        full_trajectory.append(waypoint)
+        for idx in xrange(num_points):
           interpolated_points = self.interpolate(
             trajectory[waypoint_idx], trajectory[waypoint_idx + 1], num_points)
-          trajectory.extend(interpolated_points)
-      trajectory.append(trajectory[-1])
+          full_trajectory.extend(interpolated_points)
+      full_trajectory.append(trajectory[-1])
     else:
       full_trajectory = trajectory
     for traj_point in full_trajectory:
       rs = RobotState()
-      rs.joint_state.name = self._limb.joint_names()
-      rs.joint_state.position = traj_point
-      result = StateValidity().getStateValidity(rs, group)
+      rs.joint_state.name = group.joint_names()
+      position_list = []
+      for joint in group.joint_names():
+        position_list.append(traj_point[joint])
+      rs.joint_state.position = position_list
+      gsvr = GetStateValidityRequest()
+      gsvr.robot_state = rs
+      gsvr.group_name = limb + '_arm'
+      result = self.collision_proxy.call(gsvr)
       if not result.valid: # if one point is not valid, the trajectory is not valid!! :-(
         print("COLLISION FOUND IN TRAJECTORY >:(")
         return False
