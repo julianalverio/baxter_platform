@@ -307,7 +307,7 @@ class RobotController(object):
   's0, s1, e0, e1, w0, w1, w2' which is the same as self._limb.joint_names()
   Input can also be a list of dictionaries with joints as keys and angles as values
   '''
-  def followTrajectoryFromJointAngles(self, input_trajectory, limb='left'):
+  def followTrajectoryFromJointAngles(self, input_trajectory, limb='left', timeout=None):
     if type(input_trajectory[0]) == list:
       prefix = limb + '_'
       trajectory = list()
@@ -330,9 +330,17 @@ class RobotController(object):
 
     for joint_angles in trajectory:
       if limb=='left':
-        self._left_limb.move_to_joint_positions(joint_angles)
+        if not timeout:
+          self._left_limb.move_to_joint_positions(joint_angles)
+        else:
+          self._left_limb.move_to_joint_positions(joint_angles, timeout=timeout)
       else:
-        self._right_limb.move_to_joint_positions(joint_angles)
+        if not timeout:
+          self._right_limb.move_to_joint_positions(joint_angles)
+        else:
+        self._right_limb.move_to_joint_positions(joint_angles, timeout=timeout)
+
+
 
 ####################################################################################################
 ############################### Trajectory Following Helper Methods ################################
