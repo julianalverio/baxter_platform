@@ -28,6 +28,9 @@ import traceback
 
 
 
+MACHINE = 1
+
+
 class ReplayMemory(object):
 
     def __init__(self, capacity, transition):
@@ -61,11 +64,9 @@ class DQN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
-        self.head = nn.Linear(256, 16)
+        self.head = nn.Linear(256, 8)
 
     def forward(self, x):
-        print("I need to see how to append the angles input here")
-        import pdb; pdb.set_trace()
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
@@ -108,13 +109,11 @@ class screenHandler(object):
     self.updated = True
 
 
-  def getReward_slide_right(self, out_of_bounds):
+  def getReward_slide_right(self):
     width, _ = self.most_recent.size
     if self.green_x <= width/2.:
-      print("I GOT A REWARD")
-      return 1000
-    if out_of_bounds:
-        return -1
+      print("I GOT A REWARD :D")
+      return 1
     return 0
 
 
@@ -130,6 +129,7 @@ class screenHandler(object):
         x_coord = idx % width
         y_coord = idx // width
         if g>100 and r<50 and b<50:
+          found = True
           x_coords.append(x_coord)
           y_coords.append(y_coord)
       if len(x_coords) < 50: return None, None
@@ -155,7 +155,7 @@ class screenHandler(object):
 
 
 def completionEmail(dictionary_string):
-  message = 'Training completed!'
+  message = 'Training completed on machine %s. Dictionary: %s' % (MACHINE, dictionary_string) 
   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
 
@@ -164,15 +164,26 @@ def completionEmail(dictionary_string):
 
 # reference http://sdk.rethinkrobotics.com/wiki/Hardware_Specifications#Range_of_Motion_-_Bend_Joints
 def getRandomState():
-  state = np.zeros(16)
-  state[random.randint(0, 15)] = 1
-  return torch.from_numpy(state).view(1,16)
+  joint_angles = []
+  joint_angles_dict = dict()
+  # joint_angles.append(random.uniform(-97.4, 97.4)) #s0
+  joint_angles.append(random.uniform(-30, 30)) #s0
+  joint_angles.append(random.uniform(-123, 60)) #s1
+  joint_angles.append(random.uniform(--174, 174)) #e0
+  joint_angles.append(random.uniform(-2.8, 150)) #e1
+  joint_angles.append(random.uniform(--175, 175)) #w0
+  joint_angles.append(random.uniform(-90, 120)) #w1
+  joint_angles.append(random.uniform(-175, 175)) #w2
+  joint_angles.append(random.random()) # gripper. 0 = close, 1 = open
+  return torch.from_numpy(np.array(joint_angles)).view(1, 8)
+
+
 
 class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
     def __init__(self, interpolation=Image.BILINEAR, batch_size=64, gamma=0.999, eps_start=0.9, eps_end=0.05,
                  eps_decay=200, target_update=10, replay_memory_size=1000, timeout=5, num_episodes=1000, resize=40,
-                 one_move_timeout=4., move_precision=0.02, count_timeout=1000):
+                 one_move_timeout=4., move_precision=0.02):
         self.params_dict = {
         'interpolation' : interpolation,
         'batch_size' : batch_size,
@@ -220,8 +231,6 @@ class Trainer(object):
         self.num_episodes = num_episodes
         self.one_move_timeout = one_move_timeout
         self.move_precision = move_precision
-        self.out_of_bounds = False
-        self.count_timeout = count_timeout
 
     def resetScene(self, sleep=False):
         self.manager.scene_controller.deleteAllModels(cameras=False)
@@ -265,62 +274,11 @@ class Trainer(object):
         self.steps_done += 1
         if sample > eps_threshold:
           with torch.no_grad():
-            continuous_action = self.policy_net(state).view(1, 16)
-            discrete_action = np.zeros(16)
-            import pdb; pdb.set_trace()
-            discrete_action[continuous_action.max(0)[1]] = 1
-            return torch.from_numpy(discrete_action).type(torch.DoubleTensor)
+            action = self.policy_net(state).view(1, 8)
+            return action.type(torch.DoubleTensor)
         else:
           action = getRandomState()
           return action.type(torch.DoubleTensor)
-
-
-
-    #inputs will be [s0+, s0-, s1+, s1-, e0+, e0-, e1+, e1-, w0+, w0-, w1+, w1-, w2+, w2-, open_gripper, close_gripper]
-    def performAction(self, action_list):
-        angles_dict = self.manager.robot_controller._left_limb.jointAngles();
-        joints = self.manager.robot_controller.getJointNames()
-        angles_list = [angles_dict[joint] for joint in joints]
-        #if you're not opening/closing the gripper
-        if not (action_list[-1] or action_list[-2]):
-            bounded_angles = self.checkBounds(angles_list, action_list[:-2])
-            self.manager.robot_controller.followTrajectoryFromJointAngles([bounded_angles])
-        elif action_list[-2]:
-            self.manager.robot_controller.gripperOpen()
-        elif action_list[-1]:
-            self.manager.robot_controller.gripperClose()
-        else:
-            print("Error: No action selected")
-            assert False
-
-
-    def checkBounds(self, old_angles, angles):
-        valid = True
-        #s0
-        if not (-97.4 < angles[0] < 97.4):
-            valid = False
-        #s1
-        if not (-123 < angles[1] < 60):
-            valid = False
-        #e0
-        if not (-174.9 < angles[2] < 174.9):
-            valid = False
-        #e1
-        if not (-2.8 < angles[3] < 150):
-            valid = False
-        #w0
-        if not (-175.2 < angles[4] < 175.2):
-            valid = False
-        #w1
-        if not (-90 < angles[5] < 120):
-            valid = False
-        #w2
-        if not (-175.2 < angles[6] < 175.2):
-            valid = False
-        if valid:
-            return angles
-        self.out_of_bounds = True
-        return old_angles
 
 
     # This first samples a batch, concatenates
@@ -383,20 +341,26 @@ class Trainer(object):
           self.resetScene(self.manager)
           state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
           start = rospy.Time.now()
-          for movement_idx in count():
+          for _ in count():
             # Select and perform an action
             action_tensor = self.selectAction(state)
-            print("performing an action")
-            self.performAction(np.array(action_tensor).tolist()[0])
-            print("done performing action")
+            action_list = np.array(action_tensor).tolist()[0]
+            angles_list = action_list[:-1]
+            gripper_action = action_list[-1]
+            joints = self.manager.robot_controller.getJointNames()
+            angles_dict = dict(zip(joints, angles_list))
+            print("Started moving")
+            if gripper_action >= 0.5:
+              self.manager.robot_controller.gripperOpen()
+            elif gripper_action < 0.5:
+              self.manager.robot_controller.gripperClose()
+            self.manager.robot_controller._left_limb.move_to_joint_positions(angles_dict, timeout=self.one_move_timeout, threshold=self.move_precision)
+            print("Done moving")
 
-            reward = self.screen_handler.getReward_slide_right(self.out_of_bounds)
-            self.out_of_bounds = False
+            reward = self.screen_handler.getReward_slide_right()
 
             # Observe new state
-            # done = reward or (rospy.Time.now() - start > rospy.Duration(self.TIMEOUT))
-            done = reward or movement_idx > self.count_timeout
-
+            done = reward or (rospy.Time.now() - start > rospy.Duration(self.TIMEOUT))
             if not reward:
               next_state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
             else:
