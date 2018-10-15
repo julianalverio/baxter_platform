@@ -31,28 +31,23 @@ apt-get install ros-kinetic-desktop-full -y
 rosdep init
 rosdep update
 apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
-mkdir ~/catkin_ws/src -p; cd ~/catkin_ws/src; git clone https://github.com/julianalverio/baxter_platform
+
 # Install pip and pyassimp package
 apt install python-pip -y
-pip install pyassimp
-pip install torch
-pip install torchvision
-pip install yagmail
+pip install pyassimp torch torchvision yagmail
 # Prerequisites for Baxter Platform
 apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-moveit-commander -y
 # Install MoveIt!
 apt-get install ros-kinetic-moveit -y
 # Install Xvfb for Image Rendering
-apt-get install xorg -y
-apt-get install xvfb -y
-apt-get install xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic -y
-apt-get install screen
+apt-get install xorg xvfb xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic screen -y
 
-
+mkdir ~/catkin_ws/src -p; cd ~/catkin_ws/src; git clone https://github.com/julianalverio/baxter_platform
 cp ~/catkin_ws/src/baxter_platform/installation/baxter_platform_bashrc.bash ~/.bashrc
 cp ~/catkin_ws/src/baxter_platform/baxter/baxter.sh ~/catkin_ws/baxter.sh
 chmod -R 777 ~/.ros
 chmod -R 777 ~
 
-
-
+. /opt/ros/kinetic/setup.sh
+cd ~/catkin_ws
+catkin_make
