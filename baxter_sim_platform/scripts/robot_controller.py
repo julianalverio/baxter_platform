@@ -338,7 +338,7 @@ class RobotController(object):
         if not timeout:
           self._right_limb.move_to_joint_positions(joint_angles)
         else:
-        self._right_limb.move_to_joint_positions(joint_angles, timeout=timeout)
+          self._right_limb.move_to_joint_positions(joint_angles, timeout=timeout)
 
 
 
