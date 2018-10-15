@@ -83,18 +83,20 @@ class SceneController(object):
       pose = Pose()
       quat_x, quat_y, quat_z, quat_w = tf_conversions.transformations.quaternion_from_euler(model.roll, model.pitch, model.yaw)
       pose.orientation = Quaternion(quat_x, quat_y, quat_z, quat_w)
-      pose.position.x = model.x #TODO modify to align
+      pose.position.x = model.x
       pose.position.y = model.y
-      pose.position.z = model.z
+      pose.position.z = model.z - 0.58
       model_msg = geometry_msgs.msg.PoseStamped()
       model_msg.pose = pose
       model_msg.header.frame_id = 'base'
       if model.shape == 'box':
+        import pdb; pdb.set_trace()
         self.scene_commander.add_box(
           model.name, model_msg, size=(model.size_x, model.size_y, model.size_z))
         self.waitForMoveItObject(model.name)
       elif model.shape == 'sphere':
         self.scene_commander.add_sphere(model.name, pose, radius=model.size_r)
+        rospy.sleep(1)
         self.waitForMoveItObject(model.name)
       else:
         rospy.logerr('MoveIt is ignoring model named %s of shape %s.' % (model.name, model.shape))
@@ -134,6 +136,7 @@ class SceneController(object):
   '''
   def waitForMoveItObject(self, name, end='scene', timeout=5):
     start = rospy.get_time()
+    # import pdb; pdb.set_trace()
     while (rospy.get_time() - start < timeout) and not rospy.is_shutdown():
       in_scene = name in self.scene_commander.get_known_object_names()
       attached_objects = self.scene_commander.get_attached_objects([name])
