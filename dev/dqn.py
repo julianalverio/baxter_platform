@@ -176,7 +176,7 @@ class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
     def __init__(self, interpolation=Image.BILINEAR, batch_size=64, gamma=0.999, eps_start=0.9, eps_end=0.05,
                  eps_decay=200, target_update=10, replay_memory_size=1000, timeout=5, num_episodes=1000, resize=40,
-                 one_move_timeout=.5, move_precision=0.02, count_timeout=200, movement_threshold=0.02):
+                 one_move_timeout=1., move_precision=0.02, count_timeout=100, movement_threshold=0.005):
         self.params_dict = {
         'interpolation' : interpolation,
         'batch_size' : batch_size,
@@ -258,7 +258,7 @@ class Trainer(object):
             if g > 100 and r < 50 and b < 50:
               green_pixels += 1
         if green_pixels < 50:
-          print("I did not find enough green pixels.")
+          print("Re-rending Scene.")
           # image.show()
           self.resetScene(sleep=True)
         # else:
@@ -440,7 +440,7 @@ class Trainer(object):
 
             # Observe new state
             # done = reward or (rospy.Time.now() - start > rospy.Duration(self.TIMEOUT))
-            done = (reward > 0) or (movement_idx > self.count_timeout)
+            done = (reward > 0) or (movement_idx >= self.count_timeout - 1)
 
             if reward <= 0:
               next_state_frame = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
