@@ -25,7 +25,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from scene_generator import *
 import yagmail
 import traceback
-
+import genpy
 
 
 class ReplayMemory(object):
@@ -107,7 +107,7 @@ class screenHandler(object):
     self.updated = True
 
 
-  def getReward_slide_right(self, out_of_bounds, redundant_grip):
+  def getReward_slide_right(self, out_of_bounds, redundant_grip, no_movement):
     width, _ = self.most_recent.size
     if self.green_x <= width/2.:
       print("I GOT A REWARD")
@@ -116,6 +116,8 @@ class screenHandler(object):
     if out_of_bounds:
         reward -= 1.
     if redundant_grip:
+        reward -= 1.
+    if no_movement:
         reward -= 1.
     return reward
 
@@ -174,7 +176,7 @@ class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
     def __init__(self, interpolation=Image.BILINEAR, batch_size=64, gamma=0.999, eps_start=0.9, eps_end=0.05,
                  eps_decay=200, target_update=10, replay_memory_size=1000, timeout=5, num_episodes=1000, resize=40,
-                 one_move_timeout=0.5, move_precision=0.02, count_timeout=1000):
+                 one_move_timeout=.5, move_precision=0.02, count_timeout=200, movement_threshold=0.02):
         self.params_dict = {
         'interpolation' : interpolation,
         'batch_size' : batch_size,
@@ -227,6 +229,8 @@ class Trainer(object):
         self.hand_open = True
         self.redundant_grip = False
         self.log = open('log.txt', 'w+')
+        self.no_movement = False
+        self.movement_threshold = movement_threshold
 
     def resetScene(self, sleep=False):
         self.manager.scene_controller.deleteAllModels(cameras=False)
@@ -290,7 +294,13 @@ class Trainer(object):
         #if you're not opening/closing the gripper
         if not (action_list[-1] or action_list[-2]):
             bounded_angles = self.checkBounds(angles_list, action_list[:-2])
+            start_angles = self.manager.robot_controller.getJointAngles(numpy=True)
             self.manager.robot_controller.followTrajectoryFromJointAngles([bounded_angles], timeout=self.one_move_timeout)
+            end_angles = self.manager.robot_controller.getJointAngles(numpy=True)
+            if np.linalg.norm(start_angles - end_angles) < self.movement_threshold:
+                self.no_movement = True
+                print("NO MOVEMENT!!")
+
         elif action_list[-2]:
             if not self.hand_open:
                 self.manager.robot_controller.gripperOpen()
@@ -342,7 +352,7 @@ class Trainer(object):
 
     def getRobotState(self):
         hand_tensor = torch.tensor(int(self.hand_open)).view(1, -1).type(torch.FloatTensor)
-        return torch.cat((torch.tensor(self.manager.robot_controller.jointAngles()).view(1,-1).type(torch.FloatTensor), hand_tensor), 1)
+        return torch.cat((torch.tensor(self.manager.robot_controller.getJointAngles()).view(1,-1).type(torch.FloatTensor), hand_tensor), 1)
 
 
     # This first samples a batch, concatenates
@@ -419,12 +429,14 @@ class Trainer(object):
             else: 
                 action_tensor = self.selectAction(state)
             action_index_tensor = action_tensor.max(1)[1].view(1, 1)
+            print action_index_tensor.item()
             print("Performing action #: %s" % movement_idx)
             self.performAction(np.array(action_tensor).tolist()[0])
 
-            reward = self.screen_handler.getReward_slide_right(self.out_of_bounds, self.redundant_grip)
+            reward = self.screen_handler.getReward_slide_right(self.out_of_bounds, self.redundant_grip, self.no_movement)
             self.out_of_bounds = False
             self.redundant_grip = False
+            self.no_movement = False
 
             # Observe new state
             # done = reward or (rospy.Time.now() - start > rospy.Duration(self.TIMEOUT))
