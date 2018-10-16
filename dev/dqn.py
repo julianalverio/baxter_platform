@@ -439,7 +439,6 @@ class Trainer(object):
             self.no_movement = False
 
             # Observe new state
-            # done = reward or (rospy.Time.now() - start > rospy.Duration(self.TIMEOUT))
             done = (reward > 0) or (movement_idx >= self.count_timeout - 1)
 
             if reward <= 0:
