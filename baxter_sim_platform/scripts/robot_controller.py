@@ -89,10 +89,14 @@ class RobotController(object):
     else:
       return self._right_limb.joint_names()
 
-  def jointAngles(self, limb='left'):
+  def getJointAngles(self, limb='left', numpy=False):
     if limb == 'left':
+      if numpy:
+        return np.array([self._left_limb.joint_angles()[joint] for joint in self.getJointNames()])
       return [self._left_limb.joint_angles()[joint] for joint in self.getJointNames()]
     else:
+      if numpy:
+        return np.array([self._right_limb.joint_angles()[joint] for joint in self.getJointNames()])
       return [self._right_limb.joint_angles()[joint] for joint in self.getJointNames()]
 
   # Shut down MoveIt!
