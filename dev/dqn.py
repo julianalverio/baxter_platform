@@ -61,15 +61,15 @@ class DQN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
-        self.head = nn.Linear(256, 16)
+        self.head = nn.Linear(256+8, 16)
 
-    def forward(self, x):
-        print("I need to see how to append the angles input here")
-        import pdb; pdb.set_trace()
+    def forward(self, (x, robot_state)):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        return self.head(x.view(x.size(0), -1))
+        conv_result = x.view(x.size(0), -1)
+        concatenated = torch.cat((conv_result, robot_state), 1)
+        return self.head(concatenated)
 
 
 
@@ -88,7 +88,6 @@ class screenHandler(object):
       print("screenHandler is not yet initialized. Hanging.")
     while not self.initialized:
       rospy.sleep(1)
-    print("Grabbed most recent screen.")
     return self.most_recent
 
   def callback(self, data):
@@ -108,14 +107,17 @@ class screenHandler(object):
     self.updated = True
 
 
-  def getReward_slide_right(self, out_of_bounds):
+  def getReward_slide_right(self, out_of_bounds, redundant_grip):
     width, _ = self.most_recent.size
     if self.green_x <= width/2.:
       print("I GOT A REWARD")
-      return 1000
+      return 1000.
+    reward = 0.
     if out_of_bounds:
-        return -1
-    return 0
+        reward -= 1.
+    if redundant_grip:
+        reward -= 1.
+    return reward
 
 
   def findGreenPixels(self):
@@ -154,7 +156,7 @@ class screenHandler(object):
     newim.show()
 
 
-def completionEmail(dictionary_string):
+def completionEmail():
   message = 'Training completed!'
   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
@@ -172,7 +174,7 @@ class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
     def __init__(self, interpolation=Image.BILINEAR, batch_size=64, gamma=0.999, eps_start=0.9, eps_end=0.05,
                  eps_decay=200, target_update=10, replay_memory_size=1000, timeout=5, num_episodes=1000, resize=40,
-                 one_move_timeout=4., move_precision=0.02, count_timeout=1000):
+                 one_move_timeout=0.5, move_precision=0.02, count_timeout=1000):
         self.params_dict = {
         'interpolation' : interpolation,
         'batch_size' : batch_size,
@@ -222,6 +224,9 @@ class Trainer(object):
         self.move_precision = move_precision
         self.out_of_bounds = False
         self.count_timeout = count_timeout
+        self.hand_open = True
+        self.redundant_grip = False
+        self.log = open('log.txt', 'w+')
 
     def resetScene(self, sleep=False):
         self.manager.scene_controller.deleteAllModels(cameras=False)
@@ -263,38 +268,51 @@ class Trainer(object):
         eps_threshold = self.EPS_END + (self.EPS_START - self.EPS_END) * \
           math.exp(-1. * self.steps_done / self.EPS_DECAY)
         self.steps_done += 1
-        if sample > eps_threshold:
-          with torch.no_grad():
-            continuous_action = self.policy_net(state).view(1, 16)
-            discrete_action = np.zeros(16)
-            import pdb; pdb.set_trace()
-            discrete_action[continuous_action.max(0)[1]] = 1
-            return torch.from_numpy(discrete_action).type(torch.DoubleTensor)
-        else:
+        if sample < eps_threshold or len(self.memory) < self.BATCH_SIZE:
           action = getRandomState()
           return action.type(torch.DoubleTensor)
+
+        else:
+          with torch.no_grad():
+            continuous_action = (self.policy_net(state).view(1, 16) + 1.)/2.
+            discrete_action = np.zeros(16)
+            discrete_action[continuous_action.max(0)[1]] = 1
+            return torch.from_numpy(discrete_action).type(torch.DoubleTensor).view(1, -1)
+        
 
 
 
     #inputs will be [s0+, s0-, s1+, s1-, e0+, e0-, e1+, e1-, w0+, w0-, w1+, w1-, w2+, w2-, open_gripper, close_gripper]
     def performAction(self, action_list):
-        angles_dict = self.manager.robot_controller._left_limb.jointAngles();
+        angles_dict = self.manager.robot_controller._left_limb.joint_angles();
         joints = self.manager.robot_controller.getJointNames()
         angles_list = [angles_dict[joint] for joint in joints]
         #if you're not opening/closing the gripper
         if not (action_list[-1] or action_list[-2]):
             bounded_angles = self.checkBounds(angles_list, action_list[:-2])
-            self.manager.robot_controller.followTrajectoryFromJointAngles([bounded_angles])
+            self.manager.robot_controller.followTrajectoryFromJointAngles([bounded_angles], timeout=self.one_move_timeout)
         elif action_list[-2]:
-            self.manager.robot_controller.gripperOpen()
+            if not self.hand_open:
+                self.manager.robot_controller.gripperOpen()
+                self.hand_open = True
+            else:
+                self.redundant_grip = True
         elif action_list[-1]:
-            self.manager.robot_controller.gripperClose()
+            if self.hand_open:
+                self.manager.robot_controller.gripperClose()
+                self.hand_open = False
+            else:
+                self.redundant_grip = True
         else:
             print("Error: No action selected")
             assert False
 
 
-    def checkBounds(self, old_angles, angles):
+    def checkBounds(self, old_angles, action_list):
+        action_location = action_list.index(1)//2
+        action = np.zeros(7)
+        action[action_location] = 1
+        angles = np.array(old_angles) + action
         valid = True
         #s0
         if not (-97.4 < angles[0] < 97.4):
@@ -318,9 +336,13 @@ class Trainer(object):
         if not (-175.2 < angles[6] < 175.2):
             valid = False
         if valid:
-            return angles
+            return angles.tolist()
         self.out_of_bounds = True
         return old_angles
+
+    def getRobotState(self):
+        hand_tensor = torch.tensor(int(self.hand_open)).view(1, -1).type(torch.FloatTensor)
+        return torch.cat((torch.tensor(self.manager.robot_controller.jointAngles()).view(1,-1).type(torch.FloatTensor), hand_tensor), 1)
 
 
     # This first samples a batch, concatenates
@@ -335,7 +357,6 @@ class Trainer(object):
     #
 
     def optimize_model(self):
-        import pdb; pdb.set_trace
         if len(self.memory) < self.BATCH_SIZE:
             return
         transitions = self.memory.sample(self.BATCH_SIZE)
@@ -346,26 +367,34 @@ class Trainer(object):
         # Compute a mask of non-final states and concatenate the batch elements
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                               batch.next_state)), device=self.device, dtype=torch.uint8)
-        non_final_next_states = torch.cat([s for s in batch.next_state
-                                                    if s is not None])
-        state_batch = torch.cat(batch.state)
-        import pdb; pdb.set_trace()
+
+        non_final_next_states = [s for s in batch.next_state
+                                                    if s is not None]
+
+        state_batch = batch.state
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken
-        state_action_values = self.policy_net(state_batch)#.gather(1, action_batch)
+        state_action_values_list = []
+        for state in state_batch:
+            state_action_values_list.append((self.policy_net(state) + 1.)/2.)
+        state_action_values = torch.cat(state_action_values_list, 0).gather(1, action_batch)
 
         # Compute V(s_{t+1}) for all next states.
         next_state_values = torch.zeros(self.BATCH_SIZE, device=self.device)
-        next_state_values[non_final_mask] = self.target_net(non_final_next_states).detach()
+        next_state_values_list = []
+        for next_state in non_final_next_states:
+            next_state_values_list.append(self.target_net(next_state))
+        next_state_values[non_final_mask] = torch.cat(next_state_values_list, 0).max(1)[0].detach()
         # Compute the expected Q values
         expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
 
         # Compute Huber loss
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
-        print('Loss: ', loss)
+        print('Loss: %s' % loss.item())
+        self.log.write(str(loss.item()))
 
         # Optimize the model
         self.optimizer.zero_grad()
@@ -378,34 +407,44 @@ class Trainer(object):
     def train(self):
         self.manager.scene_controller.externalCamera(quat_x=0., quat_y=0., quat_z=1., quat_w=0., x=1.7, y=0., z=1.)
         for i_episode in xrange(self.num_episodes):
-          print "Beginning episode: ", i_episode
+          print "Beginning episode #: ", i_episode
           # Initialize the environment and state
           self.resetScene(self.manager)
           state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
-          start = rospy.Time.now()
+          # start = rospy.Time.now()
           for movement_idx in count():
             # Select and perform an action
-            action_tensor = self.selectAction(state)
-            print("performing an action")
+            if movement_idx == 0:
+                action_tensor = self.selectAction((state, self.getRobotState()))
+            else: 
+                action_tensor = self.selectAction(state)
+            action_index_tensor = action_tensor.max(1)[1].view(1, 1)
+            print("Performing action #: %s" % movement_idx)
             self.performAction(np.array(action_tensor).tolist()[0])
-            print("done performing action")
 
-            reward = self.screen_handler.getReward_slide_right(self.out_of_bounds)
+            reward = self.screen_handler.getReward_slide_right(self.out_of_bounds, self.redundant_grip)
             self.out_of_bounds = False
+            self.redundant_grip = False
 
             # Observe new state
             # done = reward or (rospy.Time.now() - start > rospy.Duration(self.TIMEOUT))
-            done = reward or movement_idx > self.count_timeout
+            done = (reward > 0) or (movement_idx > self.count_timeout)
 
-            if not reward:
-              next_state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
+            if reward <= 0:
+              next_state_frame = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
+              next_state = (next_state_frame, self.getRobotState())
             else:
               next_state = None
 
             reward = torch.tensor([reward], device=self.device)
-
             # Store the transition in memory
-            self.memory.push(state, action_tensor, next_state, reward)
+
+            if movement_idx == 0:
+                state = (state, self.getRobotState())
+
+            if state is None:
+                import pdb; pdb.set_trace()
+            self.memory.push(state, action_index_tensor, next_state, reward)
 
             # Move to the next state
             state = next_state
@@ -421,9 +460,6 @@ class Trainer(object):
         torch.save(self.target_net.state_dict(), 'target_net_state')
         torch.save(self.target_net, 'target_net')
 
-        f = open('params.txt', 'w+')
-        f.write(str(self.params_dict))
-        completionEmail(str(self.params_dict))
 
 
     def loadModel(path):
@@ -434,11 +470,8 @@ class Trainer(object):
 
 
 
-try:
-    trainer = Trainer()
-    trainer.train()
-except Exception as e:
-    with open('log.txt', 'a') as f:
-        f.write(str(e))
-        f.write(traceback.format_exc())
+trainer = Trainer()
+trainer.train()
+completionEmail()
+
 

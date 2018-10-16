@@ -89,11 +89,18 @@ class RobotController(object):
     else:
       return self._right_limb.joint_names()
 
+  def jointAngles(self, limb='left'):
+    if limb == 'left':
+      return [self._left_limb.joint_angles()[joint] for joint in self.getJointNames()]
+    else:
+      return [self._right_limb.joint_angles()[joint] for joint in self.getJointNames()]
+
   # Shut down MoveIt!
   def shutdown(self):
     moveit_commander.roscpp_shutdown()
 
   def gripperOpen(self, limb='left'):
+    print("Opening gripper")
     if limb == 'left':
       self._left_gripper.open()
     else:
@@ -101,6 +108,7 @@ class RobotController(object):
     rospy.sleep(0.5)
 
   def gripperClose(self, limb='left'):
+    print("Closing gripper")
     if limb == 'left':
       self._left_gripper.close()
     else:
