@@ -144,10 +144,9 @@ class screenHandler(object):
     image = self.most_recent
     newimdata = []
     whitecolor = (255, 255, 255)
-    greencolor = (0, 255, 0)
     blackcolor = (0,0,0)
-    for color in image.getdata():
-      r,g,b = color
+    for pixel in image.getdata():
+      r,g,b = pixel
       if g > 100 and r<50 and b<50:
         newimdata.append(whitecolor)
       else:
@@ -156,6 +155,23 @@ class screenHandler(object):
     newim.putdata(newimdata)
     image.show()
     newim.show()
+
+  def showBluePixels(self):
+      image = self.most_recent
+      newimdata = []
+      whitecolor = (255, 255, 255)
+      blackcolor = (0, 0, 0)
+      for pixel in image.getdata():
+          r, g, b = pixel
+          if b > 100 and r < 50 and g < 50:
+              newimdata.append(whitecolor)
+          else:
+              newimdata.append(blackcolor)
+      newim = Image.new(image.mode, image.size)
+      newim.putdata(newimdata)
+      image.show()
+      newim.show()
+
 
 
 def completionEmail():
@@ -420,6 +436,8 @@ class Trainer(object):
           print "Beginning episode #: ", i_episode
           # Initialize the environment and state
           self.resetScene(self.manager)
+          self.screen_handler.showBluePixels()
+          assert False
           state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
           # start = rospy.Time.now()
           for movement_idx in count():
