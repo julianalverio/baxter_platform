@@ -51,7 +51,6 @@ class DQN(nn.Module):
         self.cuda()
 
     def forward(self, x):
-    	import pdb; pdb.set_trace()
         x = F.relu(self.bn1(self.conv1(x.type(torch.FloatTensor))))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
@@ -158,6 +157,7 @@ class Trainer(object):
 
     def train(self):
         for i_episode in xrange(self.num_episodes):
+        	import pdb; pdb.set_trace()
             self.steps_done = 0
             self.env.reset()
             last_screen = self.getScreen()
