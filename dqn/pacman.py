@@ -116,7 +116,7 @@ class Trainer(object):
             with torch.no_grad():
                 return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
         else:
-            return torch.tensor([[self.env.action_space.sample()]], device=self.device, dtype=torch.long)
+            return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long)
 
 
     def plotDurations(self):
@@ -171,7 +171,7 @@ class Trainer(object):
                 print('Episode %s Movement %s' % (i_episode, t))
                 action = self.selectAction(state)
                 _, reward, done, _ = self.env.step(action.item())
-                reward = torch.tensor([reward], device=self.device)
+                reward = torch.tensor([reward])
 
                 last_screen = current_screen
                 current_screen = self.getScreen()
