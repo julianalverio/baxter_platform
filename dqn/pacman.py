@@ -64,8 +64,8 @@ class Trainer(object):
 
         if gpu:
             self.device = 'cuda'
-            self.policy_net = DQN(self.env.action_space.n).cuda().to(self.device)
-            self.target_net = DQN(self.env.action_space.n).cuda().to(self.device)
+            self.policy_net = DQN(self.env.action_space.n).to(self.device)
+            self.target_net = DQN(self.env.action_space.n).to(self.device)
         else:
             self.device = 'cpu'
             self.policy_net = DQN(self.env.action_space.n)
@@ -161,8 +161,8 @@ class Trainer(object):
         for i_episode in xrange(self.num_episodes):
             self.steps_done = 0
             self.env.reset()
-            last_screen = self.getScreen().to(self.device)
-            current_screen = self.getScreen().to(self.device)
+            last_screen = self.getScreen()
+            current_screen = self.getScreen()
             difference = np.array(current_screen) - np.array(last_screen)
             gray = torch.tensor(self.rgb2gray(difference)) / 255
             current_screen = current_screen / 255
@@ -171,21 +171,17 @@ class Trainer(object):
                 state = state.cuda()
             for t in count():
                 print('Episode %s Movement %s' % (i_episode, t))
-                action = self.selectAction(state).to(self.device)
-                if self.device=='cuda':
-                    action = action.cuda()
+                action = self.selectAction(state)
                 _, reward, done, _ = self.env.step(action.item())
                 reward = torch.tensor([reward], device=self.device)
 
                 last_screen = current_screen
-                current_screen = self.getScreen().to(self.device)
+                current_screen = self.getScreen()
                 if not done:
                     difference = np.array(current_screen) - np.array(last_screen)
                     gray = torch.tensor(self.rgb2gray(difference)) / 255
                     current_screen = current_screen / 255
-                    next_state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1)).to(self.device)
-                    if self.device == 'cuda':
-                        next_state = next_state.cuda()
+                    next_state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1))
                 else:
                     next_state = None
 
