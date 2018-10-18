@@ -111,9 +111,11 @@ class Trainer(object):
             math.exp(-1. * self.steps_done / self.EPS_DECAY)
         self.steps_done += 1
         if sample > eps_threshold:
+            print("RANDOM ACTION")
             with torch.no_grad():
-                return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
+                return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device)
         else:
+            print("policy net action")
             return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device)
 
 
@@ -128,6 +130,7 @@ class Trainer(object):
     def optimizeModel(self):
         if len(self.memory) < self.BATCH_SIZE:
             return
+        print("I'M DONIG ACTUAL OPTIMIZE MODEL")
         transitions = self.memory.sample(self.BATCH_SIZE)
         batch = self.transition(*zip(*transitions))
 
@@ -157,7 +160,6 @@ class Trainer(object):
 
     def train(self):
         for i_episode in xrange(self.num_episodes):
-            import pdb; pdb.set_trace()
             self.steps_done = 0
             self.env.reset()
             last_screen = self.getScreen()
@@ -165,7 +167,7 @@ class Trainer(object):
             difference = np.array(current_screen) - np.array(last_screen)
             gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
             current_screen = current_screen / 255
-            state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1)).type(torch.DoubleTensor)
+            state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1), device=self.device).type(torch.DoubleTensor)
             for t in count():
                 print('Episode %s Movement %s' % (i_episode, t))
                 action = self.selectAction(state)
