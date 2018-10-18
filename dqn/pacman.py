@@ -64,8 +64,8 @@ class Trainer(object):
 
         if gpu:
             self.device = 'cuda'
-            self.policy_net = DQN(self.env.action_space.n).to(self.device)
-            self.target_net = DQN(self.env.action_space.n).to(self.device)
+            self.policy_net = DQN(self.env.action_space.n)
+            self.target_net = DQN(self.env.action_space.n)
         else:
             self.device = 'cpu'
             self.policy_net = DQN(self.env.action_space.n)
