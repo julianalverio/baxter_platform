@@ -13,6 +13,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import torchvision.transforms as T
+import yagmail
 
 
 
@@ -62,7 +63,7 @@ class DQN(nn.Module):
 
 
 class Trainer(object):
-    def __init__(self, num_episodes=250, view=False):
+    def __init__(self, num_episodes=100, view=False):
         self.env = gym.make('MsPacman-v0').unwrapped
         plt.ion()
 
@@ -92,7 +93,6 @@ class Trainer(object):
         self.steps_done = 0
         self.view = view
 
-    # reference: https://stackoverflow.com/questions/12201577/how-can-i-convert-an-rgb-image-into-grayscale-in-python
     def rgb2gray(self, rgb):
         img = Image.fromarray(rgb.transpose((1,2,0))).convert(mode='L')
         return np.array(img, dtype=np.float64)
@@ -157,6 +157,7 @@ class Trainer(object):
         self.optimizer.step()
 
 
+
     def train(self):
         for i_episode in xrange(self.num_episodes):
             self.steps_done = 0
@@ -196,6 +197,30 @@ class Trainer(object):
         torch.save(self.target_net, 'target_net.pth')
 
 
+
+
+def completionEmail():
+  message = 'Training completed!'
+  yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
+  yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
+
+
+def watchPacman(target_net_path):
+    target_net = torch.load(target_net_path)
+    env = gym.make('MsPacman-v0').unwrapped
+    env.reset()
+    steps_done = 0
+    done = False
+    while not done:
+        screen = env.render(mode='human')
+        action = target_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
+        _, reward, done, _ = self.env.step(action.item())
+        steps_done += 1
+    print("Steps Done: ", steps_done)
+
+
+
 trainer = Trainer(view=False)
 trainer.train()
-trainer.plotDurations()
+completionEmail()
+# trainer.plotDurations()

@@ -158,8 +158,6 @@ class screenHandler(object):
 
 
 
-
-
   def findColorPixels(self):
     found = False
     while not found:
@@ -204,8 +202,6 @@ class screenHandler(object):
         if self.checkContiguous(pixels) and (self.green_y > self.blue_y) and (abs(self.green_x - self.blue_x) < 20):
             return 1000.
             
-
-
 
   def showGreenPixels(self):
     image = self.most_recent
@@ -421,31 +417,22 @@ class Trainer(object):
         self.out_of_bounds = True
         return old_angles
 
+
     def getRobotState(self):
         hand_tensor = torch.tensor(int(self.hand_open)).view(1, -1).type(torch.FloatTensor)
         return torch.cat((torch.tensor(self.manager.robot_controller.getJointAngles()).view(1,-1).type(torch.FloatTensor), hand_tensor), 1)
 
+    def rgb2gray(self, rgb):
+        img = Image.fromarray(rgb.transpose((1,2,0))).convert(mode='L')
+        return np.array(img, dtype=np.float64)
 
-    # This first samples a batch, concatenates
-    # all the tensors into a single one, computes :math:`Q(s_t, a_t)` and
-    # :math:`V(s_{t+1}) = \max_a Q(s_{t+1}, a)`, and combines them into our
-    # loss. By defition we set :math:`V(s) = 0` if :math:`s` is a terminal
-    # state. We also use a target network to compute :math:`V(s_{t+1})` for
-    # added stability. The target network has its weights kept frozen most of
-    # the time, but is updated with the policy network's weights every so often.
-    # This is usually a set number of steps but we shall use episodes for
-    # simplicity.
-    #
 
     def optimizeModel(self):
         if len(self.memory) < self.BATCH_SIZE:
             return
         transitions = self.memory.sample(self.BATCH_SIZE)
-        # Transpose the batch (see http://stackoverflow.com/a/19343/3343043 for
-        # detailed explanation).
         batch = self.Transition(*zip(*transitions))
 
-        # Compute a mask of non-final states and concatenate the batch elements
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                               batch.next_state)), device=self.device, dtype=torch.uint8)
 
@@ -472,12 +459,10 @@ class Trainer(object):
         # Compute the expected Q values
         expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
 
-        # Compute Huber loss
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
         print('Loss: %s' % loss.item())
         self.log.write(str(loss.item()))
 
-        # Optimize the model
         self.optimizer.zero_grad()
         loss.backward()
         for param in self.policy_net.parameters():
@@ -490,7 +475,13 @@ class Trainer(object):
         for i_episode in xrange(self.num_episodes):
           print "Beginning episode #: ", i_episode
           self.resetScene(self.manager)
-          state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
+          previous_screen = self.screen_handler.getScreen()
+          current_screen = self.screen_handler.getScreen()
+          difference = self.rgb2gray(current_screen - previous_screen)
+          state = np.concatenate((current_screen, difference))
+          previous_screen = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
+          current_screen = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
+
           for movement_idx in count():
             if movement_idx == 0:
                 action_tensor = self.selectAction((state, self.getRobotState()))
@@ -506,7 +497,6 @@ class Trainer(object):
             self.redundant_grip = False
             self.no_movement = False
 
-            # Observe new state
             done = (reward > 0) or (movement_idx >= self.count_timeout - 1)
 
             if reward <= 0:
@@ -516,21 +506,17 @@ class Trainer(object):
               next_state = None
 
             reward = torch.tensor([reward], device=self.device)
-            # Store the transition in memory
 
             if movement_idx == 0:
                 state = (state, self.getRobotState())
 
             self.memory.push(state, action_index_tensor, next_state, reward)
 
-            # Move to the next state
             state = next_state
 
-            # Perform one step of the optimization (on the target network)
             self.optimizeModel()
             if done:
               break
-            # Update the target network
             if i_episode % self.TARGET_UPDATE == 0:
               self.target_net.load_state_dict(self.policy_net.state_dict())
 
