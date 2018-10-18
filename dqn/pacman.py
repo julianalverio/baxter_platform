@@ -171,7 +171,7 @@ class Trainer(object):
                 reward = torch.tensor([reward], device=self.device)
 
                 last_screen = current_screen
-                current_screen = self.getScreen().to(device)
+                current_screen = self.getScreen().to(self.device)
                 if not done:
                     difference = np.array(current_screen) - np.array(last_screen)
                     gray = torch.tensor(self.rgb2gray(difference)) / 255
