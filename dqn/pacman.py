@@ -104,7 +104,7 @@ class Trainer(object):
             self.env.render()
         screen = self.env.render(mode='rgb_array')[0:170, :, ].transpose((2, 0, 1))
         screen = np.ascontiguousarray(screen, dtype=np.uint8)
-        return torch.from_numpy(screen).to(self.device)
+        return torch.from_numpy(screen)
 
 
     def selectAction(self, state):
