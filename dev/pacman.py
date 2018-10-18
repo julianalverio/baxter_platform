@@ -67,7 +67,6 @@ class Trainer(object):
         plt.ion()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print("device: ", self.device)
 
         self.policy_net = DQN(self.env.action_space.n, self.device).to(self.device)
         self.target_net = DQN(self.env.action_space.n, self.device).to(self.device)
@@ -114,11 +113,9 @@ class Trainer(object):
             math.exp(-1. * self.steps_done / self.EPS_DECAY)
         self.steps_done += 1
         if sample > eps_threshold:
-            print("policy_net action")
             with torch.no_grad():
                 return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device)
         else:
-            print("random action")
             return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device)
 
 
@@ -133,7 +130,6 @@ class Trainer(object):
     def optimizeModel(self):
         if len(self.memory) < self.BATCH_SIZE:
             return
-        print("I'M DONIG ACTUAL OPTIMIZE MODEL")
         transitions = self.memory.sample(self.BATCH_SIZE)
         batch = self.transition(*zip(*transitions))
 
