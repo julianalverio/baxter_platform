@@ -111,11 +111,12 @@ class Trainer(object):
             math.exp(-1. * self.steps_done / self.EPS_DECAY)
         self.steps_done += 1
         if sample > eps_threshold:
-            print("RANDOM ACTION")
+            print("policy_net action")
             with torch.no_grad():
+                import pdb; pdb.set_trace()
                 return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device)
         else:
-            print("policy net action")
+            print("random action")
             return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device)
 
 
