@@ -185,7 +185,7 @@ class Trainer(object):
                     current_screen = current_screen / 255
                     next_state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1)).to(self.device)
                     if self.device == 'cuda':
-                        self.device = self.device.cuda()
+                        next_state = next_state.cuda()
                 else:
                     next_state = None
 
