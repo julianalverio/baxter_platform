@@ -167,8 +167,6 @@ class Trainer(object):
             gray = torch.tensor(self.rgb2gray(difference)) / 255
             current_screen = current_screen / 255
             state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1)).type(torch.DoubleTensor)
-            if self.device == 'cuda':
-                state = state.cuda()
             for t in count():
                 print('Episode %s Movement %s' % (i_episode, t))
                 action = self.selectAction(state)
