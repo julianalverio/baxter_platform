@@ -437,7 +437,7 @@ class Trainer(object):
     # simplicity.
     #
 
-    def optimize_model(self):
+    def optimizeModel(self):
         if len(self.memory) < self.BATCH_SIZE:
             return
         transitions = self.memory.sample(self.BATCH_SIZE)
@@ -489,12 +489,9 @@ class Trainer(object):
         self.manager.scene_controller.externalCamera(quat_x=0., quat_y=0., quat_z=1., quat_w=0., x=1.7, y=0., z=1.)
         for i_episode in xrange(self.num_episodes):
           print "Beginning episode #: ", i_episode
-          # Initialize the environment and state
           self.resetScene(self.manager)
           state = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
-          # start = rospy.Time.now()
           for movement_idx in count():
-            # Select and perform an action
             if movement_idx == 0:
                 action_tensor = self.selectAction((state, self.getRobotState()))
             else: 
@@ -524,15 +521,13 @@ class Trainer(object):
             if movement_idx == 0:
                 state = (state, self.getRobotState())
 
-            if state is None:
-                import pdb; pdb.set_trace()
             self.memory.push(state, action_index_tensor, next_state, reward)
 
             # Move to the next state
             state = next_state
 
             # Perform one step of the optimization (on the target network)
-            self.optimize_model()
+            self.optimizeModel()
             if done:
               break
             # Update the target network
