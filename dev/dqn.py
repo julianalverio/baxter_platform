@@ -74,14 +74,17 @@ class DQN(nn.Module):
 
 
 class screenHandler(object):
-  def __init__(self):
+  def __init__(self, task):
     self.bridge = CvBridge()
     self.image_sub = rospy.Subscriber('/cameras/camera_0/image', RosImage, self.callback)
     self.most_recent = None
     self.initialized = False
     self.green_x = None
     self.green_y = None
+    self.blue_x = None
+    self.blue_y = None
     self.updated = True
+    self.task = task
 
   def getScreen(self):
     if not self.initialized:
@@ -103,15 +106,14 @@ class screenHandler(object):
     # cropped.show()
     self.most_recent = pil_image
     self.initialized = True
-    self.green_x, self.green_y = self.findGreenPixels()
+    self.findColorPixels()
+    if task == 2:
+        self.blue_x, self.blue_y = self.findBluePixels()
     self.updated = True
 
 
-  def getReward_slide_right(self, out_of_bounds, redundant_grip, no_movement):
-    width, _ = self.most_recent.size
-    if self.green_x <= width/2.:
-      print("I GOT A REWARD")
-      return 1000.
+
+  def getReward(self, out_of_bounds, redundant_grip, no_movement):
     reward = 0.
     if out_of_bounds:
         reward -= 1.
@@ -119,14 +121,52 @@ class screenHandler(object):
         reward -= 1.
     if no_movement:
         reward -= 1.
+    if self.task == 1:
+        width, _ = self.most_recent.size
+        if self.green_x <= width/2.:
+          reward += 1000.
+    if self.task == 2:
+        if self.green_x < self.blue_x:
+            reward += 1000.
     return reward
 
+  def getNeighbors(self, x, y):
+    neighbors  = []
+    neighbors.append([x+1, y+1])
+    neighbors.append([x+1, y])
+    neighbors.append([x+1, y-1])
+    neighbors.append([x, y+1])
+    neighbors.append([x, y-1])
+    neighbors.append([x-1, y+1])
+    neighbors.append([x-1, y])
+    neighbors.append([x-1, y-1])
+    return neighbors
 
-  def findGreenPixels(self):
+
+  # find all the green and blue blocks' pixels. If the block are touching, the pixels will be contiguous
+  # which DFS will find
+  def checkContiguous(self, pixels):
+    queue = pixels[0]
+    found = set(pixels[0])
+    while queue:
+        x, y = queue.pop()
+        children = [pixel for pixel in self.getNeighbors(x,y) if pixel in pixels and pixel not in found]
+        queue.extend(children)
+        for child in children:
+            found.add(child)
+    return len(found) == len(pixels)
+
+
+
+
+
+  def findColorPixels(self):
     found = False
     while not found:
-      x_coords = []
-      y_coords = []
+      green_x_coords = []
+      green_y_coords = []
+      blue_x_coords = []
+      blue_y_coords = []
       image = self.most_recent
       pixels = image.getdata()
       width, height = image.size
@@ -134,10 +174,37 @@ class screenHandler(object):
         x_coord = idx % width
         y_coord = idx // width
         if g>100 and r<50 and b<50:
-          x_coords.append(x_coord)
-          y_coords.append(y_coord)
-      if len(x_coords) < 50: return None, None
-      return sum(x_coords)/len(x_coords), sum(y_coords)/len(y_coords)
+          green_x_coords.append(x_coord)
+          green_y_coords.append(y_coord)
+        if self.task > 1:
+            if b>100 and r<50 and g<50:
+                blue_x_coords.append(x_coord)
+                blue_y_coords.append(y_coord)
+
+      if not green_x_coords: 
+        self.green_x = None
+        self.green_y = None
+      self.green_x = sum(green_x_coords)/len(green_x_coords)
+      self.green_y = sum(green_y_coords)/len(green_y_coords)
+      if not blue_x_coords:
+        self.blue_x = None
+        self.blue_y = None
+      self.blue_x = sum(blue_x_coords)/len(blue_x_coords)
+      self.blue_y = sum(blue_y_coords)/len(blue_y_coords)
+      if task == 3:
+        pixels = set()
+        image = self.most_recent
+        image_pixels = self.most_recent.getdata()
+        width, height = image.size
+        for idx, (r,g,b) in enumerate(image_pixels):
+            x_coord = idx % width
+            y_coord = idx // width
+            if (g>100 and r<50 and b<50) or (b>100 and r<50 and g<50):
+                pixels.add([x_coord, y_coord])
+        if self.checkContiguous(pixels) and (self.green_y > self.blue_y) and (abs(self.green_x - self.blue_x) < 20):
+            return 1000.
+            
+
 
 
   def showGreenPixels(self):
@@ -188,11 +255,15 @@ def getRandomState():
   state[random.randint(0, 15)] = 1
   return torch.from_numpy(state).view(1,16)
 
+
+#task=1: slide a green block to the left
+#task=2: slide a green block to the left of a blue block
+#task=3: stack a green block on top of a blue block
 class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
     def __init__(self, interpolation=Image.BILINEAR, batch_size=64, gamma=0.999, eps_start=0.9, eps_end=0.05,
                  eps_decay=200, target_update=10, replay_memory_size=1000, timeout=5, num_episodes=1000, resize=40,
-                 one_move_timeout=1., move_precision=0.02, count_timeout=100, movement_threshold=0.005):
+                 one_move_timeout=1., move_precision=0.02, count_timeout=100, movement_threshold=0.005, task=1):
         self.params_dict = {
         'interpolation' : interpolation,
         'batch_size' : batch_size,
@@ -236,7 +307,7 @@ class Trainer(object):
         self.TIMEOUT = timeout  # in seconds
         self.manager = Manager()
         rospy.on_shutdown(self.manager.shutdown)
-        self.screen_handler = screenHandler()
+        self.screen_handler = screenHandler(task)
         self.num_episodes = num_episodes
         self.one_move_timeout = one_move_timeout
         self.move_precision = move_precision
@@ -451,7 +522,7 @@ class Trainer(object):
             print("Performing action #: %s" % movement_idx)
             self.performAction(np.array(action_tensor).tolist()[0])
 
-            reward = self.screen_handler.getReward_slide_right(self.out_of_bounds, self.redundant_grip, self.no_movement)
+            reward = self.screen_handler.getReward(self.out_of_bounds, self.redundant_grip, self.no_movement)
             self.out_of_bounds = False
             self.redundant_grip = False
             self.no_movement = False
