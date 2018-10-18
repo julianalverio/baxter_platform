@@ -26,6 +26,8 @@ from scene_generator import *
 import yagmail
 import traceback
 import genpy
+from PIL import ImageChops
+
 
 
 class ReplayMemory(object):
@@ -55,21 +57,24 @@ class DQN(nn.Module):
 
     def __init__(self):
         super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=5, stride=2)
+        self.conv1 = nn.Conv2d(5, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
         self.conv2 = nn.Conv2d(16, 32, kernel_size=5, stride=2)
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
+        #what dims to use
         self.head = nn.Linear(256+8, 16)
 
-    def forward(self, (x, robot_state)):
-        x = F.relu(self.bn1(self.conv1(x)))
-        x = F.relu(self.bn2(self.conv2(x)))
-        x = F.relu(self.bn3(self.conv3(x)))
-        conv_result = x.view(x.size(0), -1)
-        concatenated = torch.cat((conv_result, robot_state), 1)
-        return self.head(concatenated)
+    def forward(self, x):
+        robot_state = x[:,:,:,4]
+        x_input = x[:, :, :, :4]
+        x = F.relu(self.bn1(self.conv1(x_input)))
+        x = F.relu(self.bn2(self.conv2(x_input)))
+        x = F.relu(self.bn3(self.conv3(x_input)))
+        import pdb; pdb.set_trace()
+        concatenated = torch.cat([x.view(size(0), -1)], robot_state[0, :8])
+        return self.head(x.view(x.size(0), -1))
 
 
 
@@ -107,7 +112,7 @@ class screenHandler(object):
     self.most_recent = pil_image
     self.initialized = True
     self.findColorPixels()
-    if task == 2:
+    if self.task == 2:
         self.blue_x, self.blue_y = self.findBluePixels()
     self.updated = True
 
@@ -161,46 +166,50 @@ class screenHandler(object):
   def findColorPixels(self):
     found = False
     while not found:
-      green_x_coords = []
-      green_y_coords = []
-      blue_x_coords = []
-      blue_y_coords = []
-      image = self.most_recent
-      pixels = image.getdata()
-      width, height = image.size
-      for idx, (r,g,b) in enumerate(pixels):
-        x_coord = idx % width
-        y_coord = idx // width
-        if g>100 and r<50 and b<50:
-          green_x_coords.append(x_coord)
-          green_y_coords.append(y_coord)
-        if self.task > 1:
-            if b>100 and r<50 and g<50:
-                blue_x_coords.append(x_coord)
-                blue_y_coords.append(y_coord)
-
-      if not green_x_coords: 
-        self.green_x = None
-        self.green_y = None
-      self.green_x = sum(green_x_coords)/len(green_x_coords)
-      self.green_y = sum(green_y_coords)/len(green_y_coords)
-      if not blue_x_coords:
-        self.blue_x = None
-        self.blue_y = None
-      self.blue_x = sum(blue_x_coords)/len(blue_x_coords)
-      self.blue_y = sum(blue_y_coords)/len(blue_y_coords)
-      if task == 3:
-        pixels = set()
+        green_x_coords = []
+        green_y_coords = []
+        blue_x_coords = []
+        blue_y_coords = []
         image = self.most_recent
-        image_pixels = self.most_recent.getdata()
+        if not image:
+            return
+        pixels = image.getdata()
         width, height = image.size
-        for idx, (r,g,b) in enumerate(image_pixels):
+        for idx, (r,g,b) in enumerate(pixels):
             x_coord = idx % width
             y_coord = idx // width
-            if (g>100 and r<50 and b<50) or (b>100 and r<50 and g<50):
-                pixels.add([x_coord, y_coord])
-        if self.checkContiguous(pixels) and (self.green_y > self.blue_y) and (abs(self.green_x - self.blue_x) < 20):
-            return 1000.
+            if g>100 and r<50 and b<50:
+                green_x_coords.append(x_coord)
+            green_y_coords.append(y_coord)
+            if self.task > 1:
+                if b>100 and r<50 and g<50:
+                    blue_x_coords.append(x_coord)
+                    blue_y_coords.append(y_coord)
+
+        if not sum(green_x_coords):
+            self.green_x = None
+            self.green_y = None
+        else:
+            self.green_x = sum(green_x_coords)/len(green_x_coords)
+            self.green_y = sum(green_y_coords)/len(green_y_coords)
+        if not sum(blue_x_coords):
+            self.blue_x = None
+            self.blue_y = None
+        else:
+            self.blue_x = sum(blue_x_coords)/len(blue_x_coords)
+            self.blue_y = sum(blue_y_coords)/len(blue_y_coords)
+        if self.task == 3:
+            pixels = set()
+            image = self.most_recent
+            image_pixels = self.most_recent.getdata()
+            width, height = image.size
+            for idx, (r,g,b) in enumerate(image_pixels):
+                x_coord = idx % width
+                y_coord = idx // width
+                if (g>100 and r<50 and b<50) or (b>100 and r<50 and g<50):
+                    pixels.add([x_coord, y_coord])
+            if self.checkContiguous(pixels) and (self.green_y > self.blue_y) and (abs(self.green_x - self.blue_x) < 20):
+                return 1000.
             
 
   def showGreenPixels(self):
@@ -226,14 +235,6 @@ def completionEmail():
   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
 
-
-
-
-# reference http://sdk.rethinkrobotics.com/wiki/Hardware_Specifications#Range_of_Motion_-_Bend_Joints
-def getRandomState():
-  state = np.zeros(16)
-  state[random.randint(0, 15)] = 1
-  return torch.from_numpy(state).view(1,16)
 
 
 #task=1: slide a green block to the left
@@ -316,7 +317,7 @@ class Trainer(object):
         if sleep:
             rospy.sleep(1.)
         while not self.screen_handler.most_recent:
-          print('Waiting for scene to re-render')
+          # print('Waiting for scene to re-render')
           rospy.sleep(0.1)
         image = self.screen_handler.most_recent
         pixels = image.getdata()
@@ -340,11 +341,11 @@ class Trainer(object):
           math.exp(-1. * self.steps_done / self.EPS_DECAY)
         self.steps_done += 1
         if sample < eps_threshold or len(self.memory) < self.BATCH_SIZE:
-          action = getRandomState()
-          return action.type(torch.DoubleTensor)
+            return torch.tensor(random.randrange(0, 16), device=self.device).view(1, 1)
 
         else:
           with torch.no_grad():
+            import pdb; pdb.set_trace()
             continuous_action = (self.policy_net(state).view(1, 16) + 1.)/2.
             discrete_action = np.zeros(16)
             discrete_action[continuous_action.max(0)[1]] = 1
@@ -353,14 +354,26 @@ class Trainer(object):
 
 
 
-    #inputs will be [s0+, s0-, s1+, s1-, e0+, e0-, e1+, e1-, w0+, w0-, w1+, w1-, w2+, w2-, open_gripper, close_gripper]
-    def performAction(self, action_list):
+    #inputs will be [s0+, s0-, s1+, s1-, e0+, e0-, e1+, e1-, w0+, w0-, w1+, w1-, w2+, w2-, open_gripper, close_gripper] == indices
+    def performAction(self, action):
         angles_dict = self.manager.robot_controller._left_limb.joint_angles();
         joints = self.manager.robot_controller.getJointNames()
         angles_list = [angles_dict[joint] for joint in joints]
+        if action == 14:
+            if not self.hand_open:
+                self.manager.robot_controller.gripperOpen()
+                self.hand_open = True
+            else:
+                self.redundant_grip = True
+        elif action == 15:
+            if self.hand_open:
+                self.manager.robot_controller.gripperClose()
+                self.hand_open = False
+            else:
+                self.redundant_grip = True
         #if you're not opening/closing the gripper
-        if not (action_list[-1] or action_list[-2]):
-            bounded_angles = self.checkBounds(angles_list, action_list[:-2])
+        else:
+            bounded_angles = self.checkBounds(angles_list, action)
             start_angles = self.manager.robot_controller.getJointAngles(numpy=True)
             self.manager.robot_controller.followTrajectoryFromJointAngles([bounded_angles], timeout=self.one_move_timeout)
             end_angles = self.manager.robot_controller.getJointAngles(numpy=True)
@@ -368,27 +381,14 @@ class Trainer(object):
                 self.no_movement = True
                 print("NO MOVEMENT!!")
 
-        elif action_list[-2]:
-            if not self.hand_open:
-                self.manager.robot_controller.gripperOpen()
-                self.hand_open = True
-            else:
-                self.redundant_grip = True
-        elif action_list[-1]:
-            if self.hand_open:
-                self.manager.robot_controller.gripperClose()
-                self.hand_open = False
-            else:
-                self.redundant_grip = True
+
+
+    def checkBounds(self, old_angles, action):
+        action_arr = np.zeros(7)
+        if action % 2 == 0:
+            action_arr[action//2] = 1.
         else:
-            print("Error: No action selected")
-            assert False
-
-
-    def checkBounds(self, old_angles, action_list):
-        action_location = action_list.index(1)//2
-        action = np.zeros(7)
-        action[action_location] = 1
+            action_arr[action//2] = -1.
         angles = np.array(old_angles) + action
         valid = True
         #s0
@@ -420,7 +420,7 @@ class Trainer(object):
 
     def getRobotState(self):
         hand_tensor = torch.tensor(int(self.hand_open)).view(1, -1).type(torch.FloatTensor)
-        return torch.cat((torch.tensor(self.manager.robot_controller.getJointAngles()).view(1,-1).type(torch.FloatTensor), hand_tensor), 1)
+        return torch.cat((torch.tensor(self.manager.robot_controller.getJointAngles()).view(1,-1).type(torch.FloatTensor), hand_tensor), 1).to(self.device)
 
     def rgb2gray(self, rgb):
         img = Image.fromarray(rgb.transpose((1,2,0))).convert(mode='L')
@@ -439,19 +439,18 @@ class Trainer(object):
         non_final_next_states = [s for s in batch.next_state
                                                     if s is not None]
 
-        state_batch = batch.state
+        state_batch = torch.cat(batch.state)
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken
-        state_action_values_list = []
-        for state in state_batch:
-            state_action_values_list.append((self.policy_net(state) + 1.)/2.)
-        state_action_values = torch.cat(state_action_values_list, 0).gather(1, action_batch)
+        import pdb; pdb.set_trace()
+        state_action_values = ((self.policy_net(state_batch) + 1.) / 2.).gather(1, action_batch)
 
         # Compute V(s_{t+1}) for all next states.
         next_state_values = torch.zeros(self.BATCH_SIZE, device=self.device)
+
         next_state_values_list = []
         for next_state in non_final_next_states:
             next_state_values_list.append(self.target_net(next_state))
@@ -470,55 +469,52 @@ class Trainer(object):
         self.optimizer.step()
 
 
+    def getState(self, previous_screen, current_screen):
+        difference = np.array(ImageChops.subtract(current_screen, previous_screen).convert(mode='L')).transpose((2,0,1))
+        robot_state = self.getRobotState()
+        robot_state_2d = np.zeros(difference.shape)
+        robot_state_2d[0,:robot_state.size()[1]] = robot_state
+        return torch.tensor(np.concatenate((np.array(current_screen).transpose((2,0,1)), np.expand_dims(difference, axis=2), np.expand_dims(robot_state_2d, axis=2)), axis=2), device=self.device).unsqueeze(0)
+            
+
+
     def train(self):
         self.manager.scene_controller.externalCamera(quat_x=0., quat_y=0., quat_z=1., quat_w=0., x=1.7, y=0., z=1.)
         for i_episode in xrange(self.num_episodes):
-          print "Beginning episode #: ", i_episode
-          self.resetScene(self.manager)
-          previous_screen = self.screen_handler.getScreen()
-          current_screen = self.screen_handler.getScreen()
-          difference = self.rgb2gray(current_screen - previous_screen)
-          state = np.concatenate((current_screen, difference))
-          previous_screen = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
-          current_screen = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
-
-          for movement_idx in count():
-            if movement_idx == 0:
-                action_tensor = self.selectAction((state, self.getRobotState()))
-            else: 
+            self.resetScene(self.manager)
+            previous_screen = self.screen_handler.getScreen()
+            current_screen = self.screen_handler.getScreen()
+            state = self.getState(previous_screen, current_screen)
+            for movement_idx in count():
                 action_tensor = self.selectAction(state)
-            action_index_tensor = action_tensor.max(1)[1].view(1, 1)
-            print action_index_tensor.item()
-            print("Performing action #: %s" % movement_idx)
-            self.performAction(np.array(action_tensor).tolist()[0])
+                print(action_tensor.item())
+                print("Episode: %s Action #: %s" % (i_episode, movement_idx))
+                self.performAction(action_tensor.item())
 
-            reward = self.screen_handler.getReward(self.out_of_bounds, self.redundant_grip, self.no_movement)
-            self.out_of_bounds = False
-            self.redundant_grip = False
-            self.no_movement = False
+                reward = self.screen_handler.getReward(self.out_of_bounds, self.redundant_grip, self.no_movement)
+                self.out_of_bounds = False
+                self.redundant_grip = False
+                self.no_movement = False
 
-            done = (reward > 0) or (movement_idx >= self.count_timeout - 1)
+                done = (reward > 0) or (movement_idx >= self.count_timeout - 1)
 
-            if reward <= 0:
-              next_state_frame = self.preprocess(self.screen_handler.getScreen()).unsqueeze(0).to(self.device)
-              next_state = (next_state_frame, self.getRobotState())
-            else:
-              next_state = None
+                if reward <= 0:
+                    previous_screen = current_screen
+                    current_screen = self.screen_handler.getScreen()
+                    next_state = self.getState(previous_screen, current_screen)
+                else:
+                  next_state = None
 
-            reward = torch.tensor([reward], device=self.device)
+                reward = torch.tensor(reward, device=self.device).view(1, 1)
+                self.memory.push(state, action_tensor, next_state, reward)
 
-            if movement_idx == 0:
-                state = (state, self.getRobotState())
+                state = next_state
 
-            self.memory.push(state, action_index_tensor, next_state, reward)
-
-            state = next_state
-
-            self.optimizeModel()
-            if done:
-              break
-            if i_episode % self.TARGET_UPDATE == 0:
-              self.target_net.load_state_dict(self.policy_net.state_dict())
+                self.optimizeModel()
+                if done:
+                  break
+                if i_episode % self.TARGET_UPDATE == 0:
+                  self.target_net.load_state_dict(self.policy_net.state_dict())
 
         torch.save(self.target_net.state_dict(), 'target_net_state')
         torch.save(self.target_net, 'target_net')
