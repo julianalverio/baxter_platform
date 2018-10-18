@@ -62,7 +62,7 @@ class DQN(nn.Module):
 
 
 class Trainer(object):
-    def __init__(self, num_episodes=100, view=False):
+    def __init__(self, num_episodes=250, view=False):
         self.env = gym.make('MsPacman-v0').unwrapped
         plt.ion()
 
