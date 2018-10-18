@@ -58,18 +58,15 @@ class DQN(nn.Module):
 
 
 class Trainer(object):
-    def __init__(self, num_episodes=250, gpu=True, view=False):
+    def __init__(self, num_episodes=250, view=False):
         self.env = gym.make('MsPacman-v0').unwrapped
         plt.ion()
 
-        if gpu:
-            self.device = 'cuda'
-            self.policy_net = DQN(self.env.action_space.n)
-            self.target_net = DQN(self.env.action_space.n)
-        else:
-            self.device = 'cpu'
-            self.policy_net = DQN(self.env.action_space.n)
-            self.target_net = DQN(self.env.action_space.n)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print("device: ", self.device)
+
+        self.policy_net = DQN(self.env.action_space.n).to(self.device)
+        self.target_net = DQN(self.env.action_space.n).to(self.device)
 
         self.transition = namedtuple('Transition',
                                 ('state', 'action', 'next_state', 'reward'))
@@ -104,7 +101,7 @@ class Trainer(object):
             self.env.render()
         screen = self.env.render(mode='rgb_array')[0:170, :, ].transpose((2, 0, 1))
         screen = np.ascontiguousarray(screen, dtype=np.uint8)
-        return torch.from_numpy(screen)
+        return torch.from_numpy(screen).to(self.device)
 
 
     def selectAction(self, state):
@@ -116,7 +113,7 @@ class Trainer(object):
             with torch.no_grad():
                 return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
         else:
-            return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long)
+            return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device)
 
 
     def plotDurations(self):
@@ -134,7 +131,7 @@ class Trainer(object):
         batch = self.transition(*zip(*transitions))
 
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
-                                              batch.next_state)), device='cpu', dtype=torch.uint8)
+                                              batch.next_state)), device=self.device, dtype=torch.uint8)
         non_final_next_states = torch.cat([s for s in batch.next_state
                                                     if s is not None])
         state_batch = torch.cat(batch.state)
@@ -143,7 +140,7 @@ class Trainer(object):
 
         state_action_values = self.policy_net(state_batch).gather(1, action_batch)
 
-        next_state_values = torch.zeros(self.BATCH_SIZE, device='cpu')
+        next_state_values = torch.zeros(self.BATCH_SIZE, device=self.device)
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
         expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
 
@@ -171,7 +168,7 @@ class Trainer(object):
                 print('Episode %s Movement %s' % (i_episode, t))
                 action = self.selectAction(state)
                 _, reward, done, _ = self.env.step(action.item())
-                reward = torch.tensor([reward])
+                reward = torch.tensor([reward], device=self.device)
 
                 last_screen = current_screen
                 current_screen = self.getScreen()
