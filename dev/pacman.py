@@ -163,7 +163,7 @@ class Trainer(object):
             last_screen = self.getScreen()
             current_screen = self.getScreen()
             difference = np.array(current_screen) - np.array(last_screen)
-            gray = torch.tensor(self.rgb2gray(difference)) / 255
+            gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
             current_screen = current_screen / 255
             state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1)).type(torch.DoubleTensor)
             for t in count():
