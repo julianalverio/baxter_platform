@@ -62,9 +62,14 @@ class Trainer(object):
         self.env = gym.make('MsPacman-v0').unwrapped
         plt.ion()
 
-        self.device = 'cpu'
         if gpu:
             self.device = 'cuda'
+            self.policy_net = DQN(self.env.action_space.n).cuda().to(self.device)
+            self.target_net = DQN(self.env.action_space.n).cuda().to(self.device)
+        else:
+            self.device = 'cpu'
+            self.policy_net = DQN(self.env.action_space.n)
+            self.target_net = DQN(self.env.action_space.n)
 
         self.transition = namedtuple('Transition',
                                 ('state', 'action', 'next_state', 'reward'))
@@ -76,11 +81,6 @@ class Trainer(object):
         self.EPS_DECAY = 200
         self.TARGET_UPDATE = 10
 
-        self.policy_net = DQN(self.env.action_space.n).to(self.device)
-        self.target_net = DQN(self.env.action_space.n).to(self.device)
-        if gpu:
-            self.policy_net = self.policy_net.cuda()
-            self.target_net = self.target_net.cuda()
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
 
@@ -166,10 +166,14 @@ class Trainer(object):
             difference = np.array(current_screen) - np.array(last_screen)
             gray = torch.tensor(self.rgb2gray(difference)) / 255
             current_screen = current_screen / 255
-            state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1)).type(torch.DoubleTensor).to(self.device)
+            state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1)).type(torch.DoubleTensor)
+            if self.device == 'cuda':
+                state = state.cuda()
             for t in count():
                 print('Episode %s Movement %s' % (i_episode, t))
                 action = self.selectAction(state).to(self.device)
+                if self.device=='cuda':
+                    action = action.cuda()
                 _, reward, done, _ = self.env.step(action.item())
                 reward = torch.tensor([reward], device=self.device)
 
@@ -180,6 +184,8 @@ class Trainer(object):
                     gray = torch.tensor(self.rgb2gray(difference)) / 255
                     current_screen = current_screen / 255
                     next_state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1)).to(self.device)
+                    if self.device == 'cuda':
+                        self.device = self.device.cuda()
                 else:
                     next_state = None
 
