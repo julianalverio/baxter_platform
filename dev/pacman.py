@@ -157,7 +157,7 @@ class Trainer(object):
 
     def train(self):
         for i_episode in xrange(self.num_episodes):
-        	import pdb; pdb.set_trace()
+            import pdb; pdb.set_trace()
             self.steps_done = 0
             self.env.reset()
             last_screen = self.getScreen()
