@@ -78,6 +78,9 @@ class Trainer(object):
 
         self.policy_net = DQN(self.env.action_space.n).to(self.device)
         self.target_net = DQN(self.env.action_space.n).to(self.device)
+        if gpu:
+            self.policy_net = self.policy_net.cuda()
+            self.target_net = self.target_net.cuda()
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
 
