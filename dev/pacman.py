@@ -51,7 +51,7 @@ class DQN(nn.Module):
         self.device = device
 
     def forward(self, x):
-        if self.device == 'cuda':
+        if self.device == torch.device('cuda'):
             x = F.relu(self.bn1(self.conv1(x.type(torch.cuda.FloatTensor))))
         else:
             x = F.relu(self.bn1(self.conv1(x.type(torch.FloatTensor))))
