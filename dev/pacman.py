@@ -170,7 +170,7 @@ class Trainer(object):
             self.env.reset()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
-            state = self.getScreen(current_screen, last_screen)
+            state = self.getState(current_screen, last_screen)
             for t in count():
                 print('Episode %s Movement %s' % (i_episode, t))
                 action = self.selectAction(state)
