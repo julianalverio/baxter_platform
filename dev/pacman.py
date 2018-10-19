@@ -52,6 +52,7 @@ class DQN(nn.Module):
         self.device = device
 
     def forward(self, x):
+        import pdb; pdb.set_trace()
         if self.device == torch.device('cuda'):
             x = F.relu(self.bn1(self.conv1(x.type(torch.cuda.FloatTensor))))
         else:
@@ -66,7 +67,6 @@ class Trainer(object):
     def __init__(self, num_episodes=100, view=False):
         self.env = gym.make('MsPacman-v0').unwrapped
         plt.ion()
-
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.policy_net = DQN(self.env.action_space.n, self.device).to(self.device)
@@ -124,7 +124,7 @@ class Trainer(object):
         plt.title('Training Episode Durations')
         plt.xlabel('Episode')
         plt.ylabel('Duration')
-        plt.show()
+        plt.savefig('episode_durations.png')
 
 
     def optimizeModel(self):
@@ -157,6 +157,12 @@ class Trainer(object):
         self.optimizer.step()
 
 
+    def getState(self, current_screen, last_screen):
+        difference = np.array(current_screen) - np.array(last_screen)
+        gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
+        current_screen = current_screen / 255
+        return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1), device=self.device).type(torch.DoubleTensor)
+
 
     def train(self):
         for i_episode in xrange(self.num_episodes):
@@ -164,10 +170,7 @@ class Trainer(object):
             self.env.reset()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
-            difference = np.array(current_screen) - np.array(last_screen)
-            gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
-            current_screen = current_screen / 255
-            state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1), device=self.device).type(torch.DoubleTensor)
+            state = self.getScreen(current_screen, last_screen)
             for t in count():
                 print('Episode %s Movement %s' % (i_episode, t))
                 action = self.selectAction(state)
@@ -177,10 +180,7 @@ class Trainer(object):
                 last_screen = current_screen
                 current_screen = self.getScreen()
                 if not done:
-                    difference = np.array(current_screen) - np.array(last_screen)
-                    gray = torch.tensor(self.rgb2gray(difference)) / 255
-                    current_screen = current_screen / 255
-                    next_state = torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1))
+                    next_state = self.getState(current_screen, last_screen)
                 else:
                     next_state = None
 
@@ -196,31 +196,34 @@ class Trainer(object):
                 self.target_net.load_state_dict(self.policy_net.state_dict())
         torch.save(self.target_net, 'target_net.pth')
 
+    def showPacman(self, target_net_path):
+        self.target_net = torch.load(target_net_path, map_location='cpu')
+        self.env = gym.make('MsPacman-v0').unwrapped
+        self.env.reset()
+        self.steps_done = 0
+        done = False
+        current_screen = self.getScreen()
+        while not done:
+            self.env.render(mode='human')
+            previous_screen = current_screen
+            current_screen = self.getScreen()
+            state = self.getState(current_screen, previous_screen)
+            action = self.target_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
+            _, reward, done, _ = self.env.step(action.item())
+            steps_done += 1
+        print("Steps Done: ", steps_done)
 
 
 
-def completionEmail():
-  message = 'Training completed!'
+
+
+
+def completionEmail(message=''):
   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
 
 
-def watchPacman(target_net_path):
-    target_net = torch.load(target_net_path)
-    env = gym.make('MsPacman-v0').unwrapped
-    env.reset()
-    steps_done = 0
-    done = False
-    while not done:
-        screen = env.render(mode='human')
-        action = target_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
-        _, reward, done, _ = self.env.step(action.item())
-        steps_done += 1
-    print("Steps Done: ", steps_done)
-
 
 
 trainer = Trainer(view=False)
-trainer.train()
-completionEmail()
-# trainer.plotDurations()
+trainer.showPacman('target_net_100.pth')
