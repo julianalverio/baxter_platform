@@ -227,4 +227,5 @@ def completionEmail(message=''):
 
 
 trainer = Trainer(view=False)
-trainer.showPacman('target_net_100.pth')
+trainer.train()
+# trainer.showPacman('target_net_100.pth')
