@@ -57,24 +57,22 @@ class DQN(nn.Module):
 
     def __init__(self):
         super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(5, 16, kernel_size=5, stride=2)
+        self.conv1 = nn.Conv2d(4, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
         self.conv2 = nn.Conv2d(16, 32, kernel_size=5, stride=2)
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
-        #what dims to use
-        self.head = nn.Linear(256+8, 16)
+        self.head = nn.Linear(31976, 16)
 
-    def forward(self, x):
-        robot_state = x[:,:,:,4]
-        x_input = x[:, :, :, :4]
-        x = F.relu(self.bn1(self.conv1(x_input)))
-        x = F.relu(self.bn2(self.conv2(x_input)))
-        x = F.relu(self.bn3(self.conv3(x_input)))
-        import pdb; pdb.set_trace()
-        concatenated = torch.cat([x.view(size(0), -1)], robot_state[0, :8])
-        return self.head(x.view(x.size(0), -1))
+    def forward(self, x_input):
+        robot_state = x_input[:,-1,0,0:8]
+        x = x_input[:, 0:-1, :, :]
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn2(self.conv2(x)))
+        x = F.relu(self.bn3(self.conv3(x)))
+        concatenated = torch.cat([x.view(x.size(0), -1),  robot_state], dim=1)
+        return self.head(concatenated)
 
 
 
@@ -296,7 +294,7 @@ class Trainer(object):
         self.count_timeout = count_timeout
         self.hand_open = True
         self.redundant_grip = False
-        self.log = open('log.txt', 'w+')
+        # self.log = open('log.txt', 'w+')
         self.no_movement = False
         self.movement_threshold = movement_threshold
 
@@ -445,22 +443,16 @@ class Trainer(object):
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken
-        import pdb; pdb.set_trace()
         state_action_values = ((self.policy_net(state_batch) + 1.) / 2.).gather(1, action_batch)
 
         # Compute V(s_{t+1}) for all next states.
         next_state_values = torch.zeros(self.BATCH_SIZE, device=self.device)
-
-        next_state_values_list = []
-        for next_state in non_final_next_states:
-            next_state_values_list.append(self.target_net(next_state))
-        next_state_values[non_final_mask] = torch.cat(next_state_values_list, 0).max(1)[0].detach()
+        next_state_values[non_final_mask] = self.target_net(state_batch).max(1)[0].detach()
         # Compute the expected Q values
-        expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
+        expected_state_action_values = (next_state_values.view(64,1) * self.GAMMA) + reward_batch
 
-        loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
+        loss = F.smooth_l1_loss(state_action_values, expected_state_action_values)
         print('Loss: %s' % loss.item())
-        self.log.write(str(loss.item()))
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -470,11 +462,11 @@ class Trainer(object):
 
 
     def getState(self, previous_screen, current_screen):
-        difference = np.array(ImageChops.subtract(current_screen, previous_screen).convert(mode='L')).transpose((2,0,1))
+        difference = np.array(ImageChops.subtract(current_screen, previous_screen).convert(mode='L'))
         robot_state = self.getRobotState()
         robot_state_2d = np.zeros(difference.shape)
         robot_state_2d[0,:robot_state.size()[1]] = robot_state
-        return torch.tensor(np.concatenate((np.array(current_screen).transpose((2,0,1)), np.expand_dims(difference, axis=2), np.expand_dims(robot_state_2d, axis=2)), axis=2), device=self.device).unsqueeze(0)
+        return torch.tensor(np.concatenate((np.array(current_screen).transpose((2,0,1)), np.expand_dims(difference, axis=0), np.expand_dims(robot_state_2d, axis=0)), axis=0)).unsqueeze(0).type(torch.FloatTensor).to(self.device)
             
 
 

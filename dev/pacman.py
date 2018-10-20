@@ -167,6 +167,7 @@ class Trainer(object):
             last_screen = self.getScreen()
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
+            import pdb; pdb.set_trace()
             for t in count():
                 print('Episode %s Movement %s' % (i_episode, t))
                 action = self.selectAction(state)
@@ -190,7 +191,7 @@ class Trainer(object):
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
-        torch.save(self.target_net, 'target_net_%s.pth' % num_episodes)
+        torch.save(self.target_net, 'target_net_%s.pth' % self.num_episodes)
         self.plotDurations()
 
     def showPacman(self, target_net_path):
