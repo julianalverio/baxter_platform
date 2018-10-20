@@ -60,7 +60,7 @@ class DQN(nn.Module):
 
 
 class Trainer(object):
-    def __init__(self, num_episodes=250, view=False):
+    def __init__(self, num_episodes=500, view=False):
         self.env = gym.make('MsPacman-v0').unwrapped
         plt.ion()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
