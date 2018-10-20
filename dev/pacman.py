@@ -194,7 +194,7 @@ class Trainer(object):
                     self.episode_durations.append(t + 1)
                     break
             if i_episode % self.TARGET_UPDATE == 0:
-                self.target_net.load_state_dict(self.`_net.state_dict())
+                self.target_net.load_state_dict(self.policy_net.state_dict())
         torch.save(self.target_net, 'target_net.pth')
         self.plotDurations()
 
