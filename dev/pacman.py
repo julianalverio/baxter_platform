@@ -190,7 +190,7 @@ class Trainer(object):
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
-        torch.save(self.target_net, 'target_net.pth')
+        torch.save(self.target_net, 'target_net_%s.pth' % num_episodes)
         self.plotDurations()
 
     def showPacman(self, target_net_path):
