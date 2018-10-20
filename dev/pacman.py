@@ -167,7 +167,6 @@ class Trainer(object):
             last_screen = self.getScreen()
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
-            import pdb; pdb.set_trace()
             for t in count():
                 print('Episode %s Movement %s' % (i_episode, t))
                 action = self.selectAction(state)
