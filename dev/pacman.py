@@ -224,4 +224,5 @@ def completionEmail(message=''):
 
 trainer = Trainer(view=False)
 trainer.train()
+completionEmail('500 done')
 # trainer.showPacman('target_net_100.pth')
