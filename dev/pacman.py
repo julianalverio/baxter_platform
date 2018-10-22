@@ -221,8 +221,8 @@ def completionEmail(message=''):
 
 
 
-trainer = Trainer(view=False)
+trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-trainer.train(num_episodes=NUM_EPISODES)
+trainer.train()
 completionEmail('%s done' % NUM_EPISODES)
 # trainer.showPacman('target_net_500.pth')
