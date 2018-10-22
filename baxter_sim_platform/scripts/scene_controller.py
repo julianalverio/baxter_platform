@@ -441,7 +441,6 @@ class Model(object):
     sdf += '\t\t</link>\n'
     sdf += '\t</model>\n'
     sdf += '</sdf>'
-    print sdf
     return sdf
 
   # Helper method called by generateSDF()
