@@ -116,7 +116,7 @@ class Trainer(object):
 
 
     def plotDurations(self):
-        plt.plot(range(len(self.durations), self.durations))
+        plt.plot(range(len(self.episode_durations), self.episode_durations))
         plt.title('Training Episode Durations')
         plt.xlabel('Episode')
         plt.ylabel('Duration')
@@ -144,7 +144,6 @@ class Trainer(object):
         expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
 
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
-        print('Loss: ', loss)
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -162,13 +161,13 @@ class Trainer(object):
 
     def train(self):
         for i_episode in xrange(self.num_episodes):
+            print('Episode %s' % i_episode)
             self.steps_done = 0
             self.env.reset()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
             for t in count():
-                print('Episode %s Movement %s' % (i_episode, t))
                 action = self.selectAction(state)
                 _, reward, done, _ = self.env.step(action.item())
                 reward = torch.tensor([reward], device=self.device)
@@ -197,7 +196,7 @@ class Trainer(object):
         self.target_net = torch.load(target_net_path, map_location='cpu')
         self.env = gym.make('MsPacman-v0').unwrapped
         self.env.reset()
-        self.steps_done = 0
+        steps_done = 0
         done = False
         current_screen = self.getScreen()
         while not done:
@@ -223,6 +222,7 @@ def completionEmail(message=''):
 
 
 trainer = Trainer(view=False)
-trainer.train()
-completionEmail('500 done')
+trainer.showPacman('target_net_100.pth')
+# trainer.train()
+# completionEmail('500 done')
 # trainer.showPacman('target_net_100.pth')
