@@ -327,7 +327,7 @@ class Trainer(object):
             if g > 100 and r < 50 and b < 50:
               green_pixels += 1
         if green_pixels < 50:
-          print("Re-rending Scene.")
+          # print("Re-rending Scene.")
           # image.show()
           self.resetScene(sleep=True)
         # else:
@@ -376,7 +376,7 @@ class Trainer(object):
             end_angles = self.manager.robot_controller.getJointAngles(numpy=True)
             if np.linalg.norm(start_angles - end_angles) < self.movement_threshold:
                 self.no_movement = True
-                print("NO MOVEMENT!!")
+                # print("NO MOVEMENT!!")
 
 
 
@@ -451,7 +451,7 @@ class Trainer(object):
         expected_state_action_values = (next_state_values.view(64,1) * self.GAMMA) + reward_batch
 
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values)
-        print('Loss: %s' % loss.item())
+        # print('Loss: %s' % loss.item())
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -472,14 +472,15 @@ class Trainer(object):
     def train(self):
         self.manager.scene_controller.externalCamera(quat_x=0., quat_y=0., quat_z=1., quat_w=0., x=1.7, y=0., z=1.)
         for i_episode in xrange(self.num_episodes):
+            print("Episode: %s" % i_episode)
             self.resetScene(self.manager)
             previous_screen = self.screen_handler.getScreen()
             current_screen = self.screen_handler.getScreen()
             state = self.getState(previous_screen, current_screen)
             for movement_idx in count():
                 action_tensor = self.selectAction(state)
-                print(action_tensor.item())
-                print("Episode: %s Action #: %s" % (i_episode, movement_idx))
+                # print(action_tensor.item())
+                # print("Episode: %s Action #: %s" % (i_episode, movement_idx))
                 self.performAction(action_tensor.item())
 
                 reward = self.screen_handler.getReward(self.out_of_bounds, self.redundant_grip, self.no_movement)
