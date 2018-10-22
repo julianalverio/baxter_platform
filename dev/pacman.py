@@ -15,7 +15,7 @@ import torch.nn.functional as F
 import torchvision.transforms as T
 import yagmail
 
-
+NUM_EPISODES = 5000
 
 class ReplayMemory(object):
 
@@ -60,7 +60,7 @@ class DQN(nn.Module):
 
 
 class Trainer(object):
-    def __init__(self, num_episodes=500, view=False):
+    def __init__(self, num_episodes=1, view=False):
         self.env = gym.make('MsPacman-v0').unwrapped
         plt.ion()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -222,7 +222,6 @@ def completionEmail(message=''):
 
 
 trainer = Trainer(view=False)
-trainer.showPacman('target_net_100.pth')
-# trainer.train()
-# completionEmail('500 done')
-# trainer.showPacman('target_net_100.pth')
+trainer.train(num_episodes=NUM_EPISODES)
+completionEmail('%s done' % NUM_EPISODES)
+# trainer.showPacman('target_net_500.pth')
