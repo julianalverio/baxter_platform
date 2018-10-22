@@ -119,22 +119,40 @@ class screenHandler(object):
 
 
 
-  def getReward(self, out_of_bounds, redundant_grip, no_movement):
-    reward = 0.
-    if out_of_bounds:
-        reward -= 1.
-    if redundant_grip:
-        reward -= 1.
-    if no_movement:
-        reward -= 1.
-    if self.task == 1:
-        width, _ = self.most_recent.size
-        if self.green_x <= width/2.:
-          reward += 1000.
-    if self.task == 2:
-        if self.green_x < self.blue_x:
-            reward += 1000.
-    return reward
+    def getReward(self, out_of_bounds, redundant_grip, no_movement):
+        reward = 0.
+        if out_of_bounds:
+            reward -= 1.
+        if redundant_grip:
+            reward -= 1.
+        if no_movement:
+            reward -= 1.
+
+        # slide green block
+        if self.task == 1:
+            width, _ = self.most_recent.size
+            if self.green_x <= width/2.:
+              reward += 1000.
+        # slide green block past blue block
+        if self.task == 2:
+            if self.green_x < self.blue_x:
+                reward += 1000.
+        #stack blocks
+        if self.task==3:
+            if self.checkContiguous(pixels) and (self.green_y > self.blue_y) and (abs(self.green_x - self.blue_x) < 20):
+                reward += 1000.
+        #Pretrain to move to a position
+        if self.task == 4:
+            # target_x = 
+            # target_y = 
+            # target_z = 
+            distance = np.linalg.norm(np.array(self.manager.robot_controller.getEndpoint().position), np.array())  #TODO
+
+        return reward
+
+
+
+  
 
   def getNeighbors(self, x, y):
     neighbors  = []
@@ -209,8 +227,7 @@ class screenHandler(object):
                 y_coord = idx // width
                 if (g>100 and r<50 and b<50) or (b>100 and r<50 and g<50):
                     pixels.add([x_coord, y_coord])
-            if self.checkContiguous(pixels) and (self.green_y > self.blue_y) and (abs(self.green_x - self.blue_x) < 20):
-                return 1000.
+
             
 
   def showGreenPixels(self):
@@ -241,26 +258,27 @@ def completionEmail():
 #task=1: slide a green block to the left
 #task=2: slide a green block to the left of a blue block
 #task=3: stack a green block on top of a blue block
+#task=4: pretrain for a location
 class Trainer(object):
     # interpolation can be NEAREST, BILINEAR, BICUBIC, or LANCZOS
     def __init__(self, interpolation=Image.BILINEAR, batch_size=64, gamma=0.999, eps_start=0.9, eps_end=0.05,
                  eps_decay=200, target_update=10, replay_memory_size=1000, timeout=5, num_episodes=1000, resize=40,
-                 one_move_timeout=1., move_precision=0.02, count_timeout=100, movement_threshold=0.005, task=1):
-        self.params_dict = {
-        'interpolation' : interpolation,
-        'batch_size' : batch_size,
-        'gamma' : gamma,
-        'eps_start' : eps_start,
-        'eps_end' : eps_end,
-        'eps_decay' : eps_decay,
-        'target_update' : target_update,
-        'replay_memory_size' : replay_memory_size,
-        'timeout' : timeout,
-        'num_episodes' : num_episodes,
-        'resize' : resize,
-        'one_move_timeout' : one_move_timeout,
-        'move_precision' : move_precision
-        }
+                 one_move_timeout=1., move_precision=0.02, count_timeout=100, movement_threshold=0.005, task=4):
+        # self.params_dict = {
+        # 'interpolation' : interpolation,
+        # 'batch_size' : batch_size,
+        # 'gamma' : gamma,
+        # 'eps_start' : eps_start,
+        # 'eps_end' : eps_end,
+        # 'eps_decay' : eps_decay,
+        # 'target_update' : target_update,
+        # 'replay_memory_size' : replay_memory_size,
+        # 'timeout' : timeout,
+        # 'num_episodes' : num_episodes,
+        # 'resize' : resize,
+        # 'one_move_timeout' : one_move_timeout,
+        # 'move_precision' : move_precision
+        # }
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.Transition = namedtuple('Transition',
@@ -470,6 +488,8 @@ class Trainer(object):
 
 
     def train(self):
+        import pdb; pdb.set_trace()
+        self.manager.robot_controller.getEndpoint()
         self.manager.scene_controller.externalCamera(quat_x=0., quat_y=0., quat_z=1., quat_w=0., x=1.7, y=0., z=1.)
         for i_episode in xrange(self.num_episodes):
             print("Episode: %s" % i_episode)
@@ -529,7 +549,29 @@ pre_grip_angles = {'left_w0': 0.6699952259595108,
                              'left_s1': -0.9999781166910306}
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
-trainer.train()
-completionEmail()
+trainer.manager.scene_controller.makeModel(name='table', shape='box', roll=0., pitch=0., yaw=0.,
+                                        restitution_coeff=0., size_x=.7, size_y=1.5, size_z=.7, x=.8, y=0.,
+                                        z=.35, mass=5000, ambient_r=0.1, ambient_g=0.1, ambient_b=0.1,
+                                        ambient_a=0.1, mu1=1, mu2=1, reference_frame='', static=True)
+trainer.manager.scene_controller.makeModel(name='testObject', shape='box', size_x=0.1, size_y=0.1, size_z=0.1,
+                                        x=0.8, y=0.1, z=0.75, mass=1, mu1=1000, mu2=2000,
+                                        restitution_coeff=0.5, roll=0.1, pitch=0.2, yaw=0.3, ambient_r=0,
+                                        ambient_g=1, ambient_b=0, ambient_a=1, diffuse_r=0, diffuse_g=1,
+                                        diffuse_b=0, diffuse_a=1)
+trainer.manager.scene_controller.spawnAllModels()
+trainer.manager.robot_controller.moveToStart(threshold=0.1)
+
+Point(x=0.560425424258117, y=0.192226734175659, z=0.11028416908834014)
+
+import pdb; pdb.set_trace()
+pass
+
+
+
+
+
+
+# trainer.train()
+# completionEmail()
 
 
