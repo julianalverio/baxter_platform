@@ -30,6 +30,9 @@ from PIL import ImageChops
 
 
 
+NUM_EPISODES=5000
+
+
 class ReplayMemory(object):
 
     def __init__(self, capacity, transition):
@@ -303,7 +306,7 @@ class Trainer(object):
         self.manager.scene_controller.makeModel(name='table', shape='box', roll=0., pitch=0., yaw=0.,
                                                 restitution_coeff=0., size_x=.7, size_y=1.5, size_z=.7, x=.8, y=0.,
                                                 z=.35, mass=5000, ambient_r=0.1, ambient_g=0.1, ambient_b=0.1,
-                                                ambient_a=0.1, mu1=1, mu2=1, reference_frame='')
+                                                ambient_a=0.1, mu1=1, mu2=1, reference_frame='', static=True)
         self.manager.scene_controller.makeModel(name='testObject', shape='box', size_x=0.1, size_y=0.1, size_z=0.1,
                                                 x=0.8, y=0.1, z=0.75, mass=1, mu1=1000, mu2=2000,
                                                 restitution_coeff=0.5, roll=0.1, pitch=0.2, yaw=0.3, ambient_r=0,
@@ -343,11 +346,7 @@ class Trainer(object):
 
         else:
           with torch.no_grad():
-            import pdb; pdb.set_trace()
-            continuous_action = (self.policy_net(state).view(1, 16) + 1.)/2.
-            discrete_action = np.zeros(16)
-            discrete_action[continuous_action.max(0)[1]] = 1
-            return torch.from_numpy(discrete_action).type(torch.DoubleTensor).view(1, -1)
+            return torch.tensor(self.policy_net(state).max(1)[1], device=self.device).view(1, 1)
         
 
 
@@ -387,7 +386,7 @@ class Trainer(object):
             action_arr[action//2] = 1.
         else:
             action_arr[action//2] = -1.
-        angles = np.array(old_angles) + action
+        angles = np.array(old_angles) + action_arr
         valid = True
         #s0
         if not (-97.4 < angles[0] < 97.4):
@@ -443,7 +442,7 @@ class Trainer(object):
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken
-        state_action_values = ((self.policy_net(state_batch) + 1.) / 2.).gather(1, action_batch)
+        state_action_values = self.policy_net(state_batch).gather(1, action_batch)
 
         # Compute V(s_{t+1}) for all next states.
         next_state_values = torch.zeros(self.BATCH_SIZE, device=self.device)
@@ -520,8 +519,15 @@ class Trainer(object):
 
 
 
+pre_grip_angles = {'left_w0': 0.6699952259595108,
+                             'left_w1': 1.030009435085784,
+                             'left_w2': -0.4999997247485215,
+                             'left_e0': -1.189968899785275,
+                             'left_e1': 1.9400238130755056,
+                             'left_s0': -0.08000397926829805,
+                             'left_s1': -0.9999781166910306}
 
-trainer = Trainer()
+trainer = Trainer(num_episodes=NUM_EPISODES)
 trainer.train()
 completionEmail()
 

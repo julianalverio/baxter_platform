@@ -49,13 +49,16 @@ class DQN(nn.Module):
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
         self.head = nn.Linear(9792, num_actions)
+        self.softmax = nn.softmax()
         self.device = device
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        return self.head(x.view(x.size(0), -1))
+        import pdb; pdb.set_trace()
+        # return self.head(x.view(x.size(0), -1))
+        return self.softmax(self.head(x.view(x.size(0), -1)))
 
 
 

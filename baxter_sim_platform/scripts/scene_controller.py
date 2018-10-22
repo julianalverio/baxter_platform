@@ -191,14 +191,14 @@ class SceneController(object):
                mass=0.5, ambient_r=0, ambient_g=1, ambient_b=0, ambient_a=1, mu1=1000, mu2=1000,
                reference_frame='world',
                restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
-               name=None, diffuse_r=1, diffuse_g=1, diffuse_b=1, diffuse_a=1):
+               name=None, diffuse_r=1, diffuse_g=1, diffuse_b=1, diffuse_a=1, static=False):
     if not name:
       name = 'object_' + str(len(self.models))
     model = Model(shape=shape, size_x=size_x, size_y=size_y,
       size_z=size_z, size_r=size_r, x=x, y=y, z=z, mass=mass, ambient_r=ambient_r, ambient_g=ambient_g,
       ambient_b=ambient_b, ambient_a=ambient_a, mu1=mu1, mu2=mu2, reference_frame=reference_frame, 
       restitution_coeff=restitution_coeff, roll=roll, pitch=pitch, yaw=yaw, name=name, diffuse_r=diffuse_r,
-      diffuse_g=diffuse_g, diffuse_b=diffuse_b, diffuse_a=diffuse_a)
+      diffuse_g=diffuse_g, diffuse_b=diffuse_b, diffuse_a=diffuse_a, static=static)
     self.models.append(model)
     self.checkUniqueModelNames()
     return model
@@ -316,7 +316,7 @@ class Model(object):
   def __init__(self, shape='box', size_x=0.5, size_y=0.5, size_z=0.5, size_r=0.5, x=None, y=None, 
                z=None, mass=0.5, ambient_r=0, ambient_g=1, ambient_b=0, ambient_a=0, mu1=1000, mu2=1000,
                reference_frame='world', restitution_coeff=0.5, roll=0., pitch=0., yaw=0.,
-               name=None, diffuse_r=1, diffuse_g=1, diffuse_b=1, diffuse_a=1):
+               name=None, diffuse_r=1, diffuse_g=1, diffuse_b=1, diffuse_a=1, static=False):
     self.shape = shape
     if self.shape not in ['box', 'cylinder', 'sphere']:
       self.shape = 'box'
@@ -364,6 +364,8 @@ class Model(object):
     self.pitch = pitch
     self.yaw = yaw
 
+    self.static = static
+
   '''
   Calculates moments: [ixx, iyy, izz]
   Assumes mass is uniformly distributed
@@ -394,6 +396,8 @@ class Model(object):
     sdf += '<?xml version="1.0"?>\n'
     sdf += '<sdf version="1.6">\n'
     sdf += '\t<model name="%s">\n' % self.name
+    if self.static:
+      sdf += '\t\t<static>true</static>\n'
     sdf += '\t\t<pose>%s %s %s %s %s %s</pose>\n' % (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
     sdf += '\t\t<link name="%s_link">\n' % self.name
     sdf += '\t\t\t<inertial>\n'
@@ -437,6 +441,7 @@ class Model(object):
     sdf += '\t\t</link>\n'
     sdf += '\t</model>\n'
     sdf += '</sdf>'
+    print sdf
     return sdf
 
   # Helper method called by generateSDF()
