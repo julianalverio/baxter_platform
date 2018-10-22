@@ -104,7 +104,7 @@ class RobotController(object):
     moveit_commander.roscpp_shutdown()
 
   def gripperOpen(self, limb='left'):
-    print("Opening gripper")
+    # print("Opening gripper")
     if limb == 'left':
       self._left_gripper.open()
     else:
@@ -112,7 +112,7 @@ class RobotController(object):
     rospy.sleep(0.5)
 
   def gripperClose(self, limb='left'):
-    print("Closing gripper")
+    # print("Closing gripper")
     if limb == 'left':
       self._left_gripper.close()
     else:
