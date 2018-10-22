@@ -120,7 +120,7 @@ class Trainer(object):
         plt.title('Training Episode Durations')
         plt.xlabel('Episode')
         plt.ylabel('Duration')
-        plt.savefig('episode_durations.png')
+        plt.savefig('episode_durations_%s.png' % self.num_episodes)
 
 
     def optimizeModel(self):
