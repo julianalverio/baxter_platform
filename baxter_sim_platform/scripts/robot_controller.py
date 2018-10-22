@@ -99,6 +99,12 @@ class RobotController(object):
         return np.array([self._right_limb.joint_angles()[joint] for joint in self.getJointNames()])
       return [self._right_limb.joint_angles()[joint] for joint in self.getJointNames()]
 
+  def getEndpoint(self, limb='left'):
+    if limb == 'left':
+      return self._left_limb.endpoint_pose()
+    else:
+      return self._right_limb.endpoint_pose()
+
   # Shut down MoveIt!
   def shutdown(self):
     moveit_commander.roscpp_shutdown()
