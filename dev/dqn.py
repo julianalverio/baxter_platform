@@ -119,7 +119,7 @@ class screenHandler(object):
 
 
 
-    def getReward(self, out_of_bounds, redundant_grip, no_movement):
+    def getReward(self, out_of_bounds, redundant_grip, no_movement, steps_done):
         reward = 0.
         if out_of_bounds:
             reward -= 1.
@@ -143,11 +143,13 @@ class screenHandler(object):
                 reward += 1000.
         #Pretrain to move to a position
         if self.task == 4:
-            # target_x = 
-            # target_y = 
-            # target_z = 
-            distance = np.linalg.norm(np.array(self.manager.robot_controller.getEndpoint().position), np.array())  #TODO
-
+            target_position = np.array([0.75, 0.0, -0.129])
+            target_orientation = np.array([-0.024959081577, 0.999649402929, 0.0073791618007, 0.00486450832011])
+            position_distance = np.linalg.norm(np.array(self.manager.robot_controller.getEndpoint().position), target_position)
+            orientation_distance = np.linalg.norm(np.array([self.manager.robot_controller.getEndpoint().orientation], target_orientation))
+            reward += 1000. / position_distance
+            reward += 1000. / orientation_distance
+            reward -= steps_done
         return reward
 
 
@@ -488,11 +490,10 @@ class Trainer(object):
 
 
     def train(self):
-        import pdb; pdb.set_trace()
-        self.manager.robot_controller.getEndpoint()
         self.manager.scene_controller.externalCamera(quat_x=0., quat_y=0., quat_z=1., quat_w=0., x=1.7, y=0., z=1.)
         for i_episode in xrange(self.num_episodes):
             print("Episode: %s" % i_episode)
+            self.steps_done = 0
             self.resetScene(self.manager)
             previous_screen = self.screen_handler.getScreen()
             current_screen = self.screen_handler.getScreen()
@@ -503,7 +504,7 @@ class Trainer(object):
                 # print("Episode: %s Action #: %s" % (i_episode, movement_idx))
                 self.performAction(action_tensor.item())
 
-                reward = self.screen_handler.getReward(self.out_of_bounds, self.redundant_grip, self.no_movement)
+                reward = self.screen_handler.getReward(self.out_of_bounds, self.redundant_grip, self.no_movement, self.steps_done)
                 self.out_of_bounds = False
                 self.redundant_grip = False
                 self.no_movement = False
@@ -561,7 +562,17 @@ trainer.manager.scene_controller.makeModel(name='testObject', shape='box', size_
 trainer.manager.scene_controller.spawnAllModels()
 trainer.manager.robot_controller.moveToStart(threshold=0.1)
 
-Point(x=0.560425424258117, y=0.192226734175659, z=0.11028416908834014)
+position = Point(x=1., y=0.192226734175659, z=-0.52)
+orientation = Quaternion(x=0.08420272538222577, y=0.9947358259705235, z=-0.05680456941553487, w=0.013556491524789474)
+
+
+position_modified = Point(x=0.560425424258117, y=0.192226734175659, z=0.11028416908834014)
+
+pose = Pose()
+pose.orientation = orientation
+pose.position =  position_modified
+import pdb; pdb.set_trace()
+trainer.manager.robot_controller.followTrajectoryFromJointAngles([trainer.manager.robot_controller.solveIK(pose)])
 
 import pdb; pdb.set_trace()
 pass
