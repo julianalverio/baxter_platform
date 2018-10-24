@@ -15,7 +15,7 @@ import torch.nn.functional as F
 import torchvision.transforms as T
 import yagmail
 
-NUM_EPISODES = 5000
+NUM_EPISODES = 1
 
 class ReplayMemory(object):
 
@@ -156,7 +156,7 @@ class Trainer(object):
         difference = np.array(current_screen) - np.array(last_screen)
         gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
         current_screen = current_screen / 255
-        return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1).astype(float), device=self.device)
+        return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1).astype(np.float64), device=self.device)
 
 
     def train(self):
