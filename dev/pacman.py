@@ -65,8 +65,8 @@ class Trainer(object):
         plt.ion()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        self.policy_net = DQN(self.env.action_space.n, self.device).to(self.device)
-        self.target_net = DQN(self.env.action_space.n, self.device).to(self.device)
+        self.policy_net = DQN(self.env.action_space.n, self.device)
+        self.target_net = DQN(self.env.action_space.n, self.device)
 
         self.transition = namedtuple('Transition',
                                 ('state', 'action', 'next_state', 'reward'))
@@ -156,7 +156,7 @@ class Trainer(object):
         difference = np.array(current_screen) - np.array(last_screen)
         gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
         current_screen = current_screen / 255
-        return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1), device=self.device).type(torch.FloatTensor).to(self.device)
+        return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1).astype(float), device=self.device)
 
 
     def train(self):
