@@ -65,8 +65,8 @@ class Trainer(object):
         plt.ion()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        self.policy_net = DQN(self.env.action_space.n, self.device)
-        self.target_net = DQN(self.env.action_space.n, self.device)
+        self.policy_net = DQN(self.env.action_space.n, self.device).to(self.device)
+        self.target_net = DQN(self.env.action_space.n, self.device).to(self.device)
 
         self.transition = namedtuple('Transition',
                                 ('state', 'action', 'next_state', 'reward'))
