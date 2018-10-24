@@ -116,7 +116,7 @@ class Trainer(object):
 
 
     def plotDurations(self):
-        plt.plot(range(len(self.episode_durations), self.episode_durations))
+        plt.plot(range(len(self.episode_durations)), self.episode_durations)
         plt.title('Training Episode Durations')
         plt.xlabel('Episode')
         plt.ylabel('Duration')
