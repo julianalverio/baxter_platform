@@ -110,6 +110,7 @@ class Trainer(object):
         self.steps_done += 1
         if sample > eps_threshold:
             with torch.no_grad():
+                import pdb; pdb.set_trace()
                 return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device)
         else:
             return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device)
