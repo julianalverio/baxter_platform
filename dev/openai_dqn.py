@@ -91,6 +91,7 @@ class Trainer(object):
 
 
     def getScreen(self):
+        import pdb; pdb.set_trace()
         screen = self.env.render(mode='rgb_array').transpose((2, 0, 1))
         screen = np.ascontiguousarray(screen, dtype=np.uint8)
         return torch.from_numpy(screen).unsqueeze(0).to(self.device)
