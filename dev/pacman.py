@@ -15,7 +15,7 @@ import torch.nn.functional as F
 import torchvision.transforms as T
 import yagmail
 
-NUM_EPISODES = 1
+NUM_EPISODES = 5000
 
 class ReplayMemory(object):
 
