@@ -45,11 +45,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="329">
-              <caret line="165" column="83" selection-start-line="165" selection-start-column="83" selection-end-line="165" selection-end-column="83" />
+            <state relative-caret-position="483">
+              <caret line="195" column="17" selection-start-line="195" selection-start-column="17" selection-end-line="195" selection-end-column="17" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540484090831" expanded="true" signature="5065:5161" ph="..." />
+                <marker date="1540484311803" expanded="true" signature="5065:5161" ph="..." />
               </folding>
             </state>
           </provider>
@@ -66,6 +66,7 @@
       <find>self.state =</find>
       <find>action =</find>
       <find>selectaction</find>
+      <find>xrange</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -175,11 +176,11 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="165" column="83" selection-start-line="165" selection-start-column="83" selection-end-line="165" selection-end-column="83" />
+        <state relative-caret-position="483">
+          <caret line="195" column="17" selection-start-line="195" selection-start-column="17" selection-end-line="195" selection-end-column="17" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540484090831" expanded="true" signature="5065:5161" ph="..." />
+            <marker date="1540484311803" expanded="true" signature="5065:5161" ph="..." />
           </folding>
         </state>
       </provider>

@@ -193,7 +193,7 @@ class Trainer(object):
         steps_done = 0
         done = False
         current_screen = self.getScreen()
-        for _ in xrange(1000):
+        for _ in range(1000):
             self.env.render(mode='human')
             previous_screen = current_screen
             current_screen = self.getScreen()
