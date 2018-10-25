@@ -64,7 +64,6 @@ class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        import pdb; pdb.set_trace()
         self.policy_net = DQN(8, self.device).to(self.device)
         self.target_net = DQN(8, self.device).to(self.device)
 
@@ -155,7 +154,7 @@ class Trainer(object):
 
 
     def train(self):
-        for i_episode in xrange(self.num_episodes):
+        for i_episode in range(self.num_episodes):
             print('Episode %s' % i_episode)
             self.steps_done = 0
             self.reset
