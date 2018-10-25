@@ -65,8 +65,8 @@ class Trainer(object):
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         import pdb; pdb.set_trace()
-        self.policy_net = DQN(self.env.action_space.n, self.device).to(self.device)
-        self.target_net = DQN(self.env.action_space.n, self.device).to(self.device)
+        self.policy_net = DQN(8, self.device).to(self.device)
+        self.target_net = DQN(8, self.device).to(self.device)
 
         self.transition = namedtuple('Transition',
                                 ('state', 'action', 'next_state', 'reward'))
@@ -81,12 +81,13 @@ class Trainer(object):
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
 
-        self.optimizer = optim.RMSprop(self.policy_net.parameters()) #TODO use ADAM
+        self.optimizer = optim.Adam(self.policy_net.parameters())
         self.memory = ReplayMemory(10000, self.transition)
         self.episode_durations = []
 
         self.num_episodes = num_episodes
         self.steps_done = 0
+        self.state = [0,0,0,0]
 
 
 
@@ -97,17 +98,20 @@ class Trainer(object):
 
 
     def selectAction(self, state):
-        import pdb; pdb.set_trace()
-        #this needs to be re-done
         sample = random.random()
         eps_threshold = self.EPS_END + (self.EPS_START - self.EPS_END) * \
             math.exp(-1. * self.steps_done / self.EPS_DECAY)
         self.steps_done += 1
         if sample > eps_threshold:
             with torch.no_grad():
-                return self.policy_net(state).max(1)[1].view(1, 1)
+                idx = self.policy_net(state).max(1)[1]
         else:
-            return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long, device=self.device)
+            idx = random.randrange(0,8)
+        if idx < 4:
+            self.state[idx] += 0.1
+        else:
+            self.state[idx] -= 0.1
+        return idx
 
 
 
@@ -144,18 +148,23 @@ class Trainer(object):
         difference = current_screen - last_screen
         return torch.cat([current_screen, difference], axis=0)
 
+    def reset(self):
+        self.env.reset()
+        self.env.step([0,0,0,0])
+        self.state = [0,0,0,0]
+
 
     def train(self):
         for i_episode in xrange(self.num_episodes):
             print('Episode %s' % i_episode)
             self.steps_done = 0
-            self.env.reset()
+            self.reset
             last_screen = self.getScreen()
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
             for t in count():
-                action = self.selectAction(state)
-                _, reward, done, _ = self.env.step(action.item())
+                action = torch.tensor(self.selectAction(state), device=self.device)
+                _, reward, done, _ = self.env.step(self.state)
                 reward = torch.tensor([reward], device=self.device)
 
                 last_screen = current_screen
