@@ -90,6 +90,7 @@ class Trainer(object):
         self.num_episodes = num_episodes
         self.steps_done = 0
         self.state = [0,0,0,0]
+        self.out_of_bounds = False
 
 
 
@@ -110,9 +111,17 @@ class Trainer(object):
         else:
             idx = random.randrange(0,8)
         if idx % 2 == 0:
-            self.state[idx//2] += 0.1
+            if self.state[idx//2] > 0.9:
+                self.state[idx//2] = 1;
+                self.out_of_bounds = True
+            else:
+                self.state[idx//2] += 0.1
         else:
-            self.state[idx//2] -= 0.1
+            if self.state[idx//2] < -0.9:
+                self.state[idx//2] = -1.
+                self.out_of_bounds = True
+            else:
+                self.state[idx//2] -= 0.1
         return idx
 
 
@@ -167,6 +176,9 @@ class Trainer(object):
             for t in count():
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
                 _, reward, done, _ = self.env.step(self.state)
+                if self.out_of_bounds:
+                    reward -= 1.
+                    self.out_of_bounds = False
                 reward = torch.tensor([float(reward)], device=self.device)
 
                 last_screen = current_screen
