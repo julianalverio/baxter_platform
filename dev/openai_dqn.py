@@ -171,7 +171,7 @@ class Trainer(object):
                     next_state = self.getState(current_screen, last_screen)
                 else:
                     next_state = None
-
+                import pdb; pdb.set_trace()
                 self.memory.push(state, action, next_state, reward)
 
                 state = next_state
