@@ -108,6 +108,7 @@ class Trainer(object):
             self.state[idx//2] += 0.1
         else:
             self.state[idx//2] -= 0.1
+        print(self.state)
         return idx
 
 
