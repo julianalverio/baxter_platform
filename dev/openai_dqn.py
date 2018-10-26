@@ -66,7 +66,6 @@ class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        import pdb; pdb.set_trace()
         self.policy_net = DQN(8, self.device).to(self.device)
         self.target_net = DQN(8, self.device).to(self.device)
 
@@ -84,7 +83,7 @@ class Trainer(object):
         self.target_net.eval()
 
         self.optimizer = optim.Adam(self.policy_net.parameters())
-        self.memory = ReplayMemory(10000, self.transition)
+        self.memory = ReplayMemory(1000, self.transition)
         self.episode_durations = []
 
         self.num_episodes = num_episodes
@@ -174,6 +173,7 @@ class Trainer(object):
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
             for t in count():
+                import pdb; pdb.set_trace()
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
                 _, reward, done, _ = self.env.step(self.state)
                 if self.out_of_bounds:
