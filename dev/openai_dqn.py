@@ -124,6 +124,7 @@ class Trainer(object):
         non_final_next_states = torch.cat([s for s in batch.next_state
                                                     if s is not None])
         state_batch = torch.cat(batch.state)
+        import pdb; pdb.set_trace()
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
 
@@ -171,7 +172,6 @@ class Trainer(object):
                     next_state = self.getState(current_screen, last_screen)
                 else:
                     next_state = None
-                import pdb; pdb.set_trace()
                 self.memory.push(state, action, next_state, reward)
 
                 state = next_state
