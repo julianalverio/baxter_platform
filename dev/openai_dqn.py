@@ -13,8 +13,13 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torchvision.transforms as T
 import yagmail
+import os
+
 
 NUM_EPISODES = 5
+os.environ['CUDA_VISIBLE_DEVICES']='2,3'
+
+
 
 class ReplayMemory(object):
 
