@@ -108,7 +108,6 @@ class Trainer(object):
             self.state[idx//2] += 0.1
         else:
             self.state[idx//2] -= 0.1
-        print(self.state)
         return idx
 
 
@@ -124,7 +123,6 @@ class Trainer(object):
         non_final_next_states = torch.cat([s for s in batch.next_state
                                                     if s is not None])
         state_batch = torch.cat(batch.state)
-        import pdb; pdb.set_trace()
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
 
@@ -162,7 +160,7 @@ class Trainer(object):
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
             for t in count():
-                action = torch.tensor(self.selectAction(state), device=self.device)
+                action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
                 _, reward, done, _ = self.env.step(self.state)
                 reward = torch.tensor([float(reward)], device=self.device)
 
