@@ -144,7 +144,7 @@ class Trainer(object):
         self.optimizer.step()
 
 
-    def (self, current_screen, last_screen):
+    def getState(self, current_screen, last_screen):
         difference = current_screen - last_screen
         import pdb; pdb.set_trace()
         return torch.cat([current_screen, difference], 0)
