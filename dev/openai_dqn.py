@@ -164,8 +164,7 @@ class Trainer(object):
             for t in count():
                 action = torch.tensor(self.selectAction(state), device=self.device)
                 _, reward, done, _ = self.env.step(self.state)
-                import pdb; pdb.set_trace()
-                reward = torch.tensor([reward], device=self.device)
+                reward = torch.tensor([float(reward)], device=self.device)
 
                 last_screen = current_screen
                 current_screen = self.getScreen()
