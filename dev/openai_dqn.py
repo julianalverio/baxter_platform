@@ -17,7 +17,7 @@ import os
 
 
 NUM_EPISODES = 5
-os.environ['CUDA_VISIBLE_DEVICES']='2,3'
+os.environ['CUDA_VISIBLE_DEVICES']='1,2,3'
 
 
 
@@ -194,6 +194,7 @@ class Trainer(object):
                 self.optimizeModel()
                 if done:
                     self.episode_durations.append(t + 1)
+                    print(self.steps_done)
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
