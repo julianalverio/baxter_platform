@@ -106,11 +106,10 @@ class Trainer(object):
                 idx = self.policy_net(state).max(1)[1]
         else:
             idx = random.randrange(0,8)
-        if idx < 4:
-            self.state[idx] += 0.1
+        if idx % 2 == 0:
+            self.state[idx//2] += 0.1
         else:
-            import pdb; pdb.set_trace()
-            self.state[idx] -= 0.1
+            self.state[idx//2] -= 0.1
         return idx
 
 

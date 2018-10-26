@@ -33,12 +33,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="957" />
+          <entry key="py" value="983" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="957" />
+          <entry key="Python" value="983" />
         </counts>
       </usages-collector>
     </session>
@@ -48,11 +48,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="329">
-              <caret line="167" column="43" selection-start-line="167" selection-start-column="43" selection-end-line="167" selection-end-column="43" />
+            <state relative-caret-position="419">
+              <caret line="111" selection-start-line="111" selection-end-line="111" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540580040664" expanded="true" signature="5064:5161" ph="..." />
+                <marker date="1540580207365" expanded="true" signature="5035:5132" ph="..." />
               </folding>
             </state>
           </provider>
@@ -79,6 +79,7 @@
       <find>[idx</find>
       <find>getstate</find>
       <find>reward =</find>
+      <find>idx</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -188,11 +189,11 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="167" column="43" selection-start-line="167" selection-start-column="43" selection-end-line="167" selection-end-column="43" />
+        <state relative-caret-position="419">
+          <caret line="111" selection-start-line="111" selection-end-line="111" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540580040664" expanded="true" signature="5064:5161" ph="..." />
+            <marker date="1540580207365" expanded="true" signature="5035:5132" ph="..." />
           </folding>
         </state>
       </provider>
