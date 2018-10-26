@@ -62,7 +62,6 @@ class DQN(nn.Module):
         return self.head(x.view(x.size(0), -1))
 
 
-p
 class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
         self.env = gym.make('FetchPush-v1').unwrapped
