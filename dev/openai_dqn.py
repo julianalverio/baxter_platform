@@ -145,12 +145,12 @@ class Trainer(object):
 
     def getState(self, current_screen, last_screen):
         difference = current_screen - last_screen
-        return torch.cat([current_screen, difference], axis=0)
+        return torch.cat([current_screen, difference], 0)
 
     def reset(self):
         self.env.reset()
-        self.env.step([0,0,0,0])
         self.state = [0,0,0,0]
+        self.env.step(self.state)
 
 
     def train(self):
@@ -160,8 +160,6 @@ class Trainer(object):
             self.reset
             last_screen = self.getScreen()
             current_screen = self.getScreen()
-            print("THE BUG DIDN'T CRASH")
-            import pdb; pdb.set_trace()
             state = self.getState(current_screen, last_screen)
             for t in count():
                 action = torch.tensor(self.selectAction(state), device=self.device)
