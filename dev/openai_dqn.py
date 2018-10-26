@@ -62,11 +62,12 @@ class DQN(nn.Module):
         return self.head(x.view(x.size(0), -1))
 
 
-
+p
 class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        import pdb; pdb.set_trace()
         self.policy_net = DQN(8, self.device).to(self.device)
         self.target_net = DQN(8, self.device).to(self.device)
 
