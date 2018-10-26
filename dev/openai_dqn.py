@@ -93,7 +93,7 @@ class Trainer(object):
 
     def getScreen(self):
         screen = self.env.render(mode='rgb_array').transpose((2, 0, 1))
-        screen = np.ascontiguousarray(screen, dtype=np.uint8)
+        screen = np.ascontiguousarray(screen, dtype=np.float32)
         return torch.from_numpy(screen).unsqueeze(0).to(self.device)
 
 
