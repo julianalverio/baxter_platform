@@ -146,8 +146,7 @@ class Trainer(object):
 
     def getState(self, current_screen, last_screen):
         difference = current_screen - last_screen
-        import pdb; pdb.set_trace()
-        return torch.cat([current_screen, difference], 0)
+        return torch.cat([current_screen, difference], 1)
 
     def reset(self):
         self.env.reset()
