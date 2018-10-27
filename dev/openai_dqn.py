@@ -14,6 +14,7 @@ import torch.nn.functional as F
 import torchvision.transforms as T
 import yagmail
 import os
+import gc
 
 
 NUM_EPISODES = 5
@@ -169,6 +170,7 @@ class Trainer(object):
             print('Episode %s' % i_episode)
             self.steps_done = 0
             self.reset
+            import pdb; pdb.set_trace()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
