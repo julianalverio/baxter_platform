@@ -177,6 +177,8 @@ class Trainer(object):
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
             for t in count():
+                if len(self.memory) == 1000:
+                    import pdb; pdb.set_trace()
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
                 _, reward, done, _ = self.env.step(self.state)
                 if self.out_of_bounds:
