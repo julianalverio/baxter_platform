@@ -53,14 +53,13 @@ class DQN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
-        self.head = nn.Linear(111392, num_actions)
+        self.head = nn.Linear(2240, num_actions)
         self.device = device
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        import pdb; pdb.set_trace()
         return self.head(x.view(x.size(0), -1))
 
 
@@ -181,7 +180,6 @@ class Trainer(object):
             self.reset()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
-            import pdb; pdb.set_trace()
             state = self.getState(current_screen, last_screen)
             for t in count():
                 # import pdb; pdb.set_trace()
@@ -197,7 +195,6 @@ class Trainer(object):
 
                 last_screen = current_screen
                 current_screen = self.getScreen()
-                import  pdb; pdb.set_trace()
                 if not done:
                     next_state = self.getState(current_screen, last_screen)
                 else:
