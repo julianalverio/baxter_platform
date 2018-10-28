@@ -195,6 +195,7 @@ class Trainer(object):
 
                 last_screen = current_screen
                 current_screen = self.getScreen()
+                import  pdb; pdb.set_trace()
                 if not done:
                     next_state = self.getState(current_screen, last_screen)
                 else:

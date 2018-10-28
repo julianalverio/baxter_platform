@@ -34,12 +34,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="2915" />
+          <entry key="py" value="2957" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="2915" />
+          <entry key="Python" value="2957" />
         </counts>
       </usages-collector>
     </session>
@@ -49,11 +49,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="843">
-              <caret line="246" selection-start-line="246" selection-end-line="246" />
+            <state relative-caret-position="476">
+              <caret line="197" column="44" selection-start-line="197" selection-start-column="44" selection-end-line="197" selection-end-column="44" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540767285620" expanded="true" signature="5436:5794" ph="..." />
+                <marker date="1540767352834" expanded="true" signature="5436:5794" ph="..." />
               </folding>
             </state>
           </provider>
@@ -202,11 +202,11 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="843">
-          <caret line="246" selection-start-line="246" selection-end-line="246" />
+        <state relative-caret-position="476">
+          <caret line="197" column="44" selection-start-line="197" selection-start-column="44" selection-end-line="197" selection-end-column="44" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540767285620" expanded="true" signature="5436:5794" ph="..." />
+            <marker date="1540767352834" expanded="true" signature="5436:5794" ph="..." />
           </folding>
         </state>
       </provider>
