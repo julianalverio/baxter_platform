@@ -243,5 +243,5 @@ try:
     trainer.train()
     completionEmail('%s done' % NUM_EPISODES)
 except Exception as e:
-    print(e)
     import pdb; pdb.set_trace()
+    print(e)
