@@ -95,12 +95,9 @@ class Trainer(object):
 
 
     def getScreen(self):
+        screen = Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425)).resize((105, 81), Image.NEAREST)
         import pdb; pdb.set_trace()
-        screen = Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425))
-        import pdb; pdb.set_trace()
-        screen = np.array(Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425))).astype(np.float32)
-        # screen = np.ascontiguousarray(screen.transpose((2, 0, 1)), dtype=np.float32)
-        return torch.from_numpy(screen).unsqueeze(0).to(self.device)
+        return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((0, 2, 1))).unsqueeze(0).to(self.device)
 
 
     def selectAction(self, state):
@@ -112,10 +109,10 @@ class Trainer(object):
             with torch.no_grad():
                 idx = self.policy_net(state).max(1)[1]
         else:
-            idx = random.randrange(0,8)
+            idx = random.randrange(0, 8)
         if idx % 2 == 0:
             if self.state[idx//2] > 0.9:
-                self.state[idx//2] = 1;
+                self.state[idx//2] = 1
                 self.out_of_bounds = True
             else:
                 self.state[idx//2] += 0.1
