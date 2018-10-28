@@ -180,7 +180,7 @@ class Trainer(object):
                 print(t)
                 print(torch.cuda.memory_allocated() / 1.049e+6, torch.cuda.max_memory_allocated() / 1.049e+6,
                       torch.cuda.memory_cached() / 1.049e+6, torch.cuda.max_memory_cached() / 1.049e+6)
-                print('next expected: ', torch.cuda.memory_allocated() + 6030.336/1.049e+6)
+                print('next expected: ', torch.cuda.memory_allocated()/1.049e+6 + 6030.336/1.049e+6)
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
                 _, reward, done, _ = self.env.step(self.state)
                 if self.out_of_bounds:
