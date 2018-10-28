@@ -178,6 +178,7 @@ class Trainer(object):
         for i_episode in range(self.num_episodes):
             print('Episode %s' % i_episode)
             self.steps_done = 0
+            self.getScreen()
             self.reset()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
