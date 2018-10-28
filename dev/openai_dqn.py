@@ -180,6 +180,7 @@ class Trainer(object):
             self.reset()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
+            import pdb; pdb.set_trace()
             state = self.getState(current_screen, last_screen)
             for t in count():
                 # import pdb; pdb.set_trace()
