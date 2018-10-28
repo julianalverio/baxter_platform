@@ -154,6 +154,8 @@ class Trainer(object):
             param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
 
+        del loss
+
 
     def getState(self, current_screen, last_screen):
         difference = current_screen - last_screen
