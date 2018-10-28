@@ -95,10 +95,11 @@ class Trainer(object):
 
 
     def getScreen(self):
-        screen1 = Image.fromarray(self.env.render(mode='rgb_array')).crop((0, 120, 500, 400))
         import pdb; pdb.set_trace()
-        screen = self.env.render(mode='rgb_array').transpose((2, 0, 1))
-        screen = np.ascontiguousarray(screen, dtype=np.float32)
+        screen = Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425))
+        import pdb; pdb.set_trace()
+        screen = np.array(Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425))).astype(np.float32)
+        # screen = np.ascontiguousarray(screen.transpose((2, 0, 1)), dtype=np.float32)
         return torch.from_numpy(screen).unsqueeze(0).to(self.device)
 
 
@@ -168,9 +169,9 @@ class Trainer(object):
         self.env.viewer.cam.lookat[0] = 1.
         self.env.viewer.cam.lookat[1] = 1.5
         self.env.viewer.cam.lookat[2] = 1.1
-        self.env.viewer.cam.azimuth = 180.
+        self.env.viewer.cam.azimuth = 165.
         self.env.viewer.cam.elevation = 10.
-        # self.env.viewer.cam.distance = 10.
+        self.env.viewer.cam.distance = 2.5
         self.state = [0,0,0,0]
         self.env.step(self.state)
 
