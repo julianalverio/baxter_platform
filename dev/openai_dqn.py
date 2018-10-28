@@ -95,7 +95,7 @@ class Trainer(object):
 
 
     def getScreen(self):
-        screen1 = self.env.render(mode='rgb_array').crop((0, 120, 500, 400))
+        screen1 = Image.fromarray(self.env.render(mode='rgb_array')).crop((0, 120, 500, 400))
         import pdb; pdb.set_trace()
         screen = self.env.render(mode='rgb_array').transpose((2, 0, 1))
         screen = np.ascontiguousarray(screen, dtype=np.float32)
