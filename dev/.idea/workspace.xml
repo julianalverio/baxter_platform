@@ -34,12 +34,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="2876" />
+          <entry key="py" value="2877" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="2876" />
+          <entry key="Python" value="2877" />
         </counts>
       </usages-collector>
     </session>
@@ -49,11 +49,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="95" column="76" selection-start-line="95" selection-start-column="76" selection-end-line="95" selection-end-column="76" />
+            <state relative-caret-position="723">
+              <caret line="239" column="44" lean-forward="true" selection-start-line="239" selection-start-column="44" selection-end-line="239" selection-end-column="44" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540766669212" expanded="true" signature="5436:5794" ph="..." />
+                <marker date="1540766886443" expanded="true" signature="5436:5794" ph="..." />
               </folding>
             </state>
           </provider>
@@ -89,10 +89,10 @@
       <find>self.memory =</find>
       <find>def train</find>
       <find>render</find>
-      <find>import pdb</find>
       <find>def getscreen</find>
       <find>def reset</find>
       <find>def getscre</find>
+      <find>import pdb</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -202,11 +202,11 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="95" column="76" selection-start-line="95" selection-start-column="76" selection-end-line="95" selection-end-column="76" />
+        <state relative-caret-position="723">
+          <caret line="239" column="44" lean-forward="true" selection-start-line="239" selection-start-column="44" selection-end-line="239" selection-end-column="44" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540766669212" expanded="true" signature="5436:5794" ph="..." />
+            <marker date="1540766886443" expanded="true" signature="5436:5794" ph="..." />
           </folding>
         </state>
       </provider>
