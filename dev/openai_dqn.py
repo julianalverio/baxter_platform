@@ -93,10 +93,9 @@ class Trainer(object):
         self.out_of_bounds = False
 
 
-
+    # Grab and image, crop it, downsample and resize, then convert to tensor
     def getScreen(self):
         screen = Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425)).resize((105, 81), Image.NEAREST)
-        import pdb; pdb.set_trace()
         return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((0, 2, 1))).unsqueeze(0).to(self.device)
 
 
