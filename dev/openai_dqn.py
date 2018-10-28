@@ -170,7 +170,7 @@ class Trainer(object):
         self.env.viewer.cam.lookat[2] = 1.1
         self.env.viewer.cam.azimuth = 180.
         self.env.viewer.cam.elevation = 10.
-        self.env.viewer.cam.distance = 10.
+        # self.env.viewer.cam.distance = 10.
         self.state = [0,0,0,0]
         self.env.step(self.state)
 

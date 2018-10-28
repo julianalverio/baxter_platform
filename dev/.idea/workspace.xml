@@ -49,11 +49,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="434">
-              <caret line="172" column="42" selection-start-line="172" selection-start-column="42" selection-end-line="172" selection-end-column="42" />
+            <state relative-caret-position="449">
+              <caret line="173" column="30" lean-forward="true" selection-start-line="173" selection-start-column="30" selection-end-line="173" selection-end-column="30" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540763300785" expanded="true" signature="5450:5808" ph="..." />
+                <marker date="1540763712003" expanded="true" signature="5450:5810" ph="..." />
               </folding>
             </state>
           </provider>
@@ -202,11 +202,11 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="434">
-          <caret line="172" column="42" selection-start-line="172" selection-start-column="42" selection-end-line="172" selection-end-column="42" />
+        <state relative-caret-position="449">
+          <caret line="173" column="30" lean-forward="true" selection-start-line="173" selection-start-column="30" selection-end-line="173" selection-end-column="30" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540763300785" expanded="true" signature="5450:5808" ph="..." />
+            <marker date="1540763712003" expanded="true" signature="5450:5810" ph="..." />
           </folding>
         </state>
       </provider>
