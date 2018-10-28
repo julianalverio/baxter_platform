@@ -14,8 +14,10 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torchvision.transforms as T
 import yagmail
+import os
 
 NUM_EPISODES = 5000
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 class ReplayMemory(object):
 
@@ -189,7 +191,10 @@ class Trainer(object):
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
-        torch.save(self.target_net, 'target_net_%s.pth' % self.num_episodes)
+	try:
+        	torch.save(self.target_net.state_dict(), 'target_net_%s.pth' % self.num_episodes)
+	except:
+		import pdb; pdb.set_trace()
         # self.plotDurations()
 
     def showPacman(self, target_net_path):

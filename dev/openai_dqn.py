@@ -170,6 +170,7 @@ class Trainer(object):
             print('Episode %s' % i_episode)
             self.steps_done = 0
             self.reset
+            print(torch.cuda.memory_allocated()/1.049e+6, torch.cuda.max_memory_allocated()/1.049e+6, torch.cuda.memory_cached()/1.049e+6, torch.cuda.max_memory_cached()/1.049e+6)
             last_screen = self.getScreen()
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
@@ -230,6 +231,7 @@ print("Trainer Initialized")
 try:
     trainer.train()
     completionEmail('%s done' % NUM_EPISODES)
-except:
-    print(torch.cuda.memory_allocated())
+except Exception as e:
+    print(e)
+    import pdb; pdb.set_trace()
 # trainer.showPacman('target_net_500.pth')
