@@ -95,6 +95,8 @@ class Trainer(object):
 
 
     def getScreen(self):
+        screen1 = self.env.render(mode='rgb_array')
+        import pdb; pdb.set_trace()
         screen = self.env.render(mode='rgb_array').transpose((2, 0, 1))
         screen = np.ascontiguousarray(screen, dtype=np.float32)
         return torch.from_numpy(screen).unsqueeze(0).to(self.device)
@@ -178,8 +180,7 @@ class Trainer(object):
             for t in count():
                 import pdb; pdb.set_trace()
                 print(t)
-                print(torch.cuda.memory_allocated() / 1.049e+6, torch.cuda.max_memory_allocated() / 1.049e+6,
-                      torch.cuda.memory_cached() / 1.049e+6, torch.cuda.max_memory_cached() / 1.049e+6)
+                print(torch.cuda.memory_allocated() / 1.049e+6, torch.cuda.max_memory_allocated() / 1.049e+6, torch.cuda.memory_cached() / 1.049e+6, torch.cuda.max_memory_cached() / 1.049e+6)
                 print('next expected: ', torch.cuda.memory_allocated()/1.049e+6 + 6030.336/1.049e+6)
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
                 _, reward, done, _ = self.env.step(self.state)
