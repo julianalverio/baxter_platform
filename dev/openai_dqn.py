@@ -165,6 +165,11 @@ class Trainer(object):
 
     def reset(self):
         self.env.reset()
+        self.env.viewer.cam.lookat[0] = 1.
+        self.env.viewer.cam.lookat[1] = 1.5
+        self.env.viewer.cam.lookat[2] = 1.1
+        self.env.viewer.cam.azimuth = 180.
+        self.env.viewer.cam.elevation = 10.
         self.state = [0,0,0,0]
         self.env.step(self.state)
 
