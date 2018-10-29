@@ -189,14 +189,15 @@ class Trainer(object):
 
 
             # print('STARTING NAO')
-            first = self.env.step([0,0,0,0])
-
+            self.env.step([0,0,0,0])
+            first = self.env.sim.get_state()[1]
             for count in range(5):
                 self.getScreen()
                 time.sleep(0.2)
                 result = self.env.step([1,1,1,1])
             self.getScreen()
-            print(first[0]['observation'] - result[0]['observation'])
+            second = self.env.sim.get_state()[1]
+            print(first[0]['observation'] - second[0]['observation'])
             import pdb; pdb.set_trace()
 
 
