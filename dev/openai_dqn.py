@@ -17,7 +17,7 @@ import os
 import gc
 
 
-NUM_EPISODES = 5
+NUM_EPISODES = 10000
 os.environ['CUDA_VISIBLE_DEVICES']='1,2,3'
 
 
@@ -182,7 +182,7 @@ class Trainer(object):
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
             for t in count():
-                # import pdb; pdb.set_trace()
+                import pdb; pdb.set_trace()
                 # print(t)
                 # print(torch.cuda.memory_allocated() / 1.049e+6, torch.cuda.max_memory_allocated() / 1.049e+6, torch.cuda.memory_cached() / 1.049e+6, torch.cuda.max_memory_cached() / 1.049e+6)
                 # print('next expected: ', torch.cuda.memory_allocated()/1.049e+6 + 6030.336/1.049e+6)
@@ -195,6 +195,8 @@ class Trainer(object):
 
                 last_screen = current_screen
                 current_screen = self.getScreen()
+                if t == 1000:
+                    done = True
                 if not done:
                     next_state = self.getState(current_screen, last_screen)
                 else:
