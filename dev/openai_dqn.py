@@ -188,11 +188,11 @@ class Trainer(object):
 
             print('INCREMENTING')
             for _ in range(5):
-                result = self.env.step([1, 0, 0, 0])
+                result = self.env.step([0, 0, 1, 0])
                 print(result)
             print('DECREMENTING')
             for _ in range(5):
-                result = self.env.step([-1, 0, 0, 0])
+                result = self.env.step([0, 0, 1, 0])
                 print(result)
 
 
