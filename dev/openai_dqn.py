@@ -92,6 +92,8 @@ class Trainer(object):
         self.state = [0,0,0,0]
         self.out_of_bounds = False
 
+        self.goal = np.array([0.5, 0.1, -0.2, 0.])
+
 
     # Grab and image, crop it, downsample and resize, then convert to tensor
     def getScreen(self):
@@ -213,6 +215,52 @@ class Trainer(object):
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
         torch.save(self.target_net, 'openai_target_net_%s.pth' % self.num_episodes)
+
+    def trainForPosition(self):
+        for i_episode in range(self.num_episodes):
+            print('Episode %s' % i_episode)
+            self.steps_done = 0
+            self.getScreen()
+            self.reset()
+            last_screen = self.getScreen()
+            current_screen = self.getScreen()
+            state = self.getState(current_screen, last_screen)
+            self.env.step(self.goal)
+            import pdb; pdb.set_trace()
+            for t in count():
+                # import pdb; pdb.set_trace()
+                # print(t)
+                # print(torch.cuda.memory_allocated() / 1.049e+6, torch.cuda.max_memory_allocated() / 1.049e+6, torch.cuda.memory_cached() / 1.049e+6, torch.cuda.max_memory_cached() / 1.049e+6)
+                # print('next expected: ', torch.cuda.memory_allocated()/1.049e+6 + 6030.336/1.049e+6)
+                action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
+                _, _, done, _ = self.env.step(self.state)
+                reward = np.linalg.norm(np.array(self.state), self.goal)
+                if self.out_of_bounds:
+                    reward -= 1.
+                    self.out_of_bounds = False
+                reward = torch.tensor([float(reward)], device=self.device)
+
+                last_screen = current_screen
+                current_screen = self.getScreen()
+                if t == 1000:
+                    done = True
+                if not done:
+                    next_state = self.getState(current_screen, last_screen)
+                else:
+                    next_state = None
+                self.memory.push(state, action, next_state, reward)
+
+                state = next_state
+
+                self.optimizeModel()
+                if done:
+                    self.episode_durations.append(t + 1)
+                    print(self.steps_done)
+                    break
+            if i_episode % self.TARGET_UPDATE == 0:
+                self.target_net.load_state_dict(self.policy_net.state_dict())
+        torch.save(self.target_net, 'openai_target_net_%s.pth' % self.num_episodes)
+
 
     def showResults(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
