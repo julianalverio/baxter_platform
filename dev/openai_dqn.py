@@ -193,10 +193,12 @@ class Trainer(object):
 
             for count in range(5):
                 self.getScreen()
+                time.sleep(0.2)
                 result = self.env.step([1,1,1,1])
             self.getScreen()
-            import pdb; pdb.set_trace()
             print(first[0]['observation'] - result[0]['observation'])
+            import pdb; pdb.set_trace()
+
 
 
 
