@@ -187,34 +187,12 @@ class Trainer(object):
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
 
-            self.env.block_gripper = False
-            print('INCREMENTING')
-            # previous = self.env.step([0,0,0,0])
-            for count in range(5):
-                result = self.env.step([0, 0, 1, 0])
-                self.getScreen()
-                time.sleep(0.1)
 
-                print('Iteration: %s; Desired goal: %s; Achieved goal: %s' % (count, result[0]['desired_goal'], result[0]['achieved_goal']))
-
-
-            for count in range(5):
-                self.env.step([0,0,0,1])
-                self.getScreen()
-                time.sleep(0.1)
-
-            for count in range(5):
-                self.env.step([0,0,0,-1])
-                self.getScreen()
-                time.sleep(0.1)
-
-
-            print('DECREMENTING')
-            for count in range(5):
-                result = self.env.step([0, 0, -1, 0])
-                time.sleep(0.1)
-                self.getScreen()
-                print('Iteration: %s; Desired goal: %s; Achieved goal: %s' % (count, result[0]['desired_goal'], result[0]['achieved_goal']))
+            # print('STARTING NAO')
+            first = self.env.step([0,0,0,0])
+            self.getScreen()
+            second = self.env.step([1,1,1])
+            print(first[0]['observation'] - second[0]['observation'])
 
 
 
