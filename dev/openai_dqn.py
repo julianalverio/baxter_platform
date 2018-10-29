@@ -16,6 +16,7 @@ import yagmail
 import os
 import gc
 import datetime
+import time
 
 
 NUM_EPISODES = 10000
@@ -190,10 +191,13 @@ class Trainer(object):
             for count in range(5):
                 result = self.env.step([0, 0, 1, 0])
                 self.getScreen()
+                time.sleep(0.1)
                 print('Iteration: %s; Desired goal: %s; Achieved goal: %s' % (count, result[0]['desired_goal'], result[0]['achieved_goal']))
+
             print('DECREMENTING')
             for count in range(5):
                 result = self.env.step([0, 0, -1, 0])
+                time.sleep(0.1)
                 self.getScreen()
                 print('Iteration: %s; Desired goal: %s; Achieved goal: %s' % (count, result[0]['desired_goal'], result[0]['achieved_goal']))
 
