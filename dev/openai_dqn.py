@@ -187,6 +187,7 @@ class Trainer(object):
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
 
+            self.env.block_gripper = False
             print('INCREMENTING')
             # previous = self.env.step([0,0,0,0])
             for count in range(5):
