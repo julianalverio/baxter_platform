@@ -1,3 +1,10 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import yagmail
+import os
+
 import gym
 import math
 import random
@@ -8,13 +15,7 @@ from collections import namedtuple
 from itertools import count
 from PIL import Image
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-import torchvision.transforms as T
-import yagmail
-import os
+
 
 NUM_EPISODES = 5000
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
