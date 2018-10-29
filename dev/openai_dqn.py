@@ -186,11 +186,11 @@ class Trainer(object):
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
 
-            print 'INCREMENTING'
+            print('INCREMENTING')
             for _ in range(5):
                 result = self.env.step([1, 0, 0, 0])
                 print(result)
-            print 'DECREMENTING'
+            print('DECREMENTING')
             for _ in range(5):
                 result = self.env.step([-1, 0, 0, 0])
                 print(result)
