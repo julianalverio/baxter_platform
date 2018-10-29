@@ -187,12 +187,14 @@ class Trainer(object):
             state = self.getState(current_screen, last_screen)
 
             print('INCREMENTING')
-            for _ in range(5):
+            for _ in range(20):
                 result = self.env.step([0, 0, 1, 0])
+                self.getScreen()
                 print(result)
             print('DECREMENTING')
-            for _ in range(5):
+            for _ in range(20):
                 result = self.env.step([0, 0, 1, 0])
+                self.getScreen()
                 print(result)
 
 
