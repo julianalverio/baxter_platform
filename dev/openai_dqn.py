@@ -278,7 +278,8 @@ class Trainer(object):
             state = self.getState(current_screen, last_screen)
             for t in count():
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
-                _, reward, done, _ = self.env.step(self.state)
+                _, reward, done, metadata = self.env.step(self.state)
+                print(metadata[3]['is_success'])
                 if self.out_of_bounds:
                     reward -= 1.
                     self.out_of_bounds = False
@@ -324,6 +325,19 @@ class Trainer(object):
         print("Steps Done: ", steps_done)
 
 
+def find(input_attr, goal):
+    queue = [dir(input_attr)]
+    while queue:
+        current = queue.pop()
+        children = dir(current)
+        for child in children:
+            if goal in child:
+                print(child)
+            return
+            children.extend(current + '.' + child)
+
+
+
 
 def completionEmail(message=''):
   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
@@ -334,7 +348,6 @@ def completionEmail(message=''):
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 try:
-    import pdb; pdb.set_trace()
     trainer.train()
     completionEmail('%s done' % NUM_EPISODES)
 except Exception as e:
