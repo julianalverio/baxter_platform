@@ -257,7 +257,7 @@ class Trainer(object):
 
 def find(input_attr, goal):
     import pdb; pdb.set_trace()
-    queue = [dir(input_attr)]
+    queue = [x for x in dir(input_attr) if '_' != x[0]]
     while queue:
         current = queue.pop()
         children = dir(current)
