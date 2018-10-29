@@ -290,7 +290,7 @@ def completionEmail(message=''):
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 try:
-    trainer.train()
+    trainer.trainForPosition()
     completionEmail('%s done' % NUM_EPISODES)
 except Exception as e:
     import pdb; pdb.set_trace()
