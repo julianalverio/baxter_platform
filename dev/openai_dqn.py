@@ -190,6 +190,7 @@ class Trainer(object):
 
             # print('STARTING NAO')
             self.env.step([0,0,0,0])
+            import pdb; pdb.set_trace()
             first = self.env.sim.get_state()[1]
             for count in range(5):
                 self.getScreen()
