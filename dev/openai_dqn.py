@@ -198,9 +198,6 @@ class Trainer(object):
                 result = self.env.step([1,1,1,1])
             self.getScreen()
             second = self.env.sim.get_state()[1]
-            print(first[0]['observation'] - second[0]['observation'])
-            import pdb; pdb.set_trace()
-
 
 
 
