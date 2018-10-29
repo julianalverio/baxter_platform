@@ -193,9 +193,12 @@ class Trainer(object):
             for count in range(5):
                 self.getScreen()
                 time.sleep(0.2)
-                result = self.env.step([1,1,1,1])
+                self.env.step([1,1,1,1])
             self.getScreen()
             second = self.env.sim.get_state()[1]
+
+            import pdb; pdb.set_trace()
+            find(self.env, 'object0')
 
 
 
