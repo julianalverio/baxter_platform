@@ -187,15 +187,15 @@ class Trainer(object):
             state = self.getState(current_screen, last_screen)
 
             print('INCREMENTING')
-            for _ in range(20):
+            for count in range(5):
                 result = self.env.step([0, 0, 1, 0])
                 self.getScreen()
-                print(result)
+                print('Iteration: %s; Desired goal: %s; Achieved goal: %s' % (count, result[0]['desired_goal'], result[0]['achieved_goal']))
             print('DECREMENTING')
-            for _ in range(20):
-                result = self.env.step([0, 0, 1, 0])
+            for count in range(5):
+                result = self.env.step([0, 0, -1, 0])
                 self.getScreen()
-                print(result)
+                print('Iteration: %s; Desired goal: %s; Achieved goal: %s' % (count, result[0]['desired_goal'], result[0]['achieved_goal']))
 
 
 
