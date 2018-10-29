@@ -191,7 +191,7 @@ class Trainer(object):
             # print('STARTING NAO')
             first = self.env.step([0,0,0,0])
             self.getScreen()
-            second = self.env.step([1,1,1])
+            second = self.env.step([1,1,1,1])
             import pdb; pdb.set_trace()
             print(first[0]['observation'] - second[0]['observation'])
 
