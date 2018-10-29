@@ -182,7 +182,7 @@ class Trainer(object):
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
             for t in count():
-                import pdb; pdb.set_trace()
+                # import pdb; pdb.set_trace()
                 # print(t)
                 # print(torch.cuda.memory_allocated() / 1.049e+6, torch.cuda.max_memory_allocated() / 1.049e+6, torch.cuda.memory_cached() / 1.049e+6, torch.cuda.max_memory_cached() / 1.049e+6)
                 # print('next expected: ', torch.cuda.memory_allocated()/1.049e+6 + 6030.336/1.049e+6)

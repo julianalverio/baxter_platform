@@ -93,7 +93,7 @@ class Trainer(object):
         self.view = view
 
     def rgb2gray(self, rgb):
-        img = Image.fromarray(rgb.transpose((1,2,0))).convert(mode='L')
+        img = Image.fromarray(rgb.transpose((1, 2, 0))).convert(mode='L')
         return np.array(img, dtype=np.float64)
 
 
