@@ -71,6 +71,8 @@ class DQN(nn.Module):
 class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
         import pdb; pdb.set_trace()
+        #block griper
+
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         setupState = self.getState(self.getScreen(), self.getScreen()).to(torch.device("cpu"))
@@ -158,7 +160,10 @@ class Trainer(object):
         self.env.viewer.cam.azimuth = 165.
         self.env.viewer.cam.elevation = 10.
         self.env.viewer.cam.distance = 2.5
+        self.env.sim.nsubsteps = 5
+        self.env.block_gripper = False
         self.getScreen()
+
 
 
     '''
@@ -187,6 +192,10 @@ class Trainer(object):
             self.reset()
             current_screen = self.getScreen()
             for t in count():
+                assert self.env.viewer.cam.lookat[0] == 1. and self.env.viewer.cam.lookat[1] == 1.5 and \
+                       self.env.viewer.cam.lookat[2] == 1.1
+                assert self.env.viewer.cam.azimuth == 165. and self.env.viewer.cam.elevation == 10. and self.env.viewer.cam.distance == 2.5
+                assert self.env.sim.nsubsteps == 5 and not self.env.block_gripper
                 last_screen = current_screen
                 current_screen = self.getScreen()
                 state = self.getState(current_screen, last_screen)
