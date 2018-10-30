@@ -2,7 +2,6 @@ import sys
 import os
 sys.path.insert(0, os.getcwd() + '/gym')
 
-import pdb; pdb.set_trace()
 import gym
 import math
 import random
@@ -15,12 +14,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-import torchvision.transforms as T
 import yagmail
 import os
-import gc
 import datetime
-import time
 
 
 NUM_EPISODES = 10000
@@ -196,7 +192,7 @@ class Trainer(object):
 
                 action = torch.tensor(self.selectAction(state, t), device=self.device).view(1, 1)
                 movement = np.zeros((1, 4))
-                if action % 2 == 0:
+                if action.item() % 2 == 0:
                     movement[action // 2] += 1
                 else:
                     movement[action // 2] -= 1
