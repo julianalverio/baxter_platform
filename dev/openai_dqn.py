@@ -194,9 +194,9 @@ class Trainer(object):
                 movement = np.zeros((1, 4))
                 import pdb; pdb.set_trace()
                 if action.item() % 2 == 0:
-                    movement[action // 2] += 1
+                    movement[action.item() // 2] += 1
                 else:
-                    movement[action // 2] -= 1
+                    movement[action.item() // 2] -= 1
                 self.env.step(movement)
                 reward = self.getReward(task=1)
 

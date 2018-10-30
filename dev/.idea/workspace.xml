@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/openai_dqn.py" beforeDir="false" afterPath="$PROJECT_DIR$/openai_dqn.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -34,12 +35,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="7371" />
+          <entry key="py" value="7386" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="7371" />
+          <entry key="Python" value="7386" />
         </counts>
       </usages-collector>
     </session>
@@ -49,13 +50,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="359">
-              <caret line="194" column="43" selection-start-line="194" selection-start-column="43" selection-end-line="194" selection-end-column="43" />
+            <state relative-caret-position="419">
+              <caret line="198" column="42" selection-start-line="198" selection-start-column="42" selection-end-line="198" selection-end-column="42" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540915205751" expanded="true" signature="5175:6087" ph="..." />
-                <marker date="1540915205751" expanded="true" signature="5914:6087" ph="..." />
-                <marker date="1540915205751" expanded="true" signature="8499:8501" ph="..." />
+                <marker date="1540915272133" expanded="true" signature="5175:6087" ph="..." />
+                <marker date="1540915272133" expanded="true" signature="5914:6087" ph="..." />
+                <marker date="1540915272133" expanded="true" signature="8513:8515" ph="..." />
               </folding>
             </state>
           </provider>
@@ -215,13 +216,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="359">
-          <caret line="194" column="43" selection-start-line="194" selection-start-column="43" selection-end-line="194" selection-end-column="43" />
+        <state relative-caret-position="419">
+          <caret line="198" column="42" selection-start-line="198" selection-start-column="42" selection-end-line="198" selection-end-column="42" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540915205751" expanded="true" signature="5175:6087" ph="..." />
-            <marker date="1540915205751" expanded="true" signature="5914:6087" ph="..." />
-            <marker date="1540915205751" expanded="true" signature="8499:8501" ph="..." />
+            <marker date="1540915272133" expanded="true" signature="5175:6087" ph="..." />
+            <marker date="1540915272133" expanded="true" signature="5914:6087" ph="..." />
+            <marker date="1540915272133" expanded="true" signature="8513:8515" ph="..." />
           </folding>
         </state>
       </provider>
