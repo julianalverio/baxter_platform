@@ -47,7 +47,7 @@ class ReplayMemory(object):
 
 class DQN(nn.Module):
 
-    def __init__(self, num_actions, device):
+    def __init__(self, num_actions, device, setupFrame):
         super(DQN, self).__init__()
         self.conv1 = nn.Conv2d(6, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
@@ -55,6 +55,11 @@ class DQN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
+        setupFrame = F.relu(self.bn1(self.conv1(setupFrame)))
+        setupFrame = F.relu(self.bn2(self.conv2(setupFrame)))
+        setupFrame = F.relu(self.bn3(self.conv3(setupFrame)))
+        import pdb; pdb.set_trace()
+        print(setupFrame.size(0))
         self.head = nn.Linear(2240, num_actions)
         self.device = device
 
@@ -69,8 +74,9 @@ class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.policy_net = DQN(8, self.device).to(self.device)
-        self.target_net = DQN(8, self.device).to(self.device)
+        setupFrame = self.getScreen()
+        self.policy_net = DQN(8, self.device, setupFrame).to(self.device)
+        self.target_net = DQN(8, self.device, setupFrame).to(self.device)
 
         self.transition = namedtuple('Transition',
                                 ('state', 'action', 'next_state', 'reward'))
