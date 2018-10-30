@@ -70,6 +70,7 @@ class DQN(nn.Module):
 
 class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
+        import pdb; pdb.set_trace()
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         setupState = self.getState(self.getScreen(), self.getScreen()).to(torch.device("cpu"))
@@ -168,7 +169,6 @@ class Trainer(object):
     Task 5: Pick up block and move to location
     '''
     def getReward(self, task=1):
-        import pdb; pdb.set_trace()
         gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
         object_position = self.env.sim.data.get_site_xpos('object0')
         reward = 0
@@ -222,7 +222,6 @@ class Trainer(object):
 
     def showResults(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
-        import pdb; pdb.set_trace()
         self.env = gym.make('FetchPush-v1').unwrapped #TODO
         self.env.reset()
         steps_done = 0

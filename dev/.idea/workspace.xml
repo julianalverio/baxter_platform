@@ -34,12 +34,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="7456" />
+          <entry key="py" value="7497" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="7456" />
+          <entry key="Python" value="7497" />
         </counts>
       </usages-collector>
     </session>
@@ -50,12 +50,12 @@
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="329">
-              <caret line="175" column="56" selection-start-line="175" selection-start-column="56" selection-end-line="175" selection-end-column="56" />
+              <caret line="72" column="35" selection-start-line="72" selection-start-column="35" selection-end-line="72" selection-end-column="35" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540916191378" expanded="true" signature="5175:6124" ph="..." />
-                <marker date="1540916191378" expanded="true" signature="5950:6124" ph="..." />
-                <marker date="1540916191378" expanded="true" signature="8543:8545" ph="..." />
+                <marker date="1540916242599" expanded="true" signature="5211:6124" ph="..." />
+                <marker date="1540916242599" expanded="true" signature="5950:6124" ph="..." />
+                <marker date="1540916242599" expanded="true" signature="8507:8509" ph="..." />
               </folding>
             </state>
           </provider>
@@ -65,8 +65,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>class trainer</find>
-      <find>def reset</find>
       <find>reward</find>
       <find>def rew</find>
       <find>self.steps+</find>
@@ -95,6 +93,8 @@
       <find>unwrap</find>
       <find>todo</find>
       <find>linalg</find>
+      <find>getreward</find>
+      <find>self.env =</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -216,12 +216,12 @@
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="329">
-          <caret line="175" column="56" selection-start-line="175" selection-start-column="56" selection-end-line="175" selection-end-column="56" />
+          <caret line="72" column="35" selection-start-line="72" selection-start-column="35" selection-end-line="72" selection-end-column="35" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540916191378" expanded="true" signature="5175:6124" ph="..." />
-            <marker date="1540916191378" expanded="true" signature="5950:6124" ph="..." />
-            <marker date="1540916191378" expanded="true" signature="8543:8545" ph="..." />
+            <marker date="1540916242599" expanded="true" signature="5211:6124" ph="..." />
+            <marker date="1540916242599" expanded="true" signature="5950:6124" ph="..." />
+            <marker date="1540916242599" expanded="true" signature="8507:8509" ph="..." />
           </folding>
         </state>
       </provider>
