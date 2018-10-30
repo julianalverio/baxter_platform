@@ -168,6 +168,7 @@ class Trainer(object):
     Task 5: Pick up block and move to location
     '''
     def getReward(self, task=1):
+        import pdb; pdb.set_Trace()
         gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
         object_position = self.env.sim.data.get_site_xpos('object0')
         reward = 0
