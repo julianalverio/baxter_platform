@@ -222,7 +222,8 @@ class Trainer(object):
 
     def showResults(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
-        self.env = gym.make('FetchPush-v1').unwrapped
+        import pdb; pdb.set_trace()
+        self.env = gym.make('FetchPush-v1').unwrapped #TODO
         self.env.reset()
         steps_done = 0
         current_screen = self.getScreen()
