@@ -192,6 +192,7 @@ class Trainer(object):
 
                 action = torch.tensor(self.selectAction(state, t), device=self.device).view(1, 1)
                 movement = np.zeros((1, 4))
+                import pdb; pdb.set_trace()
                 if action.item() % 2 == 0:
                     movement[action // 2] += 1
                 else:
