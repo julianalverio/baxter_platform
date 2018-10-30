@@ -34,12 +34,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="8176" />
+          <entry key="py" value="8181" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="8176" />
+          <entry key="Python" value="8181" />
         </counts>
       </usages-collector>
     </session>
@@ -49,13 +49,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="329">
-              <caret line="133" lean-forward="true" selection-start-line="133" selection-end-line="133" />
+            <state relative-caret-position="374">
+              <caret line="136" column="23" lean-forward="true" selection-start-line="136" selection-start-column="23" selection-end-line="136" selection-end-column="23" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540919186763" expanded="true" signature="5310:6297" ph="..." />
-                <marker date="1540919186763" expanded="true" signature="6123:6297" ph="..." />
-                <marker date="1540919186763" expanded="true" signature="8710:8712" ph="..." />
+                <marker date="1540919225985" expanded="true" signature="5207:6194" ph="..." />
+                <marker date="1540919225985" expanded="true" signature="6020:6194" ph="..." />
+                <marker date="1540919225985" expanded="true" signature="8607:8609" ph="..." />
               </folding>
             </state>
           </provider>
@@ -215,13 +215,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="133" lean-forward="true" selection-start-line="133" selection-end-line="133" />
+        <state relative-caret-position="374">
+          <caret line="136" column="23" lean-forward="true" selection-start-line="136" selection-start-column="23" selection-end-line="136" selection-end-column="23" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540919186763" expanded="true" signature="5310:6297" ph="..." />
-            <marker date="1540919186763" expanded="true" signature="6123:6297" ph="..." />
-            <marker date="1540919186763" expanded="true" signature="8710:8712" ph="..." />
+            <marker date="1540919225985" expanded="true" signature="5207:6194" ph="..." />
+            <marker date="1540919225985" expanded="true" signature="6020:6194" ph="..." />
+            <marker date="1540919225985" expanded="true" signature="8607:8609" ph="..." />
           </folding>
         </state>
       </provider>

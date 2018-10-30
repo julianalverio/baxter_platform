@@ -132,11 +132,7 @@ class Trainer(object):
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].view(-1).detach()
         expected_state_action_values = (next_state_values.view(-1, 1) * self.GAMMA) + reward_batch
 
-        try:
-            loss = F.smooth_l1_loss(state_action_values.unsqueeze(0), expected_state_action_values.unsqueeze(0))
-            print("all good")
-        except:
-            import pdb; pdb.set_trace()
+        loss = F.smooth_l1_loss(state_action_values.unsqueeze(0), expected_state_action_values.unsqueeze(0))
         self.optimizer.zero_grad()
         loss.backward()
         for param in self.policy_net.parameters():
