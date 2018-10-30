@@ -1,8 +1,11 @@
+import sys
+import os
+sys.path.insert(0, os.getcwd())
+
 import gym
 import math
 import random
 import numpy as np
-import matplotlib.pyplot as plt
 from collections import namedtuple
 from itertools import count
 from PIL import Image
@@ -47,7 +50,7 @@ class ReplayMemory(object):
 
 class DQN(nn.Module):
 
-    def __init__(self, num_actions, device, setupFrame):
+    def __init__(self, num_actions, device, setupState):
         super(DQN, self).__init__()
         self.conv1 = nn.Conv2d(6, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
@@ -55,12 +58,10 @@ class DQN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
-        setupFrame = F.relu(self.bn1(self.conv1(setupFrame)))
-        setupFrame = F.relu(self.bn2(self.conv2(setupFrame)))
-        setupFrame = F.relu(self.bn3(self.conv3(setupFrame)))
-        import pdb; pdb.set_trace()
-        print(setupFrame.size(0))
-        self.head = nn.Linear(2240, num_actions)
+        setupState = F.relu(self.bn1(self.conv1(setupState)))
+        setupState = F.relu(self.bn2(self.conv2(setupState)))
+        setupState = F.relu(self.bn3(self.conv3(setupState)))
+        self.head = nn.Linear(np.prod(setupState.size()), num_actions)
         self.device = device
 
     def forward(self, x):
@@ -74,12 +75,11 @@ class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        setupFrame = self.getState(self.getScreen(), self.getScreen()).to(torch.device("cpu"))
-        self.policy_net = DQN(8, self.device, setupFrame).to(self.device)
-        self.target_net = DQN(8, self.device, setupFrame).to(self.device)
+        setupState = self.getState(self.getScreen(), self.getScreen()).to(torch.device("cpu"))
+        self.policy_net = DQN(6, self.device, setupState).to(self.device)
+        self.target_net = DQN(6, self.device, setupState).to(self.device)
 
-        self.transition = namedtuple('Transition',
-                                ('state', 'action', 'next_state', 'reward'))
+        self.transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
         self.BATCH_SIZE = 128
         self.GAMMA = 0.999
@@ -93,14 +93,8 @@ class Trainer(object):
 
         self.optimizer = optim.Adam(self.policy_net.parameters())
         self.memory = ReplayMemory(1000, self.transition)
-        self.episode_durations = []
 
         self.num_episodes = num_episodes
-        self.steps_done = 0
-        self.state = [0,0,0,0]
-        self.out_of_bounds = False
-
-        self.goal = np.array([0.5, 0.1, -0.2, 0.])
 
 
     # Grab and image, crop it, downsample and resize, then convert to tensor
@@ -109,29 +103,16 @@ class Trainer(object):
         return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((2, 1, 0))).unsqueeze(0).to(self.device)
 
 
-    def selectAction(self, state):
+    def selectAction(self, state, steps_done):
         sample = random.random()
         eps_threshold = self.EPS_END + (self.EPS_START - self.EPS_END) * \
-            math.exp(-1. * self.steps_done / self.EPS_DECAY)
-        self.steps_done += 1
+            math.exp(-1. * steps_done / self.EPS_DECAY)
         if sample > eps_threshold:
             with torch.no_grad():
-                idx = self.policy_net(state).max(1)[1]
+                return self.policy_net(state).max(1)[1]
         else:
-            idx = random.randrange(0, 8)
-        if idx % 2 == 0:
-            if self.state[idx//2] > 0.9:
-                self.state[idx//2] = 1
-                self.out_of_bounds = True
-            else:
-                self.state[idx//2] += 0.1
-        else:
-            if self.state[idx//2] < -0.9:
-                self.state[idx//2] = -1.
-                self.out_of_bounds = True
-            else:
-                self.state[idx//2] -= 0.1
-        return idx
+            return random.randrange(0, 6)
+
 
 
 
@@ -170,6 +151,7 @@ class Trainer(object):
         difference = current_screen - last_screen
         return torch.cat([current_screen, difference], 1)
 
+
     def reset(self):
         self.env.reset()
         self.env.viewer.cam.lookat[0] = 1.
@@ -178,63 +160,60 @@ class Trainer(object):
         self.env.viewer.cam.azimuth = 165.
         self.env.viewer.cam.elevation = 10.
         self.env.viewer.cam.distance = 2.5
-        self.state = [0,0,0,0]
-        self.env.step(self.state)
+        self.getScreen()
+
+
+    '''
+    Task 1: Touch the block
+    Task 2: Move the block in the positive y direction
+    Task 3: Move the block in positive y until it falls
+    Task 4: Pick up the block
+    Task 5: Pick up block and move to location
+    '''
+    def getReward(self, task=1):
+        gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
+        object_position = self.env.sim.data.get_site_xpos('object0')
+        reward = 0
+        if task == 1:
+            reward += 1/np.linalg.norm(gripper_position, object_position)
+
+        return torch.tensor(reward, device=self.device).view(1, 1)
+
+
 
 
     def train(self):
         for i_episode in range(self.num_episodes):
             print('Episode %s' % i_episode)
             start = datetime.datetime.now()
-            self.steps_done = 0
-            self.getScreen()
             self.reset()
-            last_screen = self.getScreen()
             current_screen = self.getScreen()
-            state = self.getState(current_screen, last_screen)
-
-
-            self.env.step([0,0,0,0])
-            first = self.env.sim.get_state()[1]
-            for count in range(5):
-                self.getScreen()
-                time.sleep(0.2)
-                self.env.step([1,1,1,1])
-            self.getScreen()
-            second = self.env.sim.get_state()[1]
-
-            import pdb; pdb.set_trace()
-            find(self.env, 'object0')
-
-
-
-            import pdb; pdb.set_trace()
-            #identity a good goal point for training with position
-            #look up how to see if you moved to an invalid configuration
             for t in count():
-                action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
-                _, reward, done, _ = self.env.step(self.state)
-                if self.out_of_bounds:
-                    reward -= 1.
-                    self.out_of_bounds = False
-                reward = torch.tensor([float(reward)], device=self.device)
-
                 last_screen = current_screen
                 current_screen = self.getScreen()
-                if t == 1000:
+                state = self.getState(current_screen, last_screen)
+
+                action = torch.tensor(self.selectAction(state, t), device=self.device).view(1, 1)
+                movement = np.zeros((1, 4))
+                if action % 2 == 0:
+                    movement[action // 2] += 1
+                else:
+                    movement[action // 2] -= 1
+                self.env.step(movement)
+                reward = self.getReward(task=1)
+
+                if t == 100:
                     done = True
+                last_screen = current_screen
+                current_screen = self.getScreen()
                 if not done:
                     next_state = self.getState(current_screen, last_screen)
                 else:
                     next_state = None
+
                 self.memory.push(state, action, next_state, reward)
-
-                state = next_state
-
                 self.optimizeModel()
                 if done:
-                    self.episode_durations.append(t + 1)
-                    print('Steps done: ', self.steps_done)
                     duration = (datetime.datetime.now() - start).total_seconds()
                     print('Episode Duration: %s seconds ' % duration)
                     break
@@ -248,7 +227,6 @@ class Trainer(object):
         self.env = gym.make('FetchPush-v1').unwrapped
         self.env.reset()
         steps_done = 0
-        done = False
         current_screen = self.getScreen()
         for _ in range(1000):
             self.env.render(mode='human')
@@ -261,27 +239,12 @@ class Trainer(object):
         print("Steps Done: ", steps_done)
 
 
-def find(input_attr, goal):
-    import pdb; pdb.set_trace()
-    queue = [x for x in dir(input_attr) if '_' != x[0]]
-    while queue:
-        current = queue.pop()
-        children = dir(current)
-        for child in children:
-            if goal in child:
-                print(child)
-            returnl
-            children.extend(current + '.' + child)
-
-
-
 
 def completionEmail(message=''):
   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
 
 
-import pdb; pdb.set_trace()
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 try:
