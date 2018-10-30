@@ -92,6 +92,7 @@ class Trainer(object):
         self.memory = ReplayMemory(1000, self.transition)
 
         self.num_episodes = num_episodes
+        self.steps_done = 0
 
 
     # Grab and image, crop it, downsample and resize, then convert to tensor
@@ -100,10 +101,10 @@ class Trainer(object):
         return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((2, 1, 0))).unsqueeze(0).to(self.device)
 
 
-    def selectAction(self, state, steps_done):
+    def selectAction(self, state):
         sample = random.random()
         eps_threshold = self.EPS_END + (self.EPS_START - self.EPS_END) * \
-            math.exp(-1. * steps_done / self.EPS_DECAY)
+            math.exp(-1. * self.steps_done / self.EPS_DECAY)
         if sample > eps_threshold:
             with torch.no_grad():
                 return self.policy_net(state).max(1)[1]
@@ -187,6 +188,7 @@ class Trainer(object):
             self.reset()
             current_screen = self.getScreen()
             initial_z = self.env.sim.data.get_site_xpos('object0')[2]
+            self.steps_done = 0
             for t in count():
                 done = False
                 last_screen = current_screen
