@@ -97,7 +97,6 @@ class Trainer(object):
     # Grab and image, crop it, downsample and resize, then convert to tensor
     def getScreen(self):
         screen = Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425)).resize((105, 81), Image.NEAREST)
-        import pdb; pdb.set_trace()
         return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((2, 1, 0))).unsqueeze(0).to(self.device)
 
 
@@ -203,8 +202,6 @@ class Trainer(object):
                     movement[action.item() // 2] += 1
                 else:
                     movement[action.item() // 2] -= 1
-                print(movement)
-                import pdb; pdb.set_trace()
                 self.env.step(movement)
                 reward = self.getReward(task=1)
 
