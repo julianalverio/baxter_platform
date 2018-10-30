@@ -126,7 +126,6 @@ class Trainer(object):
         state_batch = torch.cat(batch.state)
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
-        import pdb; pdb.set_trace()
         state_action_values = self.policy_net(state_batch).gather(1, action_batch)
 
         next_state_values = torch.zeros(self.BATCH_SIZE, device=self.device)
@@ -135,6 +134,7 @@ class Trainer(object):
 
         try:
             loss = F.smooth_l1_loss(state_action_values.unsqueeze(0), expected_state_action_values.unsqueeze(0))
+            print("all good")
         except:
             import pdb; pdb.set_trace()
         self.optimizer.zero_grad()
