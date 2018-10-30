@@ -134,7 +134,7 @@ class Trainer(object):
         expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
 
         try:
-            loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
+            loss = F.smooth_l1_loss(state_action_values.unsqueeze(1), expected_state_action_values.unsqueeze(1))
         except:
             import pdb; pdb.set_trace()
         self.optimizer.zero_grad()
@@ -205,7 +205,7 @@ class Trainer(object):
                 self.env.step(movement)
                 reward = self.getReward(task=1)
 
-                if t == 10:
+                if t == 1000:
                     done = True
                 last_screen = current_screen
                 current_screen = self.getScreen()
