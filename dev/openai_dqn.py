@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.insert(0, os.getcwd())
 
-import gym
+import ..gym import gym
 import math
 import random
 import numpy as np
