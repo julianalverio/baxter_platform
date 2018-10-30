@@ -126,6 +126,7 @@ class Trainer(object):
         state_batch = torch.cat(batch.state)
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
+        import pdb; pdb.set_trace()
         state_action_values = self.policy_net(state_batch).gather(1, action_batch)
 
         next_state_values = torch.zeros(self.BATCH_SIZE, device=self.device)
@@ -255,4 +256,6 @@ try:
     completionEmail('%s done' % NUM_EPISODES)
 except Exception as e:
     import pdb; pdb.set_trace()
+    import traceback
     print(e)
+    traceback.print_tb()
