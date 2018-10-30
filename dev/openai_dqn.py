@@ -173,7 +173,7 @@ class Trainer(object):
         object_position = self.env.sim.data.get_site_xpos('object0')
         reward = 0
         if task == 1:
-            reward += 1/np.linalg.norm(gripper_position, object_position)
+            reward += 1/np.linalg.norm(gripper_position - object_position)
 
         return torch.tensor(reward, device=self.device).view(1, 1)
 
