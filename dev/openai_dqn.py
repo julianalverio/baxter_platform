@@ -19,7 +19,7 @@ import os
 import datetime
 
 
-NUM_EPISODES = 10000
+NUM_EPISODES = 1000
 os.environ['CUDA_VISIBLE_DEVICES']='1,2,3'
 
 
@@ -186,10 +186,7 @@ class Trainer(object):
             start = datetime.datetime.now()
             self.reset()
             current_screen = self.getScreen()
-            import pdb; pdb.set_trace()
-            #check this
             initial_z = self.env.sim.data.get_site_xpos('object0')[2]
-
             for t in count():
                 done = False
                 last_screen = current_screen
@@ -205,9 +202,6 @@ class Trainer(object):
                 else:
                     movement[action.item() // 2] -= 1
                 self.env.step(movement)
-                penalty = 0
-                if self.env.sim.data.get_site_xpos('robot0:grip') == gripper_position:
-                    penalty -= 1000.
                 #it fell off the table
                 if initial_z - self.env.sim.data.get_site_xpos('object0')[2] > 0.2:
                     import pdb; pdb.set_trace()
