@@ -70,9 +70,6 @@ class DQN(nn.Module):
 
 class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
-        import pdb; pdb.set_trace()
-        #block griper
-
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         setupState = self.getState(self.getScreen(), self.getScreen()).to(torch.device("cpu"))
