@@ -134,7 +134,7 @@ class Trainer(object):
         expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
 
         try:
-            loss = F.smooth_l1_loss(state_action_values.unsqueeze(1), expected_state_action_values.unsqueeze(1))
+            loss = F.smooth_l1_loss(state_action_values.unsqueeze(0), expected_state_action_values.unsqueeze(0))
         except:
             import pdb; pdb.set_trace()
         self.optimizer.zero_grad()
