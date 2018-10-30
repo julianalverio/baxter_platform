@@ -34,12 +34,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="7954" />
+          <entry key="py" value="7997" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="7954" />
+          <entry key="Python" value="7997" />
         </counts>
       </usages-collector>
     </session>
@@ -49,13 +49,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="404">
-              <caret line="208" column="31" selection-start-line="208" selection-start-column="31" selection-end-line="208" selection-end-column="31" />
+            <state relative-caret-position="329">
+              <caret line="210" column="26" selection-start-line="210" selection-start-column="26" selection-end-line="210" selection-end-column="26" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540917033197" expanded="true" signature="5247:6235" ph="..." />
-                <marker date="1540917033197" expanded="true" signature="6061:6235" ph="..." />
-                <marker date="1540917033197" expanded="true" signature="9112:9114" ph="..." />
+                <marker date="1540917176626" expanded="true" signature="5283:6270" ph="..." />
+                <marker date="1540917176626" expanded="true" signature="6096:6270" ph="..." />
+                <marker date="1540917176626" expanded="true" signature="8757:8759" ph="..." />
               </folding>
             </state>
           </provider>
@@ -65,11 +65,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>def selectaction</find>
-      <find>def forward</find>
-      <find>dqn(</find>
-      <find>self.state</find>
-      <find>object_ps</find>
       <find>self.out</find>
       <find>self.out_of_bound</find>
       <find>reward =</find>
@@ -95,6 +90,11 @@
       <find>100</find>
       <find>selectaction</find>
       <find>movement =</find>
+      <find>gripp</find>
+      <find>assert</find>
+      <find>getscreen</find>
+      <find>def getscre</find>
+      <find>if t</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -215,13 +215,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="404">
-          <caret line="208" column="31" selection-start-line="208" selection-start-column="31" selection-end-line="208" selection-end-column="31" />
+        <state relative-caret-position="329">
+          <caret line="210" column="26" selection-start-line="210" selection-start-column="26" selection-end-line="210" selection-end-column="26" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540917033197" expanded="true" signature="5247:6235" ph="..." />
-            <marker date="1540917033197" expanded="true" signature="6061:6235" ph="..." />
-            <marker date="1540917033197" expanded="true" signature="9112:9114" ph="..." />
+            <marker date="1540917176626" expanded="true" signature="5283:6270" ph="..." />
+            <marker date="1540917176626" expanded="true" signature="6096:6270" ph="..." />
+            <marker date="1540917176626" expanded="true" signature="8757:8759" ph="..." />
           </folding>
         </state>
       </provider>

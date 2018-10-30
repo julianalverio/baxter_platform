@@ -97,6 +97,7 @@ class Trainer(object):
     # Grab and image, crop it, downsample and resize, then convert to tensor
     def getScreen(self):
         screen = Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425)).resize((105, 81), Image.NEAREST)
+        import pdb; pdb.set_trace()
         return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((2, 1, 0))).unsqueeze(0).to(self.device)
 
 
@@ -160,7 +161,7 @@ class Trainer(object):
         self.env.viewer.cam.elevation = 10.
         self.env.viewer.cam.distance = 2.5
         self.env.sim.nsubsteps = 5
-        self.env.block_gripper = False
+        self.env.block_gripper = True
         self.getScreen()
 
 
@@ -192,10 +193,6 @@ class Trainer(object):
             current_screen = self.getScreen()
             for t in count():
                 done = False
-                assert self.env.viewer.cam.lookat[0] == 1. and self.env.viewer.cam.lookat[1] == 1.5 and \
-                       self.env.viewer.cam.lookat[2] == 1.1
-                assert self.env.viewer.cam.azimuth == 165. and self.env.viewer.cam.elevation == 10. and self.env.viewer.cam.distance == 2.5
-                assert self.env.sim.nsubsteps == 5 and not self.env.block_gripper
                 last_screen = current_screen
                 current_screen = self.getScreen()
                 state = self.getState(current_screen, last_screen)
@@ -211,7 +208,7 @@ class Trainer(object):
                 self.env.step(movement)
                 reward = self.getReward(task=1)
 
-                if t == 1000:
+                if t == 10:
                     done = True
                 last_screen = current_screen
                 current_screen = self.getScreen()
