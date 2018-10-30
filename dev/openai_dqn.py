@@ -191,7 +191,7 @@ class Trainer(object):
                 state = self.getState(current_screen, last_screen)
 
                 action = torch.tensor(self.selectAction(state, t), device=self.device).view(1, 1)
-                movement = np.zeros((1, 4))
+                movement = np.zeros(4)
                 import pdb; pdb.set_trace()
                 if action.item() % 2 == 0:
                     movement[action.item() // 2] += 1
