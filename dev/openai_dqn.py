@@ -281,7 +281,7 @@ def completionEmail(message=''):
   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
 
 
-
+import pdb; pdb.set_trace()
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 try:
