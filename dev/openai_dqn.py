@@ -74,7 +74,7 @@ class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        setupFrame = self.getState(self.getScreen(), self.getScreen())
+        setupFrame = self.getState(self.getScreen(), self.getScreen()).to(torch.device("cpu"))
         self.policy_net = DQN(8, self.device, setupFrame).to(self.device)
         self.target_net = DQN(8, self.device, setupFrame).to(self.device)
 
