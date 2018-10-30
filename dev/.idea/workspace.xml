@@ -34,12 +34,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="7415" />
+          <entry key="py" value="7417" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="7415" />
+          <entry key="Python" value="7417" />
         </counts>
       </usages-collector>
     </session>
@@ -49,13 +49,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="344">
-              <caret line="170" column="35" selection-start-line="170" selection-start-column="35" selection-end-line="170" selection-end-column="35" />
+            <state relative-caret-position="329">
+              <caret line="170" column="29" selection-start-line="170" selection-start-column="29" selection-end-line="170" selection-end-column="29" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540915433956" expanded="true" signature="5175:6123" ph="..." />
-                <marker date="1540915433956" expanded="true" signature="5950:6123" ph="..." />
-                <marker date="1540915433956" expanded="true" signature="8544:8546" ph="..." />
+                <marker date="1540915492259" expanded="true" signature="5175:6123" ph="..." />
+                <marker date="1540915492259" expanded="true" signature="5950:6123" ph="..." />
+                <marker date="1540915492259" expanded="true" signature="8500:8502" ph="..." />
               </folding>
             </state>
           </provider>
@@ -68,7 +68,6 @@
       <find>def getsdc</find>
       <find>start =</find>
       <find>env.step</find>
-      <find>import pdb</find>
       <find>class trainer</find>
       <find>def reset</find>
       <find>reward</find>
@@ -95,6 +94,7 @@
       <find>num_episodes</find>
       <find>action =</find>
       <find>def getreward</find>
+      <find>import pdb</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -215,13 +215,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="344">
-          <caret line="170" column="35" selection-start-line="170" selection-start-column="35" selection-end-line="170" selection-end-column="35" />
+        <state relative-caret-position="329">
+          <caret line="170" column="29" selection-start-line="170" selection-start-column="29" selection-end-line="170" selection-end-column="29" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540915433956" expanded="true" signature="5175:6123" ph="..." />
-            <marker date="1540915433956" expanded="true" signature="5950:6123" ph="..." />
-            <marker date="1540915433956" expanded="true" signature="8544:8546" ph="..." />
+            <marker date="1540915492259" expanded="true" signature="5175:6123" ph="..." />
+            <marker date="1540915492259" expanded="true" signature="5950:6123" ph="..." />
+            <marker date="1540915492259" expanded="true" signature="8500:8502" ph="..." />
           </folding>
         </state>
       </provider>

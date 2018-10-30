@@ -168,7 +168,7 @@ class Trainer(object):
     Task 5: Pick up block and move to location
     '''
     def getReward(self, task=1):
-        import pdb; pdb.set_Trace()
+        import pdb; pdb.set_trace()
         gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
         object_position = self.env.sim.data.get_site_xpos('object0')
         reward = 0
@@ -193,7 +193,6 @@ class Trainer(object):
 
                 action = torch.tensor(self.selectAction(state, t), device=self.device).view(1, 1)
                 movement = np.zeros(4)
-                import pdb; pdb.set_trace()
                 if action.item() % 2 == 0:
                     movement[action.item() // 2] += 1
                 else:
