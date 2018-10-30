@@ -156,7 +156,7 @@ class Trainer(object):
         self.env.viewer.cam.azimuth = 165.
         self.env.viewer.cam.elevation = 10.
         self.env.viewer.cam.distance = 2.5
-        self.env.sim.nsubsteps = 5
+        self.env.sim.nsubsteps = 3
         self.env.block_gripper = True
         self.getScreen()
 
