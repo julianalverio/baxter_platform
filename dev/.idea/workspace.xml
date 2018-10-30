@@ -49,13 +49,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="858">
-              <caret line="259" lean-forward="true" selection-start-line="259" selection-end-line="259" />
+            <state relative-caret-position="329">
+              <caret line="132" column="98" lean-forward="true" selection-start-line="132" selection-start-column="98" selection-end-line="132" selection-end-column="98" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540918897630" expanded="true" signature="5339:6326" ph="..." />
-                <marker date="1540918897630" expanded="true" signature="6152:6326" ph="..." />
-                <marker date="1540918897630" expanded="true" signature="8739:8741" ph="..." />
+                <marker date="1540919019754" expanded="true" signature="5334:6321" ph="..." />
+                <marker date="1540919019754" expanded="true" signature="6147:6321" ph="..." />
+                <marker date="1540919019754" expanded="true" signature="8734:8736" ph="..." />
               </folding>
             </state>
           </provider>
@@ -65,7 +65,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>plot</find>
       <find>matplotlib</find>
       <find>self.goal</find>
       <find>num_episodes</find>
@@ -95,6 +94,7 @@
       <find>done</find>
       <find>.deta</find>
       <find>optimizemodel</find>
+      <find>-1</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -215,13 +215,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="858">
-          <caret line="259" lean-forward="true" selection-start-line="259" selection-end-line="259" />
+        <state relative-caret-position="329">
+          <caret line="132" column="98" lean-forward="true" selection-start-line="132" selection-start-column="98" selection-end-line="132" selection-end-column="98" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540918897630" expanded="true" signature="5339:6326" ph="..." />
-            <marker date="1540918897630" expanded="true" signature="6152:6326" ph="..." />
-            <marker date="1540918897630" expanded="true" signature="8739:8741" ph="..." />
+            <marker date="1540919019754" expanded="true" signature="5334:6321" ph="..." />
+            <marker date="1540919019754" expanded="true" signature="6147:6321" ph="..." />
+            <marker date="1540919019754" expanded="true" signature="8734:8736" ph="..." />
           </folding>
         </state>
       </provider>
