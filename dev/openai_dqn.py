@@ -133,8 +133,10 @@ class Trainer(object):
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
         expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
 
-        loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
-
+        try:
+            loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
+        except:
+            import pdb; pdb.set_trace()
         self.optimizer.zero_grad()
         loss.backward()
         for param in self.policy_net.parameters():
@@ -204,10 +206,12 @@ class Trainer(object):
                     movement[action.item() // 2] += 1
                 else:
                     movement[action.item() // 2] -= 1
+                print(movement)
+                import pdb; pdb.set_trace()
                 self.env.step(movement)
                 reward = self.getReward(task=1)
 
-                if t == 100:
+                if t == 1000:
                     done = True
                 last_screen = current_screen
                 current_screen = self.getScreen()
