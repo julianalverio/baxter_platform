@@ -197,7 +197,7 @@ class Trainer(object):
 
                 gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
                 object_position = self.env.sim.data.get_site_xpos('object0')
-                action = torch.tensor(self.selectAction(state, t), device=self.device).view(1, 1)
+                action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
                 movement = np.zeros(4)
                 if action.item() % 2 == 0:
                     movement[action.item() // 2] += 1

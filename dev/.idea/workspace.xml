@@ -49,13 +49,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="106" column="57" selection-start-line="106" selection-start-column="57" selection-end-line="106" selection-end-column="57" />
+            <state relative-caret-position="329">
+              <caret line="199" column="61" lean-forward="true" selection-start-line="199" selection-start-column="61" selection-end-line="199" selection-end-column="61" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540920185643" expanded="true" signature="5227:6214" ph="..." />
-                <marker date="1540920185643" expanded="true" signature="6040:6214" ph="..." />
-                <marker date="1540920185643" expanded="true" signature="9091:9093" ph="..." />
+                <marker date="1540920239303" expanded="true" signature="5227:6214" ph="..." />
+                <marker date="1540920239303" expanded="true" signature="6040:6214" ph="..." />
+                <marker date="1540920239303" expanded="true" signature="9088:9090" ph="..." />
               </folding>
             </state>
           </provider>
@@ -71,7 +71,6 @@
       <find>reset</find>
       <find>loss =</find>
       <find>100</find>
-      <find>selectaction</find>
       <find>movement =</find>
       <find>gripp</find>
       <find>assert</find>
@@ -95,6 +94,7 @@
       <find>class trainer</find>
       <find>self.steps_done</find>
       <find>def selectaction</find>
+      <find>selectaction</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -215,13 +215,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="106" column="57" selection-start-line="106" selection-start-column="57" selection-end-line="106" selection-end-column="57" />
+        <state relative-caret-position="329">
+          <caret line="199" column="61" lean-forward="true" selection-start-line="199" selection-start-column="61" selection-end-line="199" selection-end-column="61" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540920185643" expanded="true" signature="5227:6214" ph="..." />
-            <marker date="1540920185643" expanded="true" signature="6040:6214" ph="..." />
-            <marker date="1540920185643" expanded="true" signature="9091:9093" ph="..." />
+            <marker date="1540920239303" expanded="true" signature="5227:6214" ph="..." />
+            <marker date="1540920239303" expanded="true" signature="6040:6214" ph="..." />
+            <marker date="1540920239303" expanded="true" signature="9088:9090" ph="..." />
           </folding>
         </state>
       </provider>
