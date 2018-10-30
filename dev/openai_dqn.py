@@ -186,12 +186,18 @@ class Trainer(object):
             start = datetime.datetime.now()
             self.reset()
             current_screen = self.getScreen()
+            import pdb; pdb.set_trace()
+            #check this
+            initial_z = self.env.sim.data.get_site_xpos('object0')[2]
+
             for t in count():
                 done = False
                 last_screen = current_screen
                 current_screen = self.getScreen()
                 state = self.getState(current_screen, last_screen)
 
+                gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
+                object_position = self.env.sim.data.get_site_xpos('object0')
                 action = torch.tensor(self.selectAction(state, t), device=self.device).view(1, 1)
                 movement = np.zeros(4)
                 if action.item() % 2 == 0:
@@ -199,6 +205,13 @@ class Trainer(object):
                 else:
                     movement[action.item() // 2] -= 1
                 self.env.step(movement)
+                penalty = 0
+                if self.env.sim.data.get_site_xpos('robot0:grip') == gripper_position:
+                    penalty -= 1000.
+                #it fell off the table
+                if initial_z - self.env.sim.data.get_site_xpos('object0')[2] > 0.2:
+                    import pdb; pdb.set_trace()
+                    done = True
                 reward = self.getReward(task=1)
 
                 if t == 1000:
