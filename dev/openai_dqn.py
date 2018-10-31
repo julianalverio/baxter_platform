@@ -188,7 +188,6 @@ class Trainer(object):
             self.reset()
             current_screen = self.getScreen()
             initial_position = self.env.sim.data.get_site_xpos('object0')
-            initial_z = self.env.sim.data.get_site_xpos('object0')[2]
             self.steps_done = 0
             for t in count():
                 done = False
@@ -204,6 +203,8 @@ class Trainer(object):
                     movement[action.item() // 2] -= 1
                 self.env.step(movement)
                 reward = self.getReward(task=1)
+
+                print(np.linalg.norm(self.env.sim.data.get_site_xpos('object0') - initial_position))
 
                 #if the block moved
                 if np.linalg.norm(initial_position - self.env.sim.data.get_site_xpos('object0')) > 0.1:
