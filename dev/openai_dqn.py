@@ -209,6 +209,7 @@ class Trainer(object):
                 if np.linalg.norm(initial_position - self.env.sim.data.get_site_xpos('object0')) > 0.1:
                     done = True
                     reward += 1000.
+                    print("I TOUCHED THE BLOCK")
 
                 if t == 1000:
                     done = True
