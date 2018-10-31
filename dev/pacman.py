@@ -9,8 +9,6 @@ import gym
 import math
 import random
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
 from collections import namedtuple
 from itertools import count
 from PIL import Image
@@ -65,7 +63,6 @@ class DQN(nn.Module):
 class Trainer(object):
     def __init__(self, num_episodes=1, view=False):
         self.env = gym.make('MsPacman-v0').unwrapped
-        plt.ion()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.policy_net = DQN(self.env.action_space.n, self.device).to(self.device)
@@ -118,13 +115,6 @@ class Trainer(object):
             return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device)
 
 
-    def plotDurations(self):
-        plt.plot(range(len(self.episode_durations)), self.episode_durations)
-        plt.title('Training Episode Durations')
-        plt.xlabel('Episode')
-        plt.ylabel('Duration')
-        plt.savefig('episode_durations_%s.png' % self.num_episodes)
-
 
     def optimizeModel(self):
         if len(self.memory) < self.BATCH_SIZE:
@@ -163,7 +153,7 @@ class Trainer(object):
 
 
     def train(self):
-        for i_episode in xrange(self.num_episodes):
+        for i_episode in range(self.num_episodes):
             print('Episode %s' % i_episode)
             self.steps_done = 0
             self.env.reset()
@@ -196,7 +186,6 @@ class Trainer(object):
         	torch.save(self.target_net.state_dict(), 'target_net_%s.pth' % self.num_episodes)
 	except:
 		import pdb; pdb.set_trace()
-        # self.plotDurations()
 
     def showPacman(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
