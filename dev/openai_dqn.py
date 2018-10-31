@@ -203,14 +203,13 @@ class Trainer(object):
                     movement[action.item() // 2] -= 1
                 self.env.step(movement)
                 reward = self.getReward(task=1)
+                print(reward)
 
-                print(np.linalg.norm(self.env.sim.data.get_site_xpos('object0') - initial_position))
-
-                #if the block moved
-                if np.linalg.norm(initial_position - self.env.sim.data.get_site_xpos('object0')) > 0.1:
-                    done = True
-                    reward += 1000.
-                    print("I TOUCHED THE BLOCK")
+                # #if the block moved
+                # if np.linalg.norm(initial_position - self.env.sim.data.get_site_xpos('object0')) > 0.1:
+                #     done = True
+                #     reward += 1000.
+                #     print("I TOUCHED THE BLOCK")
 
                 if t == 1000:
                     done = True
