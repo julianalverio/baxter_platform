@@ -203,7 +203,6 @@ class Trainer(object):
                     movement[action.item() // 2] -= 1
                 self.env.step(movement)
                 reward = self.getReward(task=1)
-                print(reward)
 
                 # #if the block moved
                 # if np.linalg.norm(initial_position - self.env.sim.data.get_site_xpos('object0')) > 0.1:
