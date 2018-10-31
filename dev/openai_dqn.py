@@ -224,7 +224,8 @@ class Trainer(object):
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
-            if i_episode % 250 == 0:
+            if 1:
+            # if i_episode % 250 == 0:
                 try:
                     torch.save(self.target_net, 'openai_1_%s.pth' % self.num_episodes)
                     completionEmail('SUCCESS OPENAI GYM')
@@ -258,9 +259,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-try:
-    trainer.train()
-    completionEmail('%s done' % NUM_EPISODES)
-except Exception as e:
-    import pdb; pdb.set_trace()
-    print(e)
+trainer.train()
+completionEmail('%s done' % NUM_EPISODES)
+

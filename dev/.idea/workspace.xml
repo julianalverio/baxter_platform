@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/openai_dqn.py" beforeDir="false" afterPath="$PROJECT_DIR$/openai_dqn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pacman.py" beforeDir="false" afterPath="$PROJECT_DIR$/pacman.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -35,12 +34,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="8813" />
+          <entry key="py" value="8826" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="8813" />
+          <entry key="Python" value="8826" />
         </counts>
       </usages-collector>
     </session>
@@ -50,13 +49,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="316">
-              <caret line="198" column="38" lean-forward="true" selection-start-line="198" selection-start-column="38" selection-end-line="198" selection-end-column="38" />
+            <state relative-caret-position="828">
+              <caret line="263" lean-forward="true" selection-start-line="263" selection-end-line="263" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1541006485430" expanded="true" signature="5227:6214" ph="..." />
-                <marker date="1541006485430" expanded="true" signature="6040:6214" ph="..." />
-                <marker date="1541006485430" expanded="true" signature="9131:9133" ph="..." />
+                <marker date="1541021265346" expanded="true" signature="5227:6214" ph="..." />
+                <marker date="1541021265346" expanded="true" signature="6040:6214" ph="..." />
+                <marker date="1541021265346" expanded="true" signature="9151:9153" ph="..." />
               </folding>
             </state>
           </provider>
@@ -72,7 +71,6 @@
       <find>def getscre</find>
       <find>if t</find>
       <find>print(movem</find>
-      <find>import pdb</find>
       <find>smooth_lp1</find>
       <find>if t ==</find>
       <find>done</find>
@@ -96,6 +94,7 @@
       <find>plotdurations</find>
       <find>plt.</find>
       <find>range</find>
+      <find>import pdb</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -216,13 +215,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="198" column="38" lean-forward="true" selection-start-line="198" selection-start-column="38" selection-end-line="198" selection-end-column="38" />
+        <state relative-caret-position="828">
+          <caret line="263" lean-forward="true" selection-start-line="263" selection-end-line="263" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1541006485430" expanded="true" signature="5227:6214" ph="..." />
-            <marker date="1541006485430" expanded="true" signature="6040:6214" ph="..." />
-            <marker date="1541006485430" expanded="true" signature="9131:9133" ph="..." />
+            <marker date="1541021265346" expanded="true" signature="5227:6214" ph="..." />
+            <marker date="1541021265346" expanded="true" signature="6040:6214" ph="..." />
+            <marker date="1541021265346" expanded="true" signature="9151:9153" ph="..." />
           </folding>
         </state>
       </provider>
