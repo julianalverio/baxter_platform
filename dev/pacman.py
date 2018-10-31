@@ -182,10 +182,10 @@ class Trainer(object):
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
-	try:
-        	torch.save(self.target_net.state_dict(), 'target_net_%s.pth' % self.num_episodes)
-	except:
-		import pdb; pdb.set_trace()
+        try:
+            torch.save(self.target_net.state_dict(), 'target_net_%s.pth' % self.num_episodes)
+        except:
+            import pdb; pdb.set_trace()
 
     def showPacman(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
