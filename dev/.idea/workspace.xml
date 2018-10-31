@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/openai_dqn.py" beforeDir="false" afterPath="$PROJECT_DIR$/openai_dqn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pacman.py" beforeDir="false" afterPath="$PROJECT_DIR$/pacman.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -34,40 +35,28 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="8544" />
+          <entry key="py" value="8813" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="8544" />
+          <entry key="Python" value="8813" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/openai_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="149">
-              <caret line="190" column="31" lean-forward="true" selection-start-line="190" selection-start-column="31" selection-end-line="190" selection-end-column="31" />
+            <state relative-caret-position="316">
+              <caret line="198" column="38" lean-forward="true" selection-start-line="198" selection-start-column="38" selection-end-line="198" selection-end-column="38" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
-                <marker date="1540920950279" expanded="true" signature="5227:6214" ph="..." />
-                <marker date="1540920950279" expanded="true" signature="6040:6214" ph="..." />
-                <marker date="1540920950279" expanded="true" signature="8881:8883" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/pacman.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="572">
-              <caret line="184" column="12" lean-forward="true" selection-start-line="184" selection-start-column="12" selection-end-line="184" selection-end-column="12" />
-              <folding>
-                <element signature="e#0#12#0" expanded="true" />
+                <marker date="1541006485430" expanded="true" signature="5227:6214" ph="..." />
+                <marker date="1541006485430" expanded="true" signature="6040:6214" ph="..." />
+                <marker date="1541006485430" expanded="true" signature="9131:9133" ph="..." />
               </folding>
             </state>
           </provider>
@@ -115,8 +104,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/openai_dqn.py" />
         <option value="$PROJECT_DIR$/pacman.py" />
+        <option value="$PROJECT_DIR$/openai_dqn.py" />
       </list>
     </option>
   </component>
@@ -215,25 +204,25 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/openai_dqn.py">
+    <entry file="file://$PROJECT_DIR$/pacman.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="149">
-          <caret line="190" column="31" lean-forward="true" selection-start-line="190" selection-start-column="31" selection-end-line="190" selection-end-column="31" />
+        <state relative-caret-position="600">
+          <caret line="40" lean-forward="true" selection-start-line="40" selection-end-line="40" />
           <folding>
-            <element signature="e#0#10#0" expanded="true" />
-            <marker date="1540920950279" expanded="true" signature="5227:6214" ph="..." />
-            <marker date="1540920950279" expanded="true" signature="6040:6214" ph="..." />
-            <marker date="1540920950279" expanded="true" signature="8881:8883" ph="..." />
+            <element signature="e#0#12#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pacman.py">
+    <entry file="file://$PROJECT_DIR$/openai_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="572">
-          <caret line="184" column="12" lean-forward="true" selection-start-line="184" selection-start-column="12" selection-end-line="184" selection-end-column="12" />
+        <state relative-caret-position="316">
+          <caret line="198" column="38" lean-forward="true" selection-start-line="198" selection-start-column="38" selection-end-line="198" selection-end-column="38" />
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
+            <element signature="e#0#10#0" expanded="true" />
+            <marker date="1541006485430" expanded="true" signature="5227:6214" ph="..." />
+            <marker date="1541006485430" expanded="true" signature="6040:6214" ph="..." />
+            <marker date="1541006485430" expanded="true" signature="9131:9133" ph="..." />
           </folding>
         </state>
       </provider>

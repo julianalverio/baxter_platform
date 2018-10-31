@@ -16,7 +16,7 @@ from PIL import Image
 
 
 NUM_EPISODES = 5000
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 class ReplayMemory(object):
 
@@ -182,10 +182,13 @@ class Trainer(object):
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
-        try:
-            torch.save(self.target_net.state_dict(), 'target_net_%s.pth' % self.num_episodes)
-        except:
-            import pdb; pdb.set_trace()
+            if i_episode % 500 == 0:
+                try:
+                    torch.save(self.target_net, 'pacman_%s.pth' % i_episode)
+                    completionEmail('pacman %s episodes completed' % i_episode)
+                except:
+                    completionEmail('ERROR IN PACMAN %s' % i_episode)
+                    import pdb; pdb.set_trace()
 
     def showPacman(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')

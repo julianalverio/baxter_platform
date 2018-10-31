@@ -224,7 +224,13 @@ class Trainer(object):
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
-        torch.save(self.target_net, 'openai_target_net_%s.pth' % self.num_episodes)
+            if i_episode % 250 == 0:
+                try:
+                    torch.save(self.target_net, 'openai_1_%s.pth' % self.num_episodes)
+                    completionEmail('SUCCESS OPENAI GYM')
+                except:
+                    completionEmail('ERROR IN OPENAI GYM')
+                    import pdb; pdb.set_trace()
 
 
     def showResults(self, target_net_path):
