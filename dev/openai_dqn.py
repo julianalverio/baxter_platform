@@ -187,6 +187,7 @@ class Trainer(object):
             start = datetime.datetime.now()
             self.reset()
             current_screen = self.getScreen()
+            initial_position = self.env.sim.data.get_site_xpos('object0')
             initial_z = self.env.sim.data.get_site_xpos('object0')[2]
             self.steps_done = 0
             for t in count():
@@ -202,10 +203,12 @@ class Trainer(object):
                 else:
                     movement[action.item() // 2] -= 1
                 self.env.step(movement)
-                #it fell off the table
-                if initial_z - self.env.sim.data.get_site_xpos('object0')[2] > 0.2:
-                    done = True
                 reward = self.getReward(task=1)
+
+                #if the block moved
+                if np.linalg.norm(initial_position - self.env.sim.data.get_site_xpos('object0')) > 0.1:
+                    done = True
+                    reward += 1000.
 
                 if t == 1000:
                     done = True
