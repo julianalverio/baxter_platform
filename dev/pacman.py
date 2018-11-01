@@ -48,7 +48,7 @@ class DQN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
-        self.head = nn.Linear(2448, num_actions)
+        self.head = nn.Linear(1792, num_actions)
         self.device = device
 
     def forward(self, x):
