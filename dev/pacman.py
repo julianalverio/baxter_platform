@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-import os
 
 import gym
 import math
@@ -16,7 +15,7 @@ from PIL import Image
 
 
 NUM_EPISODES = 5000
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 class ReplayMemory(object):
 
