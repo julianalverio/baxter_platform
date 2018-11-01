@@ -96,8 +96,10 @@ class Trainer(object):
     def getScreen(self):
         # original size: 210x160x3
         import pdb; pdb.set_trace()
+        # screen = Image.fromarray(sle.f)
         screen = self.env.render(mode='rgb_array')[0:170, :, ].transpose((2, 0, 1))
         screen = np.ascontiguousarray(screen, dtype=np.uint8)
+        screen2 = np.array(Image.fromarray(self.env.render(mode='rgb_array')[0:170, :, ]).resize((80, 85))).transpose((2, 0, 1)).astype(np.uint8)
         return torch.from_numpy(screen).to(self.device)
 
 
