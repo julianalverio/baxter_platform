@@ -14,7 +14,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-import yagmail
+# import yagmail
 import os
 import datetime
 
@@ -231,9 +231,9 @@ class Trainer(object):
                 # if i_episode % 250 == 0:
                 try:
                     torch.save(self.target_net, 'openai_1_%s.pth' % i_episode)
-                    completionEmail('SUCCESS OPENAI GYM')
+                    # completionEmail('SUCCESS OPENAI GYM')
                 except:
-                    completionEmail('ERROR IN OPENAI GYM')
+                    # completionEmail('ERROR IN OPENAI GYM')
                     import pdb; pdb.set_trace()
 
 
@@ -253,15 +253,15 @@ class Trainer(object):
             steps_done += 1
         print("Steps Done: ", steps_done)
 
-
-
-def completionEmail(message=''):
-  yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
-  yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
+#
+#
+# def completionEmail(message=''):
+#   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
+#   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
 
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
+# completionEmail('%s done' % NUM_EPISODES)
 

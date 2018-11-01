@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-import yagmail
 import os
 
 import gym
@@ -12,6 +11,8 @@ import numpy as np
 from collections import namedtuple
 from itertools import count
 from PIL import Image
+import yagmail
+
 
 
 
@@ -96,8 +97,7 @@ class Trainer(object):
 
     def getScreen(self):
         # original size: 210x160x3
-        if self.view:
-            self.env.render()
+        import pdb; pdb.set_trace()
         screen = self.env.render(mode='rgb_array')[0:170, :, ].transpose((2, 0, 1))
         screen = np.ascontiguousarray(screen, dtype=np.uint8)
         return torch.from_numpy(screen).to(self.device)
