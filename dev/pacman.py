@@ -1,4 +1,3 @@
-import pdb; pdb.set_trace()
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -12,7 +11,6 @@ import numpy as np
 from collections import namedtuple
 from itertools import count
 from PIL import Image
-import yagmail
 
 
 
@@ -187,9 +185,9 @@ class Trainer(object):
             if 1:
                 try:
                     torch.save(self.target_net, 'pacman_%s.pth' % i_episode)
-                    completionEmail('pacman %s episodes completed' % i_episode)
+                    # completionEmail('pacman %s episodes completed' % i_episode)
                 except:
-                    completionEmail('ERROR IN PACMAN %s' % i_episode)
+                    # completionEmail('ERROR IN PACMAN %s' % i_episode)
                     import pdb; pdb.set_trace()
 
     def showPacman(self, target_net_path):
@@ -214,15 +212,15 @@ class Trainer(object):
 
 
 
-def completionEmail(message=''):
-  yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
-  yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
-
-
+# def completionEmail(message=''):
+#   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
+#   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
+#
+#
 
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
+# completionEmail('%s done' % NUM_EPISODES)
 # trainer.showPacman('target_net_500.pth')
