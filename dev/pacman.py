@@ -48,7 +48,7 @@ class DQN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
-        self.head = nn.Linear(9792, num_actions)
+        self.head = nn.Linear(2448, num_actions)
         self.device = device
 
     def forward(self, x):
@@ -95,11 +95,10 @@ class Trainer(object):
 
     def getScreen(self):
         # original size: 210x160x3
-        import pdb; pdb.set_trace()
-        # screen = Image.fromarray(sle.f)
-        screen = self.env.render(mode='rgb_array')[0:170, :, ].transpose((2, 0, 1))
-        screen = np.ascontiguousarray(screen, dtype=np.uint8)
-        screen2 = np.array(Image.fromarray(self.env.render(mode='rgb_array')[0:170, :, ]).resize((80, 85))).transpose((2, 0, 1)).astype(np.uint8)
+        # import pdb; pdb.set_trace()
+        # screen = self.env.render(mode='rgb_array')[0:170, :, ].transpose((2, 0, 1))
+        # screen = np.ascontiguousarray(screen, dtype=np.uint8)
+        screen = np.array(Image.fromarray(self.env.render(mode='rgb_array')[0:170, :, ]).resize((80, 85))).transpose((2, 0, 1)).astype(np.uint8)
         return torch.from_numpy(screen).to(self.device)
 
 
