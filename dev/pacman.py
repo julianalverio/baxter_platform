@@ -11,6 +11,7 @@ from itertools import count
 from PIL import Image
 import os
 import datetime
+import yagmail
 
 # THIS IS A HACK SPECIFIC TO BAFFIN
 import sys
