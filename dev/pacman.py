@@ -10,6 +10,7 @@ from collections import namedtuple
 from itertools import count
 from PIL import Image
 import os
+import datetime
 
 # THIS IS A HACK SPECIFIC TO BAFFIN
 import sys
@@ -159,7 +160,8 @@ class Trainer(object):
 
     def train(self):
         for i_episode in range(self.num_episodes):
-            print('Episode %s' % i_episode)
+            start = datetime.datetime.now()
+            print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
             self.env.reset()
             last_screen = self.getScreen()
@@ -184,6 +186,8 @@ class Trainer(object):
                 self.optimizeModel()
                 if done:
                     self.episode_durations.append(t + 1)
+                    duration = (datetime.datetime.now() - start).total_seconds()
+                    print('DURATION: %s' % duration)
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
