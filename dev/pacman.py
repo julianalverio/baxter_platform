@@ -1,13 +1,8 @@
-import sys
-print('Removed: ', sys.path.pop(0))
-sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-import pdb; pdb.set_trace()
-import gym
 import math
 import random
 import numpy as np
@@ -15,6 +10,12 @@ from collections import namedtuple
 from itertools import count
 from PIL import Image
 import os
+
+import sys
+print('Removed: ', sys.path.pop(0))
+sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
+import pdb; pdb.set_trace()
+import gym
 
 
 
