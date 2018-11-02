@@ -15,7 +15,7 @@ from PIL import Image
 
 
 NUM_EPISODES = 5000
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 class ReplayMemory(object):
 
@@ -50,7 +50,6 @@ class DQN(nn.Module):
         self.bn3 = nn.BatchNorm2d(32)
         self.head = nn.Linear(1792, num_actions)
         self.device = device
-        import pdb; pdb.set_trace()
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
