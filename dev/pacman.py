@@ -1,5 +1,5 @@
 import sys
-sys.path.pop(0)
+print('Removed: ', sys.path.pop(0))
 import torch
 import torch.nn as nn
 import torch.optim as optim
