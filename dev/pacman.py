@@ -11,10 +11,10 @@ from itertools import count
 from PIL import Image
 import os
 
+# THIS IS A HACK SPECIFIC TO BAFFIN
 import sys
 print('Removed: ', sys.path.pop(0))
 sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
-import pdb; pdb.set_trace()
 import gym
 
 
@@ -69,6 +69,7 @@ class Trainer(object):
         self.env = gym.make('MsPacman-v0').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+        import pdb; pdb.set_trace()
         self.policy_net = DQN(self.env.action_space.n, self.device).to(self.device)
         self.target_net = DQN(self.env.action_space.n, self.device).to(self.device)
 
