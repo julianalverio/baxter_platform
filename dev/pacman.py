@@ -161,6 +161,7 @@ class Trainer(object):
 
     def train(self):
         for i_episode in range(self.num_episodes):
+            completionEmail('started training')
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
@@ -192,13 +193,12 @@ class Trainer(object):
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
-            # if i_episode % 500 == 0:
-            if 1:
+            if i_episode % 500 == 0:
                 try:
                     torch.save(self.target_net, 'pacman_%s.pth' % i_episode)
-                    # completionEmail('pacman %s episodes completed' % i_episode)
+                    completionEmail('pacman %s episodes completed' % i_episode)
                 except:
-                    # completionEmail('ERROR IN PACMAN %s' % i_episode)
+                    completionEmail('ERROR IN PACMAN %s' % i_episode)
                     import pdb; pdb.set_trace()
 
     def showPacman(self, target_net_path):
@@ -223,15 +223,15 @@ class Trainer(object):
 
 
 
-# def completionEmail(message=''):
-#   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
-#   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
-#
-#
+def completionEmail(message=''):
+  yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
+  yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
+
+
 
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 trainer.train()
-# completionEmail('%s done' % NUM_EPISODES)
+completionEmail('%s done' % NUM_EPISODES)
 # trainer.showPacman('target_net_500.pth')
