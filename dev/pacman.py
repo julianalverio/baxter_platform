@@ -1,5 +1,6 @@
 import sys
 print('Removed: ', sys.path.pop(0))
+sys.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
 import torch
 import torch.nn as nn
 import torch.optim as optim
