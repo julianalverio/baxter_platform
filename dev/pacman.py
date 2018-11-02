@@ -193,7 +193,8 @@ class Trainer(object):
                     break
             if i_episode % self.TARGET_UPDATE == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
-            if i_episode % 500 == 0:
+            # if i_episode % 500 == 0:
+            if 1:
                 try:
                     torch.save(self.target_net, 'pacman_%s.pth' % i_episode)
                     completionEmail('pacman %s episodes completed' % i_episode)
