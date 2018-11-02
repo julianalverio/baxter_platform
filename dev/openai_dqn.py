@@ -187,9 +187,11 @@ class Trainer(object):
             start = datetime.datetime.now()
             self.reset()
             current_screen = self.getScreen()
-            initial_position = self.env.sim.data.get_site_xpos('object0')
+            initial_block_position = self.env.sim.data.get_site_xpos('object0')
+            initial_gripper_position = self.sim.data.get_site_xpos('robot0:grip')
             self.steps_done = 0
             for t in count():
+                print(np.linalg.norm(initial_gripper_position - self.env.sim.data.get_site_xpos('object0')))
                 done = False
                 last_screen = current_screen
                 current_screen = self.getScreen()
