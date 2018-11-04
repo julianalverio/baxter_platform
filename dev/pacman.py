@@ -15,18 +15,19 @@ from PIL import Image
 import os
 import datetime
 import yagmail
+import pickle
 
 
-# # THIS IS A HACK SPECIFIC TO BAFFIN
-# import sys
-# print('Removed: ', sys.path.pop(0))
-# sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
+# THIS IS A HACK SPECIFIC TO BAFFIN
+import sys
+sys.path.pop(0)
+sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
 import gym
 
 
 
 NUM_EPISODES = 5000
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 class ReplayMemory(object):
 
@@ -74,36 +75,57 @@ class DQN(nn.Module):
 
 
 class Trainer(object):
-    def __init__(self, num_episodes=1, view=False):
+    # warm start path points to pacman_1_4000, which is the param dict, and the actual model will be pacman_1_4000.pth
+    def __init__(self, num_episodes=5000, warm_start_path=''):
         self.env = gym.make('MsPacman-v0').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu'))
-
-        self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
-        self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
-        torch.save(self.target_net, 'delete_initial_target_net')
-
         self.transition = namedtuple('Transition',
-                                ('state', 'action', 'next_state', 'reward'))
-
-        self.BATCH_SIZE = 128
-        self.GAMMA = 0.999
-        self.EPS_START = 0.9
-        self.EPS_END = 0.05
-        self.EPS_DECAY = 200
-        self.TARGET_UPDATE = 10
-
-        self.target_net.load_state_dict(self.policy_net.state_dict())
-        self.target_net.eval()
-
-        self.optimizer = optim.RMSprop(self.policy_net.parameters())
-        self.memory = ReplayMemory(10000, self.transition)
-        self.episode_durations = []
-
+                                    ('state', 'action', 'next_state', 'reward'))
+        self.optimizer = optim.adam(self.policy_net.parameters())
         self.num_episodes = num_episodes
-        self.steps_done = 0
-        self.view = view
 
+        if not warm_start_path:
+            test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu'))
+            self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
+            self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
+            torch.save(self.target_net, 'delete_initial_target_net')
+
+            self.batch_size = 128
+            self.gamma = 0.999
+            self.eps_start = 0.9
+            self.eps_end = 0.05
+            self.eps_decay = 200
+            self.target_update = 10
+
+            self.target_net.load_state_dict(self.policy_net.state_dict())
+            self.target_net.eval()
+            self.memory = ReplayMemory(100000, self.transition)
+
+            self.steps_done = 0
+
+        else:
+            f = open(warm_start_path + '_params', 'r')
+            param_dict = eval(f.read())
+            self.batch_size = param_dict['batch_size']
+            self.gamma = param_dict['gamma']
+            self.eps_start = param_dict['eps_start']
+            self.eps_end = param_dict['eps_end']
+            self.eps_decay = param_dict['eps_decay']
+            self.target_update = param_dict['target_update']
+            self.steps_done = param_dict['steps_done']
+            self.memory = pickle.load(warm_start_path + '_memory')
+
+            self.policy_net = torch.load(warm_start_path + '_model.pth')
+            self.target_net = torch.load(warm_start_path + '_model.pth')
+
+        self.param_dict = {
+        'batch_size' : self.batch_size,
+        'gamma': self.gamma, 
+        'eps_start' : self.eps_start,
+        'eps_end': self.eps_end,
+        'eps_decay': self.eps_decay,
+        'target_update': self.target_update
+        }
 
 
     def rgb2gray(self, rgb):
@@ -119,8 +141,8 @@ class Trainer(object):
 
     def selectAction(self, state):
         sample = random.random()
-        eps_threshold = self.EPS_END + (self.EPS_START - self.EPS_END) * \
-            math.exp(-1. * self.steps_done / self.EPS_DECAY)
+        eps_threshold = self.eps_end + (self.eps_start - self.eps_end) * \
+            math.exp(-1. * self.steps_done / self.eps_decay)
         self.steps_done += 1
         if sample > eps_threshold:
             with torch.no_grad():
@@ -131,9 +153,9 @@ class Trainer(object):
 
 
     def optimizeModel(self):
-        if len(self.memory) < self.BATCH_SIZE:
+        if len(self.memory) < self.batch_size:
             return
-        transitions = self.memory.sample(self.BATCH_SIZE)
+        transitions = self.memory.sample(self.batch_size)
         batch = self.transition(*zip(*transitions))
 
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
@@ -146,9 +168,9 @@ class Trainer(object):
 
         state_action_values = self.policy_net(state_batch).gather(1, action_batch)
 
-        next_state_values = torch.zeros(self.BATCH_SIZE, device=self.device)
+        next_state_values = torch.zeros(self.batch_size, device=self.device)
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
-        expected_state_action_values = (next_state_values * self.GAMMA) + reward_batch
+        expected_state_action_values = (next_state_values * self.gamma) + reward_batch
 
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
 
@@ -193,15 +215,21 @@ class Trainer(object):
 
                 self.optimizeModel()
                 if done:
-                    self.episode_durations.append(t + 1)
                     duration = (datetime.datetime.now() - start).total_seconds()
                     print('DURATION: %s' % duration)
                     break
-            if i_episode % self.TARGET_UPDATE == 0:
+            if i_episode % self.target_update == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 try:
                     torch.save(self.target_net, 'pacman_%s.pth' % i_episode)
+                    f = open('pacman_%s_params' % i_episode, 'w+')
+                    self.param_dict['steps_done'] = self.steps_done
+                    f.write(str(self.param_dict))
+                    f.close()
+                    f = open('pacman_%s_memory' % i_episode, 'w+')
+                    pickle.dump(self.memory, f)
+                    f.close()
                     completionEmail('pacman %s episodes completed' % i_episode)
                 except Exception as e:
                     completionEmail('ERROR IN PACMAN %s' % i_episode)
