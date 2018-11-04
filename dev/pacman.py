@@ -112,7 +112,7 @@ class Trainer(object):
             self.eps_decay = param_dict['eps_decay']
             self.target_update = param_dict['target_update']
             self.steps_done = param_dict['steps_done']
-            self.memory = pickle.load(warm_start_path + '_memory')
+            self.memory = ReplayMemory(100000, self.transition)
 
             self.policy_net = torch.load(warm_start_path + '_model.pth')
             self.target_net = torch.load(warm_start_path + '_model.pth')
