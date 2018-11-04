@@ -54,7 +54,7 @@ class DQN(nn.Module):
 
     def __init__(self, num_actions, device, x):
         super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=5, stride=2)
+        self.conv1 = nn.Conv2d(4, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
         self.conv2 = nn.Conv2d(16, 32, kernel_size=5, stride=2)
         self.bn2 = nn.BatchNorm2d(32)
@@ -83,8 +83,8 @@ class Trainer(object):
         self.num_episodes = num_episodes
 
         if not warm_start_path:
-            # test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu'))
-            test_state = self.getScreen().type(torch.FloatTensor).unsqueeze(0)
+            test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu'))
+            # test_state = self.getScreen().type(torch.FloatTensor).unsqueeze(0)
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             torch.save(self.target_net, 'delete_initial_target_net')
@@ -197,8 +197,8 @@ class Trainer(object):
             self.env.reset()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
-            # state = self.getState(current_screen, last_screen)
-            state = last_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
+            state = self.getState(current_screen, last_screen)
+            # state = last_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
             for t in count():
                 action = self.selectAction(state)
                 _, reward, done, _ = self.env.step(action.item())
@@ -207,8 +207,8 @@ class Trainer(object):
                 last_screen = current_screen
                 current_screen = self.getScreen()
                 if not done:
-                    # next_state = self.getState(current_screen, last_screen)
-                    next_state = current_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
+                    next_state = self.getState(current_screen, last_screen)
+                    # next_state = current_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
                 else:
                     next_state = None
 
