@@ -77,7 +77,7 @@ class Trainer(object):
     def __init__(self, num_episodes=1, view=False):
         self.env = gym.make('MsPacman-v0').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        test_state = self.getState(self.getScreen(), self.getScreen())
+        test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu'))
 
         self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
         self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
