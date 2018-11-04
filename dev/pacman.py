@@ -27,7 +27,7 @@ import gym
 
 
 NUM_EPISODES = 5000
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 class ReplayMemory(object):
 
@@ -136,7 +136,7 @@ class Trainer(object):
 
     def getScreen(self):
         # original size: 210x160x3
-        screen = np.array(Image.fromarray(self.env.render(mode='rgb_array')[0:170, :, ]).resize((120, 128))).transpose((2, 0, 1)).astype(np.uint8)
+        screen = np.array(Image.fromarray(self.env.render(mode='rgb_array')[0:170, :, ]).resize((80, 85))).transpose((2, 0, 1)).astype(np.uint8)
         return torch.from_numpy(screen).to(self.device)
 
 
