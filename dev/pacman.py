@@ -187,7 +187,7 @@ class Trainer(object):
         # current_screen = current_screen / 255
         # return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1).astype(np.float32), device=self.device)
         import pdb; pdb.set_trace()
-        return last_screen.unsqueeze(0).astype(torch.FloatTensor).to(self.device)
+        return last_screen.unsqueeze(0).type(torch.FloatTensor).to(self.device)
 
 
     def train(self):
