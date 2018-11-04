@@ -182,11 +182,10 @@ class Trainer(object):
 
 
     def getState(self, current_screen, last_screen):
-        # difference = np.array(current_screen) - np.array(last_screen)
-        # gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
-        # current_screen = current_screen / 255
-        # return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1).astype(np.float32), device=self.device)
-        return last_screen.unsqueeze(0).type(torch.FloatTensor).to(self.device)
+        difference = np.array(current_screen) - np.array(last_screen)
+        gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
+        current_screen = current_screen / 255
+        return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1).astype(np.float32), device=self.device)
 
 
     def train(self):
@@ -197,7 +196,8 @@ class Trainer(object):
             self.env.reset()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
-            state = self.getState(current_screen, last_screen)
+            # state = self.getState(current_screen, last_screen)
+            state = last_screen.type(torch.cuda.FloatTensor)
             for t in count():
                 action = self.selectAction(state)
                 _, reward, done, _ = self.env.step(action.item())
@@ -206,7 +206,8 @@ class Trainer(object):
                 last_screen = current_screen
                 current_screen = self.getScreen()
                 if not done:
-                    next_state = self.getState(current_screen, last_screen)
+                    # next_state = self.getState(current_screen, last_screen)
+                    next_state = current_screen.type(torch.cuda.FloatTensor)
                 else:
                     next_state = None
 
