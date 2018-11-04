@@ -208,7 +208,7 @@ class Trainer(object):
                 current_screen = self.getScreen()
                 if not done:
                     # next_state = self.getState(current_screen, last_screen)
-                    next_state = current_screen.type(torch.cuda.FloatTensor)
+                    next_state = current_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
                 else:
                     next_state = None
 
