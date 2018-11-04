@@ -84,7 +84,7 @@ class Trainer(object):
 
         if not warm_start_path:
             # test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu'))
-            test_state = self.getScreen.type(torch.cuda.FloatTensor)
+            test_state = self.getScreen().type(torch.cuda.FloatTensor)
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             torch.save(self.target_net, 'delete_initial_target_net')
