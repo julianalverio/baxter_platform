@@ -66,6 +66,7 @@ class DQN(nn.Module):
         self.head = nn.Linear(np.product(x.size()), num_actions)
 
     def forward(self, x):
+        import pdb; pdb.set_trace()
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
