@@ -15,6 +15,10 @@ import torch.nn.functional as F
 import torchvision.transforms as T
 
 
+
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = '3'
+
 env = gym.make('CartPole-v0').unwrapped
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
