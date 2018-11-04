@@ -195,7 +195,12 @@ for i_episode in range(num_episodes):
         optimize_model()
         if done:
             episode_durations.append(t + 1)
-            plot_durations()
+            # plot_durations()
             break
     if i_episode % TARGET_UPDATE == 0:
         target_net.load_state_dict(policy_net.state_dict())
+try:
+    torch.save(self.target_net, 'cartpole.pth')
+except Exception as e:
+    import pdb; pdb.set_trace()
+    print(e)
