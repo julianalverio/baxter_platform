@@ -66,7 +66,6 @@ class DQN(nn.Module):
         self.head = nn.Linear(np.product(x.size()), num_actions)
 
     def forward(self, x):
-        import pdb; pdb.set_trace()
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
@@ -86,7 +85,6 @@ class Trainer(object):
         if not warm_start_path:
             # test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu'))
             test_state = self.getScreen().type(torch.FloatTensor).unsqueeze(0)
-            import pdb; pdb.set_trace()
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             torch.save(self.target_net, 'delete_initial_target_net')
@@ -200,7 +198,7 @@ class Trainer(object):
             last_screen = self.getScreen()
             current_screen = self.getScreen()
             # state = self.getState(current_screen, last_screen)
-            state = last_screen.type(torch.cuda.FloatTensor)
+            state = last_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
             for t in count():
                 action = self.selectAction(state)
                 _, reward, done, _ = self.env.step(action.item())
