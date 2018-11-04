@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, '/Users/julianalverio/venv/lib/python3.7/site-packages')
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -13,10 +16,11 @@ import os
 import datetime
 import yagmail
 
-# THIS IS A HACK SPECIFIC TO BAFFIN
-import sys
-print('Removed: ', sys.path.pop(0))
-sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
+
+# # THIS IS A HACK SPECIFIC TO BAFFIN
+# import sys
+# print('Removed: ', sys.path.pop(0))
+# sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
 import gym
 
 
@@ -104,10 +108,7 @@ class Trainer(object):
 
     def getScreen(self):
         # original size: 210x160x3
-        # import pdb; pdb.set_trace()
-        # screen = self.env.render(mode='rgb_array')[0:170, :, ].transpose((2, 0, 1))
-        # screen = np.ascontiguousarray(screen, dtype=np.uint8)
-        screen = np.array(Image.fromarray(self.env.render(mode='rgb_array')[0:170, :, ]).resize((80, 85))).transpose((2, 0, 1)).astype(np.uint8)
+        screen = np.array(Image.fromarray(self.env.render(mode='rgb_array')[0:170, :, ]).resize((120, 128))).transpose((2, 0, 1)).astype(np.uint8)
         return torch.from_numpy(screen).to(self.device)
 
 
@@ -232,6 +233,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
-# trainer.showPacman('target_net_500.pth')
+# trainer.train()
+# completionEmail('%s done' % NUM_EPISODES)
+trainer.showPacman('pacman_4000.pth')

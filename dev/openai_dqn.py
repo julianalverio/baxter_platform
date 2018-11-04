@@ -189,9 +189,11 @@ class Trainer(object):
             current_screen = self.getScreen()
             initial_block_position = self.env.sim.data.get_site_xpos('object0')
             initial_gripper_position = self.sim.data.get_site_xpos('robot0:grip')
+            initial_object_qpos = self.sim.data.get_joint_qpos('object0:joint')
             self.steps_done = 0
             for t in count():
-                print(np.linalg.norm(initial_gripper_position - self.env.sim.data.get_site_xpos('object0')))
+                #experiment: see if there's any change in position as the block moves
+                print(np.linalg.norm(initial_object_qpos - self.sim.data.get_joint_qpos('object0:joint')))
                 done = False
                 last_screen = current_screen
                 current_screen = self.getScreen()
