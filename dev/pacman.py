@@ -228,9 +228,6 @@ class Trainer(object):
                     self.param_dict['steps_done'] = self.steps_done
                     f.write(str(self.param_dict))
                     f.close()
-                    f = open('pacman_%s_memory' % i_episode, 'w+')
-                    pickle.dump(self.memory, f)
-                    f.close()
                     completionEmail('pacman %s episodes completed' % i_episode)
                 except Exception as e:
                     completionEmail('ERROR IN PACMAN %s' % i_episode)
