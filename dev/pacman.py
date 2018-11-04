@@ -54,13 +54,12 @@ class DQN(nn.Module):
 
     def __init__(self, num_actions, device, x):
         super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(4, 16, kernel_size=5, stride=2)
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
         self.conv2 = nn.Conv2d(16, 32, kernel_size=5, stride=2)
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
-        self.head = nn.Linear(1792, num_actions)
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
@@ -183,10 +182,11 @@ class Trainer(object):
 
 
     def getState(self, current_screen, last_screen):
-        difference = np.array(current_screen) - np.array(last_screen)
-        gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
-        current_screen = current_screen / 255
-        return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1).astype(np.float32), device=self.device)
+        # difference = np.array(current_screen) - np.array(last_screen)
+        # gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
+        # current_screen = current_screen / 255
+        # return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1).astype(np.float32), device=self.device)
+        return last_screen.unsqueeze(0)
 
 
     def train(self):
