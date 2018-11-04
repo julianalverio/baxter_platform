@@ -51,7 +51,7 @@ class ReplayMemory(object):
 
 class DQN(nn.Module):
 
-    def __init__(self, num_actions, device):
+    def __init__(self, num_actions, device, x):
         super(DQN, self).__init__()
         self.conv1 = nn.Conv2d(4, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
@@ -60,7 +60,10 @@ class DQN(nn.Module):
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
         self.head = nn.Linear(1792, num_actions)
-        self.device = device
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn2(self.conv2(x)))
+        x = F.relu(self.bn3(self.conv3(x)))
+        self.head = nn.Linear(np.product(x.size()), num_actions)
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
@@ -74,9 +77,10 @@ class Trainer(object):
     def __init__(self, num_episodes=1, view=False):
         self.env = gym.make('MsPacman-v0').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        test_state = self.getState(self.getScreen(), self.getScreen())
 
-        self.policy_net = DQN(self.env.action_space.n, self.device).to(self.device)
-        self.target_net = DQN(self.env.action_space.n, self.device).to(self.device)
+        self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
+        self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
         torch.save(self.target_net, 'delete_initial_target_net')
 
         self.transition = namedtuple('Transition',
@@ -99,6 +103,7 @@ class Trainer(object):
         self.num_episodes = num_episodes
         self.steps_done = 0
         self.view = view
+
 
 
     def rgb2gray(self, rgb):
