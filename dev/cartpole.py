@@ -98,7 +98,7 @@ class Trainer(object):
 
             self.target_net.load_state_dict(self.policy_net.state_dict())
             self.target_net.eval()
-            self.memory = ReplayMemory(100000, self.transition)
+            self.memory = ReplayMemory(10000, self.transition)
 
             self.steps_done = 0
 
