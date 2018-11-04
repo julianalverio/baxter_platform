@@ -198,8 +198,9 @@ class Trainer(object):
                 try:
                     torch.save(self.target_net, 'pacman_%s.pth' % i_episode)
                     completionEmail('pacman %s episodes completed' % i_episode)
-                except:
+                except Exception as e:
                     completionEmail('ERROR IN PACMAN %s' % i_episode)
+                    print(e)
                     import pdb; pdb.set_trace()
 
     def showPacman(self, target_net_path):
@@ -233,6 +234,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-# trainer.train()
-# completionEmail('%s done' % NUM_EPISODES)
-trainer.showPacman('pacman_4000.pth')
+trainer.train()
+completionEmail('%s done' % NUM_EPISODES)
+# trainer.showPacman('pacman_4000.pth')
