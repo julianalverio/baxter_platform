@@ -102,7 +102,7 @@ def get_screen():
     # Resize, and add a batch dimension (BCHW)
     return resize(screen).unsqueeze(0).to(device)
 
-
+import pdb; pdb.set_trace()
 env.reset()
 
 
