@@ -25,9 +25,9 @@ sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-pa
 import gym
 
 
-
+GPU_NUM = '0'
 NUM_EPISODES = 5000
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
 class ReplayMemory(object):
 
@@ -54,7 +54,8 @@ class DQN(nn.Module):
 
     def __init__(self, num_actions, device, x):
         super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(4, 16, kernel_size=5, stride=2)
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=5, stride=2)
+        # self.conv1 = nn.Conv2d(4, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
         self.conv2 = nn.Conv2d(16, 32, kernel_size=5, stride=2)
         self.bn2 = nn.BatchNorm2d(32)
@@ -83,22 +84,22 @@ class Trainer(object):
         self.num_episodes = num_episodes
 
         if not warm_start_path:
-            test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu'))
-            # test_state = self.getScreen().type(torch.FloatTensor).unsqueeze(0)
+            # test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu'))
+            test_state = self.getScreen().type(torch.FloatTensor).unsqueeze(0)
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             torch.save(self.target_net, 'delete_initial_target_net')
 
-            self.batch_size = 128
+            self.batch_size = 32
             self.gamma = 0.999
-            self.eps_start = 0.9
-            self.eps_end = 0.05
+            self.eps_start = 0.999
+            self.eps_end = 0.1
             self.eps_decay = 200
-            self.target_update = 10
+            self.target_update = 100
 
             self.target_net.load_state_dict(self.policy_net.state_dict())
             self.target_net.eval()
-            self.memory = ReplayMemory(100000, self.transition)
+            self.memory = ReplayMemory(10000, self.transition)
 
             self.steps_done = 0
 
@@ -112,7 +113,7 @@ class Trainer(object):
             self.eps_decay = param_dict['eps_decay']
             self.target_update = param_dict['target_update']
             self.steps_done = param_dict['steps_done']
-            self.memory = ReplayMemory(100000, self.transition)
+            self.memory = ReplayMemory(10000, self.transition)
 
             self.policy_net = torch.load(warm_start_path + '_model.pth')
             self.target_net = torch.load(warm_start_path + '_model.pth')
@@ -197,8 +198,8 @@ class Trainer(object):
             self.env.reset()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
-            state = self.getState(current_screen, last_screen)
-            # state = last_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
+            # state = self.getState(current_screen, last_screen)
+            state = last_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
             for t in count():
                 action = self.selectAction(state)
                 _, reward, done, _ = self.env.step(action.item())
@@ -207,8 +208,8 @@ class Trainer(object):
                 last_screen = current_screen
                 current_screen = self.getScreen()
                 if not done:
-                    next_state = self.getState(current_screen, last_screen)
-                    # next_state = current_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
+                    # next_state = self.getState(current_screen, last_screen)
+                    next_state = current_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
                 else:
                     next_state = None
 
@@ -225,7 +226,7 @@ class Trainer(object):
                 self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 try:
-                    torch.save(self.target_net, 'pacman_%s.pth' % i_episode)
+                    torch.save(self.target_net, 'pacman_%s_%s.pth' % (GPU_NUM, i_episode))
                     f = open('pacman_%s_params' % i_episode, 'w+')
                     self.param_dict['steps_done'] = self.steps_done
                     f.write(str(self.param_dict))

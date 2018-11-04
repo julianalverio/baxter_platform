@@ -27,7 +27,8 @@ import gym
 
 
 NUM_EPISODES = 5000
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+gpu_num = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = gpu_num
 
 class ReplayMemory(object):
 
@@ -225,7 +226,7 @@ class Trainer(object):
                 self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 try:
-                    torch.save(self.target_net, 'pacman_%s.pth' % i_episode)
+                    torch.save(self.target_net, 'pacman_%s_%s.pth' % (gpu_num, i_episode))
                     f = open('pacman_%s_params' % i_episode, 'w+')
                     self.param_dict['steps_done'] = self.steps_done
                     f.write(str(self.param_dict))
