@@ -81,7 +81,6 @@ class Trainer(object):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.transition = namedtuple('Transition',
                                     ('state', 'action', 'next_state', 'reward'))
-        self.optimizer = optim.Adam(self.policy_net.parameters())
         self.num_episodes = num_episodes
 
         if not warm_start_path:
@@ -117,6 +116,8 @@ class Trainer(object):
 
             self.policy_net = torch.load(warm_start_path + '_model.pth')
             self.target_net = torch.load(warm_start_path + '_model.pth')
+
+        self.optimizer = optim.Adam(self.policy_net.parameters())
 
         self.param_dict = {
         'batch_size' : self.batch_size,
