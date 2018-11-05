@@ -1,1 +1,1 @@
-{'batch_size': 32, 'eps_end': 0.1, 'eps_decay': 200, 'eps_start': 0.999, 'target_update': 100, 'gamma': 0.999, 'steps_done': 982}
+{'steps_done': 569, 'eps_decay': 200, 'eps_start': 0.999, 'batch_size': 128, 'target_update': 100, 'eps_end': 0.1, 'gamma': 0.999}
