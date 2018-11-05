@@ -137,7 +137,7 @@ class Trainer(object):
     def getScreen(self):
         # original size: 210x160x3
         image = Image.fromarray(self.env.render(mode='rgb_array')[25:195, 8:152, :]).resize((72, 85)).convert(mode='L')
-        return torch.from_numpy(np.array(image)/255.).unsqueeze(0).unsqueeze(0).to(self.device)
+        return torch.from_numpy(np.array(image)/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device)
 
 
     def selectAction(self, state):
