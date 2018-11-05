@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import time
+
 
 import math
 import random
@@ -25,7 +27,7 @@ sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-pa
 import gym
 
 
-GPU_NUM = '2'
+GPU_NUM = '0'
 NUM_EPISODES = 5000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
@@ -53,8 +55,7 @@ class ReplayMemory(object):
 class DQN(nn.Module):
     def __init__(self, num_actions, device, x):
         super(DQN, self).__init__()
-        # self.conv1 = nn.Conv2d(3, 16, kernel_size=5, stride=2) #SWITCH
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=5, stride=2)
+        self.conv1 = nn.Conv2d(2, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
         self.conv2 = nn.Conv2d(16, 32, kernel_size=5, stride=2)
         self.bn2 = nn.BatchNorm2d(32)
@@ -74,22 +75,20 @@ class DQN(nn.Module):
 
 
 class Trainer(object):
-    # warm start path points to pacman_1_4000, which is the param dict, and the actual model will be pacman_1_4000.pth
     def __init__(self, num_episodes=5000, warm_start_path=''):
-        self.env = gym.make('MsPacman-v0').unwrapped
+        self.env = gym.make('Breakout-v0').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.transition = namedtuple('Transition',
                                     ('state', 'action', 'next_state', 'reward'))
         self.num_episodes = num_episodes
 
         if not warm_start_path:
-            # test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu')) ##SWITCH
-            test_state = self.getScreen().type(torch.FloatTensor).unsqueeze(0)
+            test_state = self.getState(self.getScreen(), self.getScreen()).to(torch.device('cpu'))
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             torch.save(self.target_net, 'delete_initial_target_net')
 
-            self.batch_size = 128
+            self.batch_size = 64
             self.gamma = 0.999
             self.eps_start = 0.999
             self.eps_end = 0.1
@@ -134,10 +133,11 @@ class Trainer(object):
         return np.array(img, dtype=np.float64)
 
 
+    # All images in black and white
     def getScreen(self):
         # original size: 210x160x3
-        screen = np.array(Image.fromarray(self.env.render(mode='rgb_array')[0:170, :, ]).resize((80, 85))).transpose((2, 0, 1)).astype(np.uint8)
-        return torch.from_numpy(screen).to(self.device)
+        image = Image.fromarray(self.env.render(mode='rgb_array')[25:195, 8:152, :]).resize((72, 85)).convert(mode='L')
+        return torch.from_numpy(np.array(image)/255.).unsqueeze(0).unsqueeze(0).to(self.device)
 
 
     def selectAction(self, state):
@@ -183,10 +183,8 @@ class Trainer(object):
 
 
     def getState(self, current_screen, last_screen):
-        difference = np.array(current_screen) - np.array(last_screen)
-        gray = torch.tensor(self.rgb2gray(difference), device=self.device) / 255
-        current_screen = current_screen / 255
-        return torch.tensor(np.concatenate((current_screen.unsqueeze(0), gray.unsqueeze(0).unsqueeze(0)), axis=1).astype(np.float32), device=self.device)
+        difference = current_screen - last_screen
+        return torch.cat([current_screen, difference], dim=1)
 
 
     def train(self):
@@ -195,10 +193,10 @@ class Trainer(object):
             print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
             self.env.reset()
+            import pdb; pdb.set_trace()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
-            # state = self.getState(current_screen, last_screen) #SWITCH
-            state = last_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
+            state = self.getState(current_screen, last_screen)
             for t in count():
                 action = self.selectAction(state)
                 _, reward, done, _ = self.env.step(action.item())
@@ -207,8 +205,7 @@ class Trainer(object):
                 last_screen = current_screen
                 current_screen = self.getScreen()
                 if not done:
-                    # next_state = self.getState(current_screen, last_screen) #SWITCH
-                    next_state = current_screen.type(torch.cuda.FloatTensor).unsqueeze(0)
+                    next_state = self.getState(current_screen, last_screen)
                 else:
                     next_state = None
 
@@ -220,36 +217,35 @@ class Trainer(object):
                 if done:
                     duration = (datetime.datetime.now() - start).total_seconds()
                     print('DURATION: %s' % duration)
+                    print('Steps Taken: %s' % t)
                     break
             if i_episode % self.target_update == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 try:
-                    torch.save(self.target_net, 'pacman_%s_%s.pth' % (GPU_NUM, i_episode))
-                    f = open('pacman_%s_params' % i_episode, 'w+')
-                    self.param_dict['steps_done'] = self.steps_done
-                    f.write(str(self.param_dict))
-                    f.close()
-                    completionEmail('pacman %s episodes completed' % i_episode)
+                    torch.save(self.target_net, 'breakout_%s.pth' % (i_episode))
+                    # f = open('pacman_%s_params' % i_episode, 'w+')
+                    # self.param_dict['steps_done'] = self.steps_done
+                    # f.write(str(self.param_dict))
+                    # f.close()
+                    completionEmail('Breakout %s episodes completed' % i_episode)
                 except Exception as e:
-                    completionEmail('ERROR IN PACMAN %s' % i_episode)
+                    completionEmail('ERROR IN BREAKOUT %s' % i_episode)
                     print(e)
                     import pdb; pdb.set_trace()
 
-    def showPacman(self, target_net_path):
-        import time
+    def playback(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
-        self.env = gym.make('MsPacman-v0').unwrapped
+        self.env = gym.make('Breakout-v0').unwrapped
         self.env.reset()
         steps_done = 0
         done = False
         current_screen = self.getScreen()
         while not done:
             self.env.render(mode='human')
-            time.sleep(0.05)
+            time.sleep(0.025)
             previous_screen = current_screen
             current_screen = self.getScreen()
-            # state = current_screen.type(torch.FloatTensor).unsqueeze(0)
             state = self.getState(current_screen, previous_screen)
             action = self.target_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
             _, reward, done, _ = self.env.step(action.item())
@@ -272,6 +268,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-# trainer.train()
-# completionEmail('%s done' % NUM_EPISODES)
-trainer.showPacman('pacman_1_4500.pth')
+trainer.train()
+completionEmail('%s done' % NUM_EPISODES)
+# trainer.playback('pacman_0_4500.pth')

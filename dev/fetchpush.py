@@ -14,13 +14,13 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-# import yagmail
+import yagmail
 import os
 import datetime
 
 
 NUM_EPISODES = 1000
-os.environ['CUDA_VISIBLE_DEVICES']='0,1,2,3'
+os.environ['CUDA_VISIBLE_DEVICES']='1,2,3'
 
 class ReplayMemory(object):
 
@@ -31,7 +31,6 @@ class ReplayMemory(object):
         self.transition = transition
 
     def push(self, *args):
-        """Saves a transition."""
         if len(self.memory) < self.capacity:
             self.memory.append(None)
         self.memory[self.position] = self.transition(*args)
@@ -189,6 +188,7 @@ class Trainer(object):
             self.steps_done = 0
             for t in count():
                 #experiment: see if there's any change in position as the block moves
+                import pdb; pdb.set_trace()
                 print(np.linalg.norm(initial_object_qpos - self.sim.data.get_joint_qpos('object0:joint')))
                 done = False
                 last_screen = current_screen
@@ -229,16 +229,16 @@ class Trainer(object):
                 self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 250 == 0:
                 try:
-                    torch.save(self.target_net, 'openai_1_%s.pth' % i_episode)
-                    # completionEmail('SUCCESS OPENAI GYM')
-                except:
-                    # completionEmail('ERROR IN OPENAI GYM')
+                    torch.save(self.target_net, 'fetchpush_%s.pth' % i_episode)
+                    completionEmail('SUCCESS OPENAI GYM')
+                except Exception as e:
+                    completionEmail('ERROR IN OPENAI GYM')
                     import pdb; pdb.set_trace()
 
 
     def showResults(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
-        self.env = gym.make('FetchPush-v1').unwrapped #TODO
+        self.env = gym.make('FetchPush-v1').unwrapped
         self.env.reset()
         steps_done = 0
         current_screen = self.getScreen()
@@ -252,15 +252,15 @@ class Trainer(object):
             steps_done += 1
         print("Steps Done: ", steps_done)
 
-#
-#
-# def completionEmail(message=''):
-#   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
-#   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
+
+
+def completionEmail(message=''):
+  yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
+  yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
 
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 trainer.train()
-# completionEmail('%s done' % NUM_EPISODES)
+completionEmail('%s done' % NUM_EPISODES)
 
