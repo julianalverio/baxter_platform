@@ -193,7 +193,6 @@ class Trainer(object):
             print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
             self.env.reset()
-            import pdb; pdb.set_trace()
             last_screen = self.getScreen()
             current_screen = self.getScreen()
             state = self.getState(current_screen, last_screen)
