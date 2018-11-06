@@ -119,7 +119,7 @@ class Trainer(object):
 
         self.param_dict = {
         'batch_size' : self.batch_size,
-        'gamma': self.gamma, 
+        'gamma': self.gamma,
         'eps_start' : self.eps_start,
         'eps_end': self.eps_end,
         'eps_decay': self.eps_decay,
@@ -215,7 +215,6 @@ class Trainer(object):
                 if done:
                     duration = (datetime.datetime.now() - start).total_seconds()
                     print('DURATION: %s' % duration)
-                    print('Steps Taken: %s' % t)
                     break
             if i_episode % self.target_update == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
@@ -266,6 +265,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
-# trainer.playback('breakout_4500.pth')
+# trainer.train()
+# completionEmail('%s done' % NUM_EPISODES)
+trainer.playback('breakout_24500.pth')
