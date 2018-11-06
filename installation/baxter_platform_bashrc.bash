@@ -124,3 +124,6 @@ alias sim_headless='roslaunch baxter_gazebo baxter_world.launch gui:=false recor
 alias sim_server='Xvfb :1 -screen 0 1600x1200x16  & export DISPLAY=:1.0; sim_headless'
 alias velocity_server='rosrun baxter_interface joint_trajectory_action_server.py --mode velocity'
 alias position_server='rosrun baxter_interface joint_trajectory_action_server.py --mode position'
+alias set_stuff='rosparam set /robot_description_semantic -t ~/catkin_ws/src/baxter_platform/moveit_robots/baxter/baxter_moveit_config/config/baxter.srdf'
+alias load_stuff='rosparam load ~/catkin_ws/src/baxter_platform/moveit_robots/baxter/baxter_moveit_config/config/kinematics.yaml'
+alias setup='set_stuff; load_stuff; rosrun moveit_ros_move_group move_group'
