@@ -24,7 +24,7 @@ baxter_hostname="orion"
 # Set *Either* your computers ip address or hostname. Please note if using
 # your_hostname that this must be resolvable to Baxter.
 #you can get this by running ifconfig and looking at enet address
-your_ip = "172.16.109.132"
+your_ip="172.16.109.132"
 #your_hostname="1100044p.local"
 
 # Specify ROS distribution (e.g. indigo, hydro, etc.)
