@@ -27,8 +27,8 @@ sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-pa
 import gym
 
 
-GPU_NUM = '0'
-NUM_EPISODES = 50000
+GPU_NUM = '0,1,2,3'
+NUM_EPISODES = 25000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
 class ReplayMemory(object):
@@ -87,16 +87,16 @@ class Trainer(object):
             self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             torch.save(self.target_net, 'delete_initial_target_net')
 
-            self.batch_size = 64
-            self.gamma = 0.999
+            self.batch_size = 32
+            self.gamma = 0.99
             self.eps_start = 0.999
-            self.eps_end = 0.1
+            self.eps_end = 0.05
             self.eps_decay = 200
-            self.target_update = 100
+            self.target_update = 1000
 
             self.target_net.load_state_dict(self.policy_net.state_dict())
             self.target_net.eval()
-            self.memory = ReplayMemory(10000, self.transition)
+            self.memory = ReplayMemory(100000, self.transition)
 
             self.steps_done = 0
 
@@ -115,7 +115,7 @@ class Trainer(object):
             self.policy_net = torch.load(warm_start_path + '_model.pth')
             self.target_net = torch.load(warm_start_path + '_model.pth')
 
-        self.optimizer = optim.Adam(self.policy_net.parameters())
+        self.optimizer = optim.Adam(self.policy_net.parameters(), lr = 0.0001)
 
         self.param_dict = {
         'batch_size' : self.batch_size,
