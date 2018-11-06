@@ -28,7 +28,7 @@ import gym
 
 
 GPU_NUM = '0'
-NUM_EPISODES = 5000
+NUM_EPISODES = 50000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
 class ReplayMemory(object):
@@ -40,7 +40,6 @@ class ReplayMemory(object):
         self.transition = transition
 
     def push(self, *args):
-        """Saves a transition."""
         if len(self.memory) < self.capacity:
             self.memory.append(None)
         self.memory[self.position] = self.transition(*args)
@@ -188,7 +187,7 @@ class Trainer(object):
 
 
     def train(self):
-        for i_episode in range(self.num_episodes):
+        for i_episode in range(self.num_episodes+1):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
@@ -269,4 +268,4 @@ trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 trainer.train()
 completionEmail('%s done' % NUM_EPISODES)
-# trainer.playback('pacman_0_4500.pth')
+# trainer.playback('breakout_4500.pth')
