@@ -192,7 +192,7 @@ class Trainer(object):
             object_position = self.env.sim.data.get_site_xpos('object0')
             for t in count():
                 gripper_difference = np.linalg.norm(gripper_position - self.env.sim.data.get_site_xpos('robot0:grip'))
-                object_difference = np.linalgo.norm(object_position - self.env.sim.data.get_site_xpos('object0'))
+                object_difference = np.linalg.norm(object_position - self.env.sim.data.get_site_xpos('object0'))
                 reward = 1./np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - self.env.sim.data.get_site_xpos('object0'))
                 print(reward, gripper_difference, object_difference)
                 # print(np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - gripper_position))
