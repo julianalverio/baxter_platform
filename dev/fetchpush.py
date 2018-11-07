@@ -68,7 +68,7 @@ class Trainer(object):
     def __init__(self, num_episodes=NUM_EPISODES):
         self.env = gym.make('FetchPush-v1').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        setupState = self.getState(self.getScreen(), self.getScreen()).to(torch.device("cpu"))
+        setupState = self.getScreen().to(torch.device("cpu"))
         self.policy_net = DQN(6, self.device, setupState).to(self.device)
         self.target_net = DQN(6, self.device, setupState).to(self.device)
 
@@ -227,7 +227,7 @@ class Trainer(object):
                     import pdb; pdb.set_trace()
 
 
-    def showResults(self, target_net_path):
+    def playback(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
         self.env = gym.make('FetchPush-v1').unwrapped
         self.env.reset()
@@ -237,7 +237,6 @@ class Trainer(object):
             self.env.render(mode='human')
             previous_screen = current_screen
             current_screen = self.getScreen()
-            state = self.getState(current_screen, previous_screen)
             action = self.target_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
             _, reward, done, _ = self.env.step(action.item())
             steps_done += 1
@@ -254,4 +253,4 @@ trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 trainer.train()
 completionEmail('%s done' % NUM_EPISODES)
-
+trainer.playback('fetchpush_1000.pth')
