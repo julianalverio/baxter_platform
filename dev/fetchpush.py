@@ -175,6 +175,8 @@ class Trainer(object):
 
 
 
+    #to see all "joint names" look at self.env.sim.model.joint_names --> only object0:joint doesn't have 'robot' as a prefix
+    #last thing I ran: (Pdb) [x for x in dir(self.env.sim.data) if 'get' in x and 'joint' in x]
 
     def train(self):
         for i_episode in range(self.num_episodes):
@@ -182,14 +184,20 @@ class Trainer(object):
             start = datetime.datetime.now()
             self.reset()
             current_screen = self.getScreen()
+            import pdb; pdb.set_trace()
+
             initial_block_position = self.env.sim.data.get_site_xpos('object0')
+            initial_block_joint_position = self.env.sim.data.get_site_xpos('object0:joint')
             initial_gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
             initial_object_qpos = self.env.sim.data.get_joint_qpos('object0:joint')
+            initial_site_poses = self.env.sim.model.site_pos
             self.steps_done = 0
             for t in count():
                 #experiment: see if there's any change in position as the block moves
                 import pdb; pdb.set_trace()
-                print(np.linalg.norm(initial_object_qpos - self.env.sim.data.get_joint_qpos('object:joint')))
+                print(np.linalg.norm(initial_site_poses - self.env.sim.model.site_pos))
+                # print(np.linalg.norm(initial_object_qpos - self.env.sim.data.get_joint_qpos('object:joint')))
+
                 done = False
                 last_screen = current_screen
                 current_screen = self.getScreen()
