@@ -188,8 +188,8 @@ class Trainer(object):
             self.steps_done = 0
             for t in count():
                 #experiment: see if there's any change in position as the block moves
-                # import pdb; pdb.set_trace()
-                print(np.linalg.norm(initial_object_qpos - self.env.sim.data.get_joint_qpos('object0:joint')))
+                import pdb; pdb.set_trace()
+                print(np.linalg.norm(initial_object_qpos - self.env.sim.data.get_joint_qpos('object:joint')))
                 done = False
                 last_screen = current_screen
                 current_screen = self.getScreen()
