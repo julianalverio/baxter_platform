@@ -8,6 +8,7 @@ import numpy as np
 from collections import namedtuple
 from itertools import count
 from PIL import Image
+import copy
 
 import torch
 import torch.nn as nn
@@ -187,22 +188,21 @@ class Trainer(object):
             start = datetime.datetime.now()
             self.reset()
             self.steps_done = 0
-            gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
-            object_position = self.env.sim.data.get_site_xpos('object0')
-            import pdb; pdb.set_trace()
+            gripper_position = copy.deepcopy(self.env.sim.data.get_site_xpos('robot0:grip'))
+            object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
             for t in count():
-                new_gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
-                new_object_position = self.env.sim.data.get_site_xpos('object0')
-                # gripper_difference = gripper_position - self.env.sim.data.get_site_xpos('robot0:grip')
-                # object_difference = object_position - self.env.sim.data.get_site_xpos('object0')
+                # new_gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
+                # new_object_position = self.env.sim.data.get_site_xpos('object0')
+                gripper_difference = gripper_position - self.env.sim.data.get_site_xpos('robot0:grip')
+                object_difference = object_position - self.env.sim.data.get_site_xpos('object0')
                 reward = 1./np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - self.env.sim.data.get_site_xpos('object0'))
-                # print(reward, gripper_difference, object_difference)
+                print(reward, gripper_difference, object_difference)
                 # print(np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - gripper_position))
                 # print(np.linalg.norm(self.env.sim.data.get_site_xpos('object0') - object_position))
-                print('Start')
-                print('Showing new, then old')
-                print(reward, new_gripper_position, new_object_position)
-                print(reward, gripper_position, object_position)
+                # print('Start')
+                # print('Showing new, then old')
+                # print(reward, new_gripper_position, new_object_position)
+                # print(reward, gripper_position, object_position)
                 done = False
                 state = self.getScreen()
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
