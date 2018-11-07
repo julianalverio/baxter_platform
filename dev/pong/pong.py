@@ -17,6 +17,8 @@ from PIL import Image
 import os
 import datetime
 import yagmail
+#HACK SPECIFIC TO MELVILLE
+import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 import cv2
 
 # THIS IS A HACK SPECIFIC TO BAFFIN
