@@ -1,7 +1,6 @@
 import sys
 import os
-# sys.path.insert(0, os.getcwd() + '/gym')
-sys.path.pop(0)
+sys.path.insert(0, os.getcwd() + '/gym')
 import gym
 import pdb; pdb.set_trace()
 import math
@@ -175,35 +174,26 @@ class Trainer(object):
         return torch.tensor(reward, device=self.device).view(1, 1)
 
 
-
+    # initial_block_position = self.env.sim.data.get_site_xpos('object0')
+    # initial_block_joint_position = self.env.sim.data.get_site_xpos('object0:joint')
+    # initial_gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
+    # initial_object_qpos = self.env.sim.data.get_joint_qpos('object0:joint')
+    # initial_site_poses = self.env.sim.model.site_pos
     #to see all "joint names" look at self.env.sim.model.joint_names --> only object0:joint doesn't have 'robot' as a prefix
     #last thing I ran: (Pdb) [x for x in dir(self.env.sim.data) if 'get' in x and 'joint' in x]
-
     def train(self):
+        gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
+        object_position = self.env.sim.data.get_site_xpos('object0')
         for i_episode in range(self.num_episodes):
             print('Episode %s' % i_episode)
             start = datetime.datetime.now()
             self.reset()
-            current_screen = self.getScreen()
-            import pdb; pdb.set_trace()
-
-            initial_block_position = self.env.sim.data.get_site_xpos('object0')
-            # initial_block_joint_position = self.env.sim.data.get_site_xpos('object0:joint')
-            initial_gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
-            initial_object_qpos = self.env.sim.data.get_joint_qpos('object0:joint')
-            initial_site_poses = self.env.sim.model.site_pos
             self.steps_done = 0
             for t in count():
-                #experiment: see if there's any change in position as the block moves
-                # import pdb; pdb.set_trace()
-                print(np.linalg.norm(initial_site_poses - self.env.sim.model.site_pos))
-                # print(np.linalg.norm(initial_object_qpos - self.env.sim.data.get_joint_qpos('object:joint')))
-
+                print(np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - gripper_position))
+                print(np.linalg.norm(self.env.sim.data.get_site_xpos('object0') - object_position))
                 done = False
-                last_screen = current_screen
-                current_screen = self.getScreen()
-                state = self.getState(current_screen, last_screen)
-
+                start = self.getScreen()
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
                 movement = np.zeros(4)
                 if action.item() % 2 == 0:
@@ -213,18 +203,10 @@ class Trainer(object):
                 self.env.step(movement)
                 reward = self.getReward(task=1)
 
-                # #if the block moved
-                # if np.linalg.norm(initial_position - self.env.sim.data.get_site_xpos('object0')) > 0.1:
-                #     done = True
-                #     reward += 1000.
-                #     print("I TOUCHED THE BLOCK")
-
                 if t == 1000:
                     done = True
-                last_screen = current_screen
-                current_screen = self.getScreen()
                 if not done:
-                    next_state = self.getState(current_screen, last_screen)
+                    next_state = self.getScreen()
                 else:
                     next_state = None
 
