@@ -19,7 +19,7 @@ import os
 import datetime
 
 
-NUM_EPISODES = 2000
+NUM_EPISODES = 5000
 os.environ['CUDA_VISIBLE_DEVICES']='1,2,3'
 
 class ReplayMemory(object):
@@ -164,13 +164,17 @@ class Trainer(object):
     Task 4: Pick up the block
     Task 5: Pick up block and move to location
     '''
-    def getReward(self, task=1):
+    def getReward(self, initial_object_position, task=1):
+        done = False
         gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
         object_position = self.env.sim.data.get_site_xpos('object0')
         reward = 0
         if task == 1:
             reward += 1./np.linalg.norm(gripper_position - object_position)
-        return torch.tensor(reward, device=self.device).view(1, 1)
+        if np.linalg.norm(initial_object_position - object_position) > 1e-3:
+            reward += 1000.
+            done = True
+        return torch.tensor(reward, device=self.device).view(1, 1), done
 
 
     # initial_block_position = self.env.sim.data.get_site_xpos('object0')
@@ -181,29 +185,13 @@ class Trainer(object):
     #to see all "joint names" look at self.env.sim.model.joint_names --> only object0:joint doesn't have 'robot' as a prefix
     #last thing I ran: (Pdb) [x for x in dir(self.env.sim.data) if 'get' in x and 'joint' in x]
     def train(self):
-        gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
-        object_position = self.env.sim.data.get_site_xpos('object0')
         for i_episode in range(self.num_episodes):
             print('Episode %s' % i_episode)
             start = datetime.datetime.now()
             self.reset()
             self.steps_done = 0
-            gripper_position = copy.deepcopy(self.env.sim.data.get_site_xpos('robot0:grip'))
-            object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
+            initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
             for t in count():
-                # new_gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
-                # new_object_position = self.env.sim.data.get_site_xpos('object0')
-                gripper_difference = gripper_position - self.env.sim.data.get_site_xpos('robot0:grip')
-                object_difference = object_position - self.env.sim.data.get_site_xpos('object0')
-                reward = 1./np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - self.env.sim.data.get_site_xpos('object0'))
-                print(reward, np.linalg.norm(gripper_difference), np.linalg.norm(object_difference))
-                # print(np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - gripper_position))
-                # print(np.linalg.norm(self.env.sim.data.get_site_xpos('object0') - object_position))
-                # print('Start')
-                # print('Showing new, then old')
-                # print(reward, new_gripper_position, new_object_position)
-                # print(reward, gripper_position, object_position)
-                done = False
                 state = self.getScreen()
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
                 movement = np.zeros(4)
@@ -212,7 +200,7 @@ class Trainer(object):
                 else:
                     movement[action.item() // 2] -= 1
                 self.env.step(movement)
-                reward = self.getReward(task=1)
+                reward, done = self.getReward(initial_object_position, task=1)
 
                 if t == 1000:
                     done = True
