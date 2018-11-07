@@ -168,8 +168,8 @@ class Trainer(object):
         object_position = self.env.sim.data.get_site_xpos('object0')
         reward = 0
         if task == 1:
-            reward += 1/np.linalg.norm(gripper_position - object_position)
-
+            reward += 1./np.linalg.norm(gripper_position - object_position)
+        print(reward)
         return torch.tensor(reward, device=self.device).view(1, 1)
 
 
@@ -188,12 +188,11 @@ class Trainer(object):
             start = datetime.datetime.now()
             self.reset()
             self.steps_done = 0
-            state = self.getScreen()
             for t in count():
-                print(np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - gripper_position))
-                print(np.linalg.norm(self.env.sim.data.get_site_xpos('object0') - object_position))
+                # print(np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - gripper_position))
+                # print(np.linalg.norm(self.env.sim.data.get_site_xpos('object0') - object_position))
                 done = False
-                start = self.getScreen()
+                state = self.getScreen()
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
                 movement = np.zeros(4)
                 if action.item() % 2 == 0:
