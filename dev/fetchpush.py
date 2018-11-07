@@ -2,7 +2,6 @@ import sys
 import os
 sys.path.insert(0, os.getcwd() + '/gym')
 import gym
-import pdb; pdb.set_trace()
 import math
 import random
 import numpy as np
@@ -189,6 +188,7 @@ class Trainer(object):
             start = datetime.datetime.now()
             self.reset()
             self.steps_done = 0
+            state = self.getScreen()
             for t in count():
                 print(np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - gripper_position))
                 print(np.linalg.norm(self.env.sim.data.get_site_xpos('object0') - object_position))
