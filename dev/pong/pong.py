@@ -17,8 +17,7 @@ from PIL import Image
 import os
 import datetime
 import yagmail
-import pickle
-
+import cv2
 
 # THIS IS A HACK SPECIFIC TO BAFFIN
 import sys
@@ -73,6 +72,7 @@ class DQN(nn.Module):
 
 
 
+
 class Trainer(object):
     def __init__(self, num_episodes=5000, warm_start_path=''):
         self.env = gym.make('Pong-v0').unwrapped
@@ -83,15 +83,16 @@ class Trainer(object):
 
         if not warm_start_path:
             test_state = (self.getScreen() - self.getScreen()).to(torch.device('cpu'))
-            self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
-            self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
+            self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
+            self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
             torch.save(self.target_net, 'delete_initial_target_net')
 
             self.batch_size = 32
             self.gamma = 0.99
-            self.eps_start = 0.999
-            self.eps_end = 0.05
-            self.eps_decay = 200
+            self.eps_start = 1.
+            self.eps_end = 0.2
+            # self.eps_decay = 200
+            self.decay_steps = 100000 #100K
             self.target_update = 1000
 
             self.target_net.load_state_dict(self.policy_net.state_dict())
@@ -99,6 +100,10 @@ class Trainer(object):
             self.memory = ReplayMemory(100000, self.transition)
 
             self.steps_done = 0
+            self.prefetch_episodes = 10000
+            print('Prefetching %s Random Movements...' % self.prefetch_episodes)
+            self.prefetch()
+            self.steps_before_refresh = 4
 
         else:
             f = open(warm_start_path + '_params', 'r')
@@ -127,36 +132,46 @@ class Trainer(object):
         }
 
 
-    def rgb2gray(self, rgb):
-        img = Image.fromarray(rgb.transpose((1, 2, 0))).convert(mode='L')
-        return np.array(img, dtype=np.float64)
+    def prefetch(self):
+        for iteration in range(self.prefetch_episodes):
+            done = False
+            self.env.reset()
+            while not done:
+                state = self.getScreen()
+                action = self.env.action_space.sample()
+                _, reward, done, _ = self.env.step(action)
+                next_state = self.getScreen()
+                self.memory.push(state, action, next_state, reward)
 
 
-    # All images in black and white
+    # original size: 210x160x3
+    # final dims: 1x1x85x72
     def getScreen(self):
-        # original size: 210x160x3
-        image = Image.fromarray(self.env.render(mode='rgb_array')[25:195, 8:152, :]).resize((72, 85)).convert(mode='L')
-       # image = Image.fromarray(self.env.render(mode='rgb_array')[25:195, 8:152, :]).convert(mode='L')
-        return torch.from_numpy(np.array(image)/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device)
+        # new size: 170 x 146
+        img = self.env.render(mode='rgb_array')[25:195, 8:152, :]
+        img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
+        img = cv2.resize(img, (72, 85), interpolation=cv2.INTER_AREA)
+        return torch.from_numpy(img/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device, non_blocking=True)
 
 
     def selectAction(self, state):
         sample = random.random()
-        eps_threshold = self.eps_end + (self.eps_start - self.eps_end) * \
-            math.exp(-1. * self.steps_done / self.eps_decay)
+        eps_threshold = self.eps_start - (self.eps_start - self.eps_end)/self.decay_steps*self.steps_done
+        # eps_threshold = self.eps_end + (self.eps_start - self.eps_end) * \
+        #     math.exp(-1. * self.steps_done / self.eps_decay)
         self.steps_done += 1
         if sample > eps_threshold:
             with torch.no_grad():
-                return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device)
+                return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device, non_blocking=True)
         else:
-            return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device)
+            return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
 
 
 
     def optimizeModel(self):
-        if len(self.memory) < self.batch_size:
+        if len(self.memory) < self.batch_size * self.steps_before_refresh:
             return
-        transitions = self.memory.sample(self.batch_size)
+        transitions = self.memory.sample(self.batch_size * self.steps_before_refresh)
         batch = self.transition(*zip(*transitions))
 
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
@@ -182,10 +197,10 @@ class Trainer(object):
         self.optimizer.step()
 
 
-    def getState(self, current_screen, last_screen):
-        difference = current_screen - last_screen
-        return torch.cat([current_screen, difference], dim=1)
-
+    # def getState(self, current_screen, last_screen):
+    #     difference = current_screen - last_screen
+    #     return torch.cat([current_screen, difference], dim=1)
+    #
 
     def train(self):
         for i_episode in range(self.num_episodes+1):
@@ -193,29 +208,22 @@ class Trainer(object):
             print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
             self.env.reset()
-            last_screen = self.getScreen()
-            current_screen = self.getScreen()
-            state = current_screen - last_screen
-            for t in count():
-                action = self.selectAction(state)
-                _, reward, done, _ = self.env.step(action.item())
-                reward = torch.tensor([reward], device=self.device)
-
-                last_screen = current_screen
-                current_screen = self.getScreen()
-                if not done:
-                    next_state = current_screen - last_screen
-                else:
-                    next_state = None
-
-                self.memory.push(state, action, next_state, reward)
-
-                state = next_state
+            state = self.getScreen()
+            for _ in count():
+                for _ in range(self.steps_before_refresh):
+                    action = self.selectAction(state)
+                    _, reward, done, _ = self.env.step(action.item())
+                    reward = torch.tensor([reward], device=self.device)
+                    if not done:
+                        next_state = self.getScreen()
+                    else:
+                        next_state = None
+                    self.memory.push(state, action, next_state, reward)
+                    state = next_state
 
                 self.optimizeModel()
                 if done:
-                    duration = (datetime.datetime.now() - start).total_seconds()
-                    print('DURATION: %s' % duration)
+                    print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
                     break
             if i_episode % self.target_update == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
@@ -245,7 +253,6 @@ class Trainer(object):
             _, reward, done, _ = self.env.step(action.item())
             steps_done += 1
         print("Steps Done: ", steps_done)
-        import sys; sys.exit()
 
 
 
