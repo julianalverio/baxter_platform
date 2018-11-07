@@ -168,9 +168,7 @@ class Trainer(object):
         object_position = self.env.sim.data.get_site_xpos('object0')
         reward = 0
         if task == 1:
-            # reward += 1./np.linalg.norm(gripper_position - object_position)
-            reward += 1./np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - self.env.sim.data.get_site_xpos('object0'))
-        print(reward)
+            reward += 1./np.linalg.norm(gripper_position - object_position)
         return torch.tensor(reward, device=self.device).view(1, 1)
 
 
@@ -193,12 +191,18 @@ class Trainer(object):
             object_position = self.env.sim.data.get_site_xpos('object0')
             import pdb; pdb.set_trace()
             for t in count():
-                gripper_difference = gripper_position - self.env.sim.data.get_site_xpos('robot0:grip')
-                object_difference = object_position - self.env.sim.data.get_site_xpos('object0')
+                new_gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
+                new_object_position = self.env.sim.data.get_site_xpos('object0')
+                # gripper_difference = gripper_position - self.env.sim.data.get_site_xpos('robot0:grip')
+                # object_difference = object_position - self.env.sim.data.get_site_xpos('object0')
                 reward = 1./np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - self.env.sim.data.get_site_xpos('object0'))
                 # print(reward, gripper_difference, object_difference)
                 # print(np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - gripper_position))
                 # print(np.linalg.norm(self.env.sim.data.get_site_xpos('object0') - object_position))
+                print('Start')
+                print('Showing new, then old')
+                print(reward, new_gripper_position, new_object_position)
+                print(reward, gripper_position, object_position)
                 done = False
                 state = self.getScreen()
                 action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
