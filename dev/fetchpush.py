@@ -1,8 +1,9 @@
 import sys
 import os
-sys.path.insert(0, os.getcwd() + '/gym')
+# sys.path.insert(0, os.getcwd() + '/gym')
 
 import gym
+import pdb; pdb.set_trace()
 import math
 import random
 import numpy as np
