@@ -168,7 +168,9 @@ class Trainer(object):
         object_position = self.env.sim.data.get_site_xpos('object0')
         reward = 0
         if task == 1:
-            reward += 1./np.linalg.norm(gripper_position - object_position)
+            # reward += 1./np.linalg.norm(gripper_position - object_position)
+            reward += 1./np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - self.env.sim.data.get_site_xpos('object0'))
+        print(reward)
         return torch.tensor(reward, device=self.device).view(1, 1)
 
 
@@ -189,11 +191,12 @@ class Trainer(object):
             self.steps_done = 0
             gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
             object_position = self.env.sim.data.get_site_xpos('object0')
+            import pdb; pdb.set_trace()
             for t in count():
                 gripper_difference = gripper_position - self.env.sim.data.get_site_xpos('robot0:grip')
                 object_difference = object_position - self.env.sim.data.get_site_xpos('object0')
                 reward = 1./np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - self.env.sim.data.get_site_xpos('object0'))
-                print(reward, gripper_difference, object_difference)
+                # print(reward, gripper_difference, object_difference)
                 # print(np.linalg.norm(self.env.sim.data.get_site_xpos('robot0:grip') - gripper_position))
                 # print(np.linalg.norm(self.env.sim.data.get_site_xpos('object0') - object_position))
                 done = False
