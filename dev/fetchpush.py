@@ -187,14 +187,14 @@ class Trainer(object):
             import pdb; pdb.set_trace()
 
             initial_block_position = self.env.sim.data.get_site_xpos('object0')
-            initial_block_joint_position = self.env.sim.data.get_site_xpos('object0:joint')
+            # initial_block_joint_position = self.env.sim.data.get_site_xpos('object0:joint')
             initial_gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
             initial_object_qpos = self.env.sim.data.get_joint_qpos('object0:joint')
             initial_site_poses = self.env.sim.model.site_pos
             self.steps_done = 0
             for t in count():
                 #experiment: see if there's any change in position as the block moves
-                import pdb; pdb.set_trace()
+                # import pdb; pdb.set_trace()
                 print(np.linalg.norm(initial_site_poses - self.env.sim.model.site_pos))
                 # print(np.linalg.norm(initial_object_qpos - self.env.sim.data.get_joint_qpos('object:joint')))
 
