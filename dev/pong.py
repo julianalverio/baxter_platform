@@ -240,7 +240,7 @@ class Trainer(object):
             time.sleep(0.025)
             previous_screen = current_screen
             current_screen = self.getScreen()
-            state = self.getState(current_screen, previous_screen)
+            state = current_screen - previous_screen
             action = self.target_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
             _, reward, done, _ = self.env.step(action.item())
             steps_done += 1
@@ -262,6 +262,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
-# trainer.playback('Pong_24500.pth')
+# trainer.train()
+# completionEmail('%s done' % NUM_EPISODES)
+trainer.playback('pong_4000.pth')
