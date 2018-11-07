@@ -169,6 +169,7 @@ class Trainer(object):
         reward = 0
         if task == 1:
             reward += 1./np.linalg.norm(gripper_position - object_position)
+        import pdb; pdb.set_trace()
         print(reward, gripper_position, object_position)
         return torch.tensor(reward, device=self.device).view(1, 1)
 
