@@ -226,11 +226,7 @@ class Trainer(object):
 
 
     def train(self):
-        time = 0.
-        test_start = datetime.datetime.now()
-        time_counter = 0
         for i_episode in range(self.num_episodes+1):
-            print('steps done', self.steps_done)
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
@@ -257,14 +253,10 @@ class Trainer(object):
                     skip_update = False
 
                 if self.steps_done % self.target_update == 0 or synch_now:
-                    print('SYNCHING NOW')
                     time += (datetime.datetime.now() - start).total_seconds()
                     test_start = datetime.datetime.now()
                     time_counter += 1
                     if time_counter == 10:
-                        print("showing time")
-                        print(time)
-                        import pdb; pdb.set_trace()
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 try:
