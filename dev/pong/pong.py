@@ -20,15 +20,20 @@ import yagmail
 #HACK SPECIFIC TO MELVILLE
 import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 
-# THIS IS A HACK SPECIFIC TO BAFFIN
 import sys
 import copy
 old_path = copy.deepcopy(sys.path)
 sys.path = ['/afs/csail.mit.edu/u/j/jalverio/venv/lib/python3.5/site-packages']
 import cv2
-sys.path.pop(0)
-sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
-import gym
+import pdb; pdb.set_trace()
+
+
+
+# THIS IS A HACK SPECIFIC TO BAFFIN
+# import sys
+# sys.path.pop(0)
+# sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
+# import gym
 
 
 GPU_NUM = '0,1,2,3'
