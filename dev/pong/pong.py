@@ -250,10 +250,9 @@ class Trainer(object):
 
     def SARSProcess(self):
         self.sars_exec = 0
-        import pdb; pdb.set_trace()
         state = self.getScreen()
         while 1:
-            while self.sars_exec < (self.opt_exec + 2):
+            while self.sars_exec >= (self.opt_exec + 2):
                 time.sleep(0.1)
             state, done = self.SARS(state)
             self.sars_exec += 1
@@ -290,13 +289,12 @@ class Trainer(object):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
-            # environment_process = Process(target=self.SARSProcess)
-            # optimization_process = Process(target=self.optimizeModelProcess)
-            # environment_process.start()
+            environment_process = Process(target=self.SARSProcess)
+            optimization_process = Process(target=self.optimizeModelProcess)
+            environment_process.start()
             # optimization_process.start()
             # environment_process.join()
             self.SARSProcess()
-
             # optimization_process.join()
             if i_episode % 500 == 0:
                 self.saveModel(i_episode)
