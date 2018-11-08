@@ -147,9 +147,6 @@ class Trainer(object):
                 reward = torch.tensor([reward], device=self.device)
                 next_state = self.getScreen()
                 self.memory.push(state, action, next_state, reward)
-                # if counter % 1000 == 0:
-                #     print(counter / float(self.prefetch_episodes))
-                #     print(torch.cuda.memory_allocated())
                 if counter == self.prefetch_episodes:
                     return
 
@@ -189,7 +186,10 @@ class Trainer(object):
                                               batch.next_state)), device=self.device, dtype=torch.uint8)
         non_final_next_states = torch.cat([s for s in batch.next_state
                                                   if s is not None])
-        state_batch = torch.cat(batch.state)
+        try:
+            state_batch = torch.cat(batch.state)
+        except:
+            import pdb; pdb.set_trace()
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
 
