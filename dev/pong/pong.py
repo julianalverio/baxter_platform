@@ -137,7 +137,6 @@ class Trainer(object):
         for iteration in range(self.prefetch_episodes):
             done = False
             self.env.reset()
-            import pdb; pdb.set_trace()
             import copy
             starting_memory = copy.deepcopy(torch.cuda.memory_allocated())
             counter = 0
