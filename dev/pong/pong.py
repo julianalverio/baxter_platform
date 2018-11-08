@@ -20,14 +20,6 @@ import yagmail
 #HACK SPECIFIC TO MELVILLE
 import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 
-import sys
-import copy
-# old_path = copy.deepcopy(sys.path)
-sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/venv/lib/python3.5/site-packages')
-import pdb; pdb.set_trace()
-
-
-
 # THIS IS A HACK SPECIFIC TO BAFFIN
 import sys
 sys.path.pop(0)
@@ -160,7 +152,6 @@ class Trainer(object):
         img = self.env.render(mode='rgb_array')[25:195, 8:152, :]
         img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
         img = np.array(Image.fromarray(img).resize((72, 85)))
-        import pdb; pdb.set_trace()
         return torch.from_numpy(img/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device, non_blocking=True)
 
 
