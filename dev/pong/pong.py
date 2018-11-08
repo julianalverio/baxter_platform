@@ -290,11 +290,13 @@ class Trainer(object):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
-            environment_process = Process(target=self.SARSProcess)
-            optimization_process = Process(target=self.optimizeModelProcess)
-            environment_process.start()
+            # environment_process = Process(target=self.SARSProcess)
+            # optimization_process = Process(target=self.optimizeModelProcess)
+            # environment_process.start()
             # optimization_process.start()
-            environment_process.join()
+            # environment_process.join()
+            self.optimizeModelProcess()
+            
             # optimization_process.join()
             if i_episode % 500 == 0:
                 self.saveModel(i_episode)
