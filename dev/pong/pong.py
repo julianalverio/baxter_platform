@@ -17,6 +17,7 @@ from PIL import Image
 import os
 import datetime
 import yagmail
+import copy
 #HACK SPECIFIC TO MELVILLE
 import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 
@@ -134,11 +135,9 @@ class Trainer(object):
 
 
     def prefetch(self):
-        import pdb; pdb.set_trace()
         for iteration in range(self.prefetch_episodes):
             done = False
             self.env.reset()
-            import copy
             starting_memory = copy.deepcopy(torch.cuda.memory_allocated())
             counter = 0
             while not done:
