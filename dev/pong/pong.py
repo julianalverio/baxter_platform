@@ -134,6 +134,7 @@ class Trainer(object):
 
 
     def prefetch(self):
+        import pdb; pdb.set_trace()
         for iteration in range(self.prefetch_episodes):
             done = False
             self.env.reset()
