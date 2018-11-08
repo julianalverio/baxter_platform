@@ -241,7 +241,7 @@ class Trainer(object):
                 if done:
                     print('DURATION: %s' % (datetime.datetime.now() - test_start).total_seconds())
                     break
-            if i_episode % self.target_update == 0:
+            if self.steps_done % self.target_update == 0:
                 print('SYNCHING NOW')
                 time += (datetime.datetime.now() - start).total_seconds()
                 test_start = datetime.datetime.now()
