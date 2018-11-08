@@ -293,7 +293,7 @@ class Trainer(object):
             environment_process = Process(target=self.SARSProcess)
             optimization_process = Process(target=self.optimizeModelProcess)
             environment_process.start()
-            optimization_process.start()
+            # optimization_process.start()
             environment_process.join()
             optimization_process.join()
             if i_episode % 500 == 0:
