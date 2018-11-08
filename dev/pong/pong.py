@@ -249,6 +249,7 @@ class Trainer(object):
             import pdb; pdb.set_trace()
 
     def SARSProcess(self):
+        import pdb; pdb.set_trace()
         self.sars_exec = 0
         state = self.getScreen()
         while 1:
