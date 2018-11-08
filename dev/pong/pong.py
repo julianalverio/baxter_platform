@@ -190,15 +190,13 @@ class Trainer(object):
         non_final_next_states = torch.cat([s for s in batch.next_state
                                                   if s is not None])
         state_batch = torch.cat(batch.state)
-        try:
-            action_batch = torch.cat(batch.action)
-        except:
-            import pdb; pdb.set_trace()
+        action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
 
         state_action_values = self.policy_net(state_batch).gather(1, action_batch)
 
         next_state_values = torch.zeros(self.batch_size, device=self.device)
+        import pdb; pdb.set_trace()
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
         expected_state_action_values = (next_state_values * self.gamma) + reward_batch
 
