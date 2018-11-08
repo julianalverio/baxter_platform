@@ -139,12 +139,11 @@ class Trainer(object):
         while 1:
             done = False
             self.env.reset()
-            starting_memory = copy.deepcopy(torch.cuda.memory_allocated())
             while not done:
                 counter += 1
                 state = self.getScreen()
-                action = self.env.action_space.sample()
-                _, reward, done, _ = self.env.step(action)
+                action = torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
+                _, reward, done, _ = self.env.step(action.item())
                 next_state = self.getScreen()
                 self.memory.push(state, action, next_state, reward)
                 # if counter % 1000 == 0:
@@ -227,8 +226,6 @@ class Trainer(object):
                 for _ in range(self.steps_before_refresh):
                     action = self.selectAction(state)
                     _, reward, done, _ = self.env.step(action.item())
-                    if type(action) == tuple:
-                        import pdb; pdb.set_trace()
                     reward = torch.tensor([reward], device=self.device)
                     if not done:
                         next_state = self.getScreen()
