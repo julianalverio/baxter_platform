@@ -6,6 +6,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import time
+from torch.multiprocessing import Process, Lock
+
 
 
 import math
@@ -17,6 +19,7 @@ from PIL import Image
 import os
 import datetime
 import yagmail
+import time
 import copy
 #HACK SPECIFIC TO MELVILLE
 import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
@@ -59,7 +62,7 @@ class ReplayMemory(object):
         return len(self.memory)
 
 class DQN(nn.Module):
-    def __init__(self, num_actions, device, x):
+    def __init__(self, num_actions, x):
         super(DQN, self).__init__()
         self.conv1 = nn.Conv2d(1, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
@@ -87,6 +90,8 @@ class Trainer(object):
                                         ('state', 'action', 'next_state', 'reward'))
         self.num_episodes = num_episodes
 
+        self.memory_lock = Lock()
+
         if not warm_start_path:
             test_state = (self.getScreen() - self.getScreen()).to(torch.device('cpu'))
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
@@ -109,19 +114,24 @@ class Trainer(object):
             self.prefetch_episodes = 10000
             print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
             self.prefetch()
-            self.steps_before_optimize = 6
+            self.steps_before_optimize = 4
 
-        else:
-            f = open(warm_start_path + '_params', 'r')
-            param_dict = eval(f.read())
-            self.batch_size = param_dict['batch_size']
-            self.gamma = param_dict['gamma']
-            self.eps_start = param_dict['eps_start']
-            self.eps_end = param_dict['eps_end']
-            self.eps_decay = param_dict['eps_decay']
-            self.target_update = param_dict['target_update']
-            self.steps_done = param_dict['steps_done']
-            self.memory = ReplayMemory(10000, self.transition)
+            self.sars_exec = 0
+            self.opt_exec = 0
+            self.done = False
+
+
+        # else:
+        #     f = open(warm_start_path + '_params', 'r')
+        #     param_dict = eval(f.read())
+        #     self.batch_size = param_dict['batch_size']
+        #     self.gamma = param_dict['gamma']
+        #     self.eps_start = param_dict['eps_start']
+        #     self.eps_end = param_dict['eps_end']
+        #     self.eps_decay = param_dict['eps_decay']
+        #     self.target_update = param_dict['target_update']
+        #     self.steps_done = param_dict['steps_done']
+        #     self.memory = ReplayMemory(10000, self.transition)
 
             self.policy_net = torch.load(warm_start_path + '_model.pth')
             self.target_net = torch.load(warm_start_path + '_model.pth')
@@ -179,7 +189,9 @@ class Trainer(object):
 
 
 
+
     def optimizeModel(self):
+        self.memory_lock.acquire()
         if len(self.memory) < self.batch_size * self.steps_before_optimize:
             return
         transitions = self.memory.sample(self.batch_size * self.steps_before_optimize)
@@ -200,6 +212,7 @@ class Trainer(object):
         expected_state_action_values = (next_state_values * self.gamma) + reward_batch
 
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
+        self.memory_lock.release()
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -207,16 +220,22 @@ class Trainer(object):
             param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
 
-
+    # do multiple state-action-reward-nextState updates and push them to the buffer in a thread-safe way
     def SARS(self, state):
-        action = self.selectAction(state)
-        _, reward, done, _ = self.env.step(action.item())
-        reward = torch.tensor([reward], device=self.device)
-        if not done:
-            next_state = self.getScreen()
-        else:
-            next_state = None
-        self.memory.push(state, action, next_state, reward)
+        transitions_to_push = []
+        for _ in range(self.steps_before_optimize):
+            action = self.selectAction(state)
+            _, reward, done, _ = self.env.step(action.item())
+            reward = torch.tensor([reward], device=self.device)
+            if not done:
+                next_state = self.getScreen()
+            else:
+                next_state = None
+            transitions_to_push.append((state, action, next_state, reward))
+        self.memory_lock.acquire()
+        for state, action, next_state, reward in transitions_to_push:
+            self.memory.push(state, action, next_state, reward)
+        self.memory_lock.release()
         self.steps_done += 1
         return next_state, done
 
@@ -229,30 +248,56 @@ class Trainer(object):
             completionEmail('ERROR IN PONG %s' % i_episode)
             import pdb; pdb.set_trace()
 
+    def SARSProcess(self):
+        self.sars_exec = 0
+        state = self.getScreen()
+        while 1:
+            while self.sars_exec >= (self.opt_exec + 2):
+                time.sleep(0.1)
+            state, done = self.SARS(state)
+            self.sars_exec += 1
+            if self.steps_done >= 1000 or done:
+                self.done = True
+                return
+
+    def optimizeModelProcess(self):
+        done = False
+        self.opt_exec = 0
+        while 1:
+            if self.done:
+                done = True
+            while self.opt_exec == self.sars_exec:
+                time.sleep(0.1)
+            self.optimizeModel()
+            if self.steps_done % self.target_update in [0,1,2,3]:
+                self.target_net.load_state_dict(self.policy_net.state_dict())
+            self.opt_exec += 1
+            if self.steps_done >= 30000:
+                print('\n\n\n\n\n\n')
+                print('\a\a\a\a')
+                print('steps done: ', self.steps_done)
+                print('total time: ', (datetime.datetime.now() - self.global_start_time).total_seconds())
+            if done:
+                return
+
+
     def train(self):
         self.steps_done = 0
-        global_start_time = datetime.datetime.now()
+        self.global_start_time = datetime.datetime.now()
         for i_episode in range(self.num_episodes+1):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
-            state = self.getScreen()
-            done = False
-            while not done:
-                for _ in range(self.steps_before_optimize):
-                    state, done = self.SARS(state)
-                    if self.steps_done == 30000:
-                        print((datetime.datetime.now() - global_start_time).total_seconds())
-                        import pdb;
-                        pdb.set_trace()
-                    if done: break
-                self.optimizeModel()
-
-                if self.steps_done % self.target_update == 0:
-                    self.target_net.load_state_dict(self.policy_net.state_dict())
+            environment_process = Process(target=self.SARSProcess)
+            optimization_process = Process(target=self.optimizeModelProcess, args={'i_episode':i_episode})
+            environment_process.start()
+            optimization_process.start()
+            environment_process.join()
+            optimization_process.join()
             if i_episode % 500 == 0:
                 self.saveModel(i_episode)
             print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
+
 
     def playback(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
