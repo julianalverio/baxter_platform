@@ -79,12 +79,14 @@ class DQN(nn.Module):
         return self.head(x.view(x.size(0), -1))
 
 
+
+
 class Trainer(object):
     def __init__(self, num_episodes=5000, warm_start_path=''):
         self.env = gym.make('Pong-v0').unwrapped
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.transition = namedtuple('Transition',
-                                        ('state', 'action', 'next_state', 'reward'))
+                                    ('state', 'action', 'next_state', 'reward'))
         self.num_episodes = num_episodes
 
         if not warm_start_path:
@@ -98,7 +100,7 @@ class Trainer(object):
             self.eps_start = 1.
             self.eps_end = 0.2
             # self.eps_decay = 200
-            self.decay_steps = 100000
+            self.decay_steps = 100000 #100K
             self.target_update = 1000
 
             self.target_net.load_state_dict(self.policy_net.state_dict())
@@ -109,7 +111,7 @@ class Trainer(object):
             self.prefetch_episodes = 10000
             print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
             self.prefetch()
-            self.steps_before_optimize = 6
+            self.steps_before_optimize = 4
 
         else:
             f = open(warm_start_path + '_params', 'r')
@@ -126,7 +128,7 @@ class Trainer(object):
             self.policy_net = torch.load(warm_start_path + '_model.pth')
             self.target_net = torch.load(warm_start_path + '_model.pth')
 
-        self.optimizer = optim.Adam(self.policy_net.parameters(), lr=0.0001)
+        self.optimizer = optim.Adam(self.policy_net.parameters(), lr = 0.0001)
 
         # self.param_dict = {
         # 'batch_size' : self.batch_size,
@@ -207,6 +209,11 @@ class Trainer(object):
             param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
 
+
+    # def getState(self, current_screen, last_screen):
+    #     difference = current_screen - last_screen
+    #     return torch.cat([current_screen, difference], dim=1)
+    #
 
     def SARS(self, state):
         action = self.selectAction(state)
