@@ -32,6 +32,12 @@ GPU_NUM = '0,1,2,3'
 NUM_EPISODES = 25000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
+torch.backends.cudnn.deterministic = True
+torch.manual_seed(999)
+torch.backends.cudnn.deterministic = True
+torch.cuda.manual_seed_all(999)
+np.random.seed(999)
+
 class ReplayMemory(object):
 
     def __init__(self, capacity, transition):
