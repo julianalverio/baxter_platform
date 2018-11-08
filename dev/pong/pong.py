@@ -137,8 +137,12 @@ class Trainer(object):
         for iteration in range(self.prefetch_episodes):
             done = False
             self.env.reset()
+            import pdb; pdb.set_trace()
+            memory = torch.cuda.memory_allocated()
             while not done:
                 state = self.getScreen()
+                print(torch.cuda.memory_allocated() - memory)
+                memory = torch.cuda.memory_allocated()
                 action = self.env.action_space.sample()
                 _, reward, done, _ = self.env.step(action)
                 next_state = self.getScreen()
@@ -209,7 +213,6 @@ class Trainer(object):
             print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
             self.env.reset()
-            import pdb; pdb.set_trace()
             state = self.getScreen()
             for _ in count():
                 for _ in range(self.steps_before_refresh):
