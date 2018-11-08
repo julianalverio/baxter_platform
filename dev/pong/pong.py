@@ -226,31 +226,26 @@ class Trainer(object):
 
 
     def train(self):
-        global_environment_time = 0.
-        global_optimization_time = 0.
         self.steps_done = 0
+        global_start_time = datetime.datetime.now()
         for i_episode in range(self.num_episodes+1):
+            start = datetime.datetime.now()
             print(self.steps_done, 'steps done')
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
             state = self.getScreen()
             for _ in count():
-                start = datetime.datetime.now()
                 state, done = self.SARS(state)
-                global_environment_time += (datetime.datetime.now() - start).total_seconds()
-                start = datetime.datetime.now()
                 self.optimizeModel()
                 if done:
                     print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
-                    global_optimization_time += (datetime.datetime.now() - start).total_seconds()
                     break
 
                 if self.steps_done % self.target_update == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
-                global_optimization_time += (datetime.datetime.now() - start).total_seconds()
                 if self.steps_done == 30000:
-                    print(global_environment_time, global_environment_time/(global_optimization_time+global_environment_time))
-                    print(global_optimization_time, global_optimization_time/(global_environment_time + global_optimization_time))
+                    print((datetime.datetime.now() - global_start_time).total_seconds())
+                    import pdb; pdb.set_trace()
             if i_episode % 500 == 0:
                 try:
                     torch.save(self.target_net, 'pong_%s.pth' % (i_episode))
