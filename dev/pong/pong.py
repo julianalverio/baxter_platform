@@ -24,7 +24,6 @@ import sys
 import copy
 # old_path = copy.deepcopy(sys.path)
 sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/venv/lib/python3.5/site-packages')
-import cv2
 import pdb; pdb.set_trace()
 
 
@@ -160,7 +159,8 @@ class Trainer(object):
         # new size: 170 x 146
         img = self.env.render(mode='rgb_array')[25:195, 8:152, :]
         img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
-        img = cv2.resize(img, (72, 85), interpolation=cv2.INTER_AREA)
+        img = np.array(Image.fromarray(img).resize((72, 85)))
+        import pdb; pdb.set_trace()
         return torch.from_numpy(img/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device, non_blocking=True)
 
 
