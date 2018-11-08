@@ -253,7 +253,7 @@ class Trainer(object):
         import pdb; pdb.set_trace()
         state = self.getScreen()
         while 1:
-            while self.sars_exec >= (self.opt_exec + 2):
+            while self.sars_exec < (self.opt_exec + 2):
                 time.sleep(0.1)
             state, done = self.SARS(state)
             self.sars_exec += 1
