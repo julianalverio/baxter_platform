@@ -262,6 +262,7 @@ class Trainer(object):
                 return
 
     def optimizeModelProcess(self):
+        import pdb; pdb.set_trace()
         done = False
         self.opt_exec = 0
         while 1:
@@ -296,7 +297,7 @@ class Trainer(object):
             # optimization_process.start()
             # environment_process.join()
             self.optimizeModelProcess()
-            
+
             # optimization_process.join()
             if i_episode % 500 == 0:
                 self.saveModel(i_episode)
