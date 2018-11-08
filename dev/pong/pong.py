@@ -249,7 +249,6 @@ class Trainer(object):
             import pdb; pdb.set_trace()
 
     def SARSProcess(self):
-        import pdb; pdb.set_trace()
         self.sars_exec = 0
         state = self.getScreen()
         while 1:
@@ -290,11 +289,12 @@ class Trainer(object):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
+            import pdb; pdb.set_trace()
             environment_process = Process(target=self.SARSProcess)
             optimization_process = Process(target=self.optimizeModelProcess)
-            # environment_process.start()
+            environment_process.start()
             # optimization_process.start()
-            # environment_process.join()
+            environment_process.join()
             self.SARSProcess()
             # optimization_process.join()
             if i_episode % 500 == 0:
