@@ -241,6 +241,7 @@ class Trainer(object):
                 self.optimizeModel()
                 if done:
                     print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
+                    global_optimization_time += (datetime.datetime.now() - start).total_seconds()
                     break
 
                 if self.steps_done % self.target_update == 0:
