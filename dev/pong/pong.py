@@ -228,10 +228,10 @@ class Trainer(object):
     def train(self):
         global_environment_time = 0.
         global_optimization_time = 0.
+        self.steps_done = 0
         for i_episode in range(self.num_episodes+1):
             print(self.steps_done, 'steps done')
             print('Beginning Episode %s' % i_episode)
-            self.steps_done = 0
             self.env.reset()
             state = self.getScreen()
             for _ in count():
