@@ -192,10 +192,7 @@ class Trainer(object):
                                               batch.next_state)), device=self.device, dtype=torch.uint8)
         non_final_next_states = torch.cat([s for s in batch.next_state
                                                   if s is not None])
-        try:
-            state_batch = torch.cat(batch.state)
-        except:
-            import pdb; pdb.set_trace()
+        state_batch = torch.cat(batch.state)
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
 
