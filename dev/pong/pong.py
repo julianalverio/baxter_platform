@@ -135,12 +135,13 @@ class Trainer(object):
 
 
     def prefetch(self):
-        for iteration in range(self.prefetch_episodes):
-            print(iteration/float(self.prefetch_episodes))
+        counter = 0
+        while 1:
+            if counter % 1000 == 0:
+                print(counter/float(self.prefetch_episodes))
             done = False
             self.env.reset()
             starting_memory = copy.deepcopy(torch.cuda.memory_allocated())
-            counter = 0
             while not done:
                 counter += 1
                 state = self.getScreen()
@@ -150,6 +151,8 @@ class Trainer(object):
                 if torch.cuda.memory_allocated() - starting_memory != 49152 * counter:
                     import pdb; pdb.set_trace()
                 self.memory.push(state, action, next_state, reward)
+                if counter == self.prefetch_episodes:
+                    return
 
 
     # original size: 210x160x3
