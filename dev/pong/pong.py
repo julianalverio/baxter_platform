@@ -291,7 +291,6 @@ class Trainer(object):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
-            import pdb; pdb.set_trace()
             environment_process = Process(target=self.SARSProcess)
             optimization_process = Process(target=self.optimizeModelProcess)
             environment_process.start()
