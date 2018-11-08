@@ -147,7 +147,8 @@ class Trainer(object):
                 action = self.env.action_space.sample()
                 _, reward, done, _ = self.env.step(action)
                 next_state = self.getScreen()
-                print(torch.cuda.memory_allocated() - starting_memory == 49152 * counter, torch.cuda.memory_allocated())
+                if torch.cuda.memory_allocated() - starting_memory != 49152 * counter:
+                    import pdb; pdb.set_trace()
                 self.memory.push(state, action, next_state, reward)
 
 
