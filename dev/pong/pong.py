@@ -124,14 +124,14 @@ class Trainer(object):
 
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr = 0.0001)
 
-        self.param_dict = {
-        'batch_size' : self.batch_size,
-        'gamma': self.gamma,
-        'eps_start' : self.eps_start,
-        'eps_end': self.eps_end,
-        'eps_decay': self.eps_decay,
-        'target_update': self.target_update
-        }
+        # self.param_dict = {
+        # 'batch_size' : self.batch_size,
+        # 'gamma': self.gamma,
+        # 'eps_start' : self.eps_start,
+        # 'eps_end': self.eps_end,
+        # 'eps_decay': self.eps_decay,
+        # 'target_update': self.target_update
+        # }
 
 
     def prefetch(self):
