@@ -241,6 +241,7 @@ class Trainer(object):
         global_start_time = datetime.datetime.now()
         for i_episode in range(self.num_episodes+1):
             start = datetime.datetime.now()
+            print(self.steps_done, 'steps done')
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
             state = self.getScreen()
