@@ -173,7 +173,6 @@ class Trainer(object):
         eps_threshold = self.eps_start - (self.eps_start - self.eps_end)/self.decay_steps*self.steps_done
         # eps_threshold = self.eps_end + (self.eps_start - self.eps_end) * \
         #     math.exp(-1. * self.steps_done / self.eps_decay)
-        self.steps_done += 1
         if sample > eps_threshold:
             with torch.no_grad():
                 return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device, non_blocking=True)
@@ -225,6 +224,7 @@ class Trainer(object):
         else:
             next_state = None
         self.memory.push(state, action, next_state, reward)
+        self.steps_done += 1
         return next_state, done
 
 
