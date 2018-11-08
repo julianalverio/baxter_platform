@@ -220,6 +220,7 @@ class Trainer(object):
             self.steps_done = 0
             self.env.reset()
             state = self.getScreen()
+            start = datetime.datetime.now()
             for _ in count():
                 for _ in range(self.steps_before_refresh):
                     action = self.selectAction(state)
@@ -239,6 +240,7 @@ class Trainer(object):
                     print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
                     break
             if i_episode % self.target_update == 0:
+                print((datetime.datetime.now() - start).total_seconds())
                 self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 try:
