@@ -111,7 +111,7 @@ class Trainer(object):
             self.prefetch_episodes = 10000
             print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
             self.prefetch()
-            self.steps_before_refresh = 4
+            self.steps_before_optimize = 4
 
         else:
             f = open(warm_start_path + '_params', 'r')
@@ -183,9 +183,9 @@ class Trainer(object):
 
 
     def optimizeModel(self):
-        if len(self.memory) < self.batch_size * self.steps_before_refresh:
+        if len(self.memory) < self.batch_size * self.steps_before_optimize:
             return
-        transitions = self.memory.sample(self.batch_size * self.steps_before_refresh)
+        transitions = self.memory.sample(self.batch_size * self.steps_before_optimize)
         batch = self.transition(*zip(*transitions))
 
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
@@ -198,7 +198,7 @@ class Trainer(object):
 
         state_action_values = self.policy_net(state_batch).gather(1, action_batch)
 
-        next_state_values = torch.zeros(self.batch_size*self.steps_before_refresh, device=self.device)
+        next_state_values = torch.zeros(self.batch_size*self.steps_before_optimize, device=self.device)
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
         expected_state_action_values = (next_state_values * self.gamma) + reward_batch
 
@@ -228,34 +228,33 @@ class Trainer(object):
         return next_state, done
 
 
+    def saveModel(self, i_episode):
+        try:
+            torch.save(self.target_net, 'pong_%s.pth' % (i_episode))
+            completionEmail('Pong %s episodes completed' % i_episode)
+        except Exception as e:
+            completionEmail('ERROR IN PONG %s' % i_episode)
+            import pdb; pdb.set_trace()
+
     def train(self):
         self.steps_done = 0
-        global_start_time = datetime.datetime.now()
         for i_episode in range(self.num_episodes+1):
             start = datetime.datetime.now()
-            print(self.steps_done, 'steps done')
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
             state = self.getScreen()
-            for _ in count():
-                state, done = self.SARS(state)
+            done = False
+            while not done:
+                for _ in range(self.steps_before_optimize):
+                    state, done = self.SARS(state)
+                    if done: break
                 self.optimizeModel()
-                if done:
-                    print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
-                    break
 
                 if self.steps_done % self.target_update == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
-                if self.steps_done == 30000:
-                    print((datetime.datetime.now() - global_start_time).total_seconds())
-                    import pdb; pdb.set_trace()
             if i_episode % 500 == 0:
-                try:
-                    torch.save(self.target_net, 'pong_%s.pth' % (i_episode))
-                    completionEmail('Pong %s episodes completed' % i_episode)
-                except Exception as e:
-                    completionEmail('ERROR IN PONG %s' % i_episode)
-                    import pdb; pdb.set_trace()
+                self.saveModel(i_episode)
+            print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
 
     def playback(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
