@@ -214,10 +214,11 @@ class Trainer(object):
     #
 
     def train(self):
-        start = datetime.datetime.now()
         time = 0.
+        test_start = datetime.datetime.now()
         time_counter = 0
         for i_episode in range(self.num_episodes+1):
+            start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
             self.env.reset()
@@ -238,13 +239,14 @@ class Trainer(object):
 
                 self.optimizeModel()
                 if done:
-                    print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
+                    print('DURATION: %s' % (datetime.datetime.now() - test_start).total_seconds())
                     break
             if i_episode % self.target_update == 0:
+                print('SYNCHING NOW')
                 time += (datetime.datetime.now() - start).total_seconds()
-                start = datetime.datetime.now()
+                test_start = datetime.datetime.now()
                 time_counter += 1
-                if time_counter == 10:
+                if time_counter == 3:
                     print("showing time")
                     print(time)
                     import pdb; pdb.set_trace()
