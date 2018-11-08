@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import time
-from torch.multiprocessing import Process, Lock
+from multiprocessing import Process, Lock
 
 
 
