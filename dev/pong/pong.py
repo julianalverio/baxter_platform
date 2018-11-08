@@ -144,6 +144,7 @@ class Trainer(object):
                 state = self.getScreen()
                 action = torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
                 _, reward, done, _ = self.env.step(action.item())
+                reward = torch.tensor([reward], device=self.device)
                 next_state = self.getScreen()
                 self.memory.push(state, action, next_state, reward)
                 # if counter % 1000 == 0:
