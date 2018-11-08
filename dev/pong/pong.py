@@ -295,7 +295,7 @@ class Trainer(object):
             environment_process.start()
             # optimization_process.start()
             environment_process.join()
-            optimization_process.join()
+            # optimization_process.join()
             if i_episode % 500 == 0:
                 self.saveModel(i_episode)
             print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
