@@ -214,13 +214,14 @@ class Trainer(object):
     #
 
     def train(self):
+        start = datetime.datetime.now()
+        time = 0.
+        time_counter = 0
         for i_episode in range(self.num_episodes+1):
-            start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
             self.env.reset()
             state = self.getScreen()
-            start = datetime.datetime.now()
             for _ in count():
                 for _ in range(self.steps_before_refresh):
                     action = self.selectAction(state)
@@ -240,7 +241,13 @@ class Trainer(object):
                     print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
                     break
             if i_episode % self.target_update == 0:
-                print((datetime.datetime.now() - start).total_seconds())
+                time += (datetime.datetime.now() - start).total_seconds()
+                start = datetime.datetime.now()
+                time_counter += 1
+                if time_counter == 10:
+                    print("showing time")
+                    print(time)
+                    import pdb; pdb.set_trace()
                 self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 try:
