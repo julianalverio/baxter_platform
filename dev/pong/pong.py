@@ -235,28 +235,13 @@ class Trainer(object):
             skip_update = False
             synch_now = False
             for _ in count():
-                for _ in range(self.steps_before_refresh):
-                    state, done = self.SARS(state)
-                    if done:
-                        self.optimizeModel()
-                        print('DURATION: %s' % (datetime.datetime.now() - test_start).total_seconds())
-                        skip_update = True
-                        break
-                    if self.steps_done % self.target_update == 0:
-                        synch_now = True
-
-                if not skip_update:
-                    self.optimizeModel()
-                    if done:
-                        print('DURATION: %s' % (datetime.datetime.now() - test_start).total_seconds())
-                        break
-                    skip_update = False
+                state, done = self.SARS(state)
+                self.optimizeModel()
+                if done:
+                    print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
+                    break
 
                 if self.steps_done % self.target_update == 0 or synch_now:
-                    time += (datetime.datetime.now() - start).total_seconds()
-                    test_start = datetime.datetime.now()
-                    time_counter += 1
-                    if time_counter == 10:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 try:
