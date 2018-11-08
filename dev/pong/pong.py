@@ -103,7 +103,7 @@ class Trainer(object):
 
             self.steps_done = 0
             self.prefetch_episodes = 10000
-            print('Prefetching %s Random Movements...' % self.prefetch_episodes)
+            print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
             self.prefetch()
             self.steps_before_refresh = 4
 
@@ -229,6 +229,7 @@ class Trainer(object):
         global_environment_time = 0.
         global_optimization_time = 0.
         for i_episode in range(self.num_episodes+1):
+            print(self.steps_done, 'steps done')
             print('Beginning Episode %s' % i_episode)
             self.steps_done = 0
             self.env.reset()
