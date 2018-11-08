@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import time
-from multiprocessing import Process, Lock
+from torch.multiprocessing import Process, Lock
 
 
 
@@ -250,6 +250,7 @@ class Trainer(object):
             import pdb; pdb.set_trace()
 
     def SARSProcess(self):
+        torch.tensor(1).to(self.device)
         self.sars_exec = 0
         state = self.getScreen()
         while 1:
