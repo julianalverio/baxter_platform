@@ -261,7 +261,7 @@ class Trainer(object):
                     time += (datetime.datetime.now() - start).total_seconds()
                     test_start = datetime.datetime.now()
                     time_counter += 1
-                    if time_counter == 3:
+                    if time_counter == 10:
                         print("showing time")
                         print(time)
                         import pdb; pdb.set_trace()
