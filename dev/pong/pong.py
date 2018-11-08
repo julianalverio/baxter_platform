@@ -249,11 +249,12 @@ class Trainer(object):
             while not done:
                 for _ in range(self.steps_before_optimize):
                     state, done = self.SARS(state)
+                    if self.steps_done == 30000:
+                        print((datetime.datetime.now() - global_start_time).total_seconds())
+                        import pdb;
+                        pdb.set_trace()
                     if done: break
                 self.optimizeModel()
-                if self.steps_done == 30000:
-                    print((datetime.datetime.now() - global_start_time).total_seconds())
-                    import pdb; pdb.set_trace()
 
                 if self.steps_done % self.target_update == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
