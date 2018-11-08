@@ -94,8 +94,8 @@ class Trainer(object):
 
         if not warm_start_path:
             test_state = (self.getScreen() - self.getScreen()).to(torch.device('cpu'))
-            self.policy_net = DQN(self.env.action_space.n, test_state).to(self.device, non_blocking=True)
-            self.target_net = DQN(self.env.action_space.n, test_state).to(self.device, non_blocking=True)
+            self.policy_net = DQN(self.env.action_space.n, test_state).to(self.device)
+            self.target_net = DQN(self.env.action_space.n, test_state).to(self.device)
             torch.save(self.target_net, 'delete_initial_target_net')
 
             self.batch_size = 32
@@ -173,7 +173,7 @@ class Trainer(object):
         img = self.env.render(mode='rgb_array')[25:195, 8:152, :]
         img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
         img = np.array(Image.fromarray(img).resize((72, 85)))
-        return torch.from_numpy(img/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device, non_blocking=True)
+        return torch.from_numpy(img/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device)
 
 
     def selectAction(self, state):
@@ -183,9 +183,9 @@ class Trainer(object):
         #     math.exp(-1. * self.steps_done / self.eps_decay)
         if sample > eps_threshold:
             with torch.no_grad():
-                return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device, non_blocking=True)
+                return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device)
         else:
-            return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
+            return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device)
 
 
 
@@ -250,7 +250,7 @@ class Trainer(object):
 
     def SARSProcess(self):
         self.sars_exec = 0
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         state = self.getScreen()
         while 1:
             while self.sars_exec < (self.opt_exec + 2):
@@ -292,7 +292,8 @@ class Trainer(object):
             self.env.reset()
             environment_process = Process(target=self.SARSProcess)
             optimization_process = Process(target=self.optimizeModelProcess)
-            environment_process.start()
+            environment_process()
+            # environment_process.start()
             # optimization_process.start()
             environment_process.join()
             # optimization_process.join()
