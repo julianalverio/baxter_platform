@@ -138,14 +138,17 @@ class Trainer(object):
             done = False
             self.env.reset()
             import pdb; pdb.set_trace()
-            memory = torch.cuda.memory_allocated()
+            import copy
+            starting_memory = copy.deepcopy(torch.cuda.memory_allocated())
+            counter = 0
             while not done:
+                counter += 1
                 state = self.getScreen()
-                print(torch.cuda.memory_allocated() - memory)
-                memory = torch.cuda.memory_allocated()
                 action = self.env.action_space.sample()
                 _, reward, done, _ = self.env.step(action)
                 next_state = self.getScreen()
+                print(torch.cuda.memory_allocated() - starting_memory == 49152 * counter)
+                print(torch.cuda.memory_allocated())
                 self.memory.push(state, action, next_state, reward)
 
 
