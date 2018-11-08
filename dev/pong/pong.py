@@ -213,6 +213,18 @@ class Trainer(object):
     #     return torch.cat([current_screen, difference], dim=1)
     #
 
+    def SARS(self, state):
+        action = self.selectAction(state)
+        _, reward, done, _ = self.env.step(action.item())
+        reward = torch.tensor([reward], device=self.device)
+        if not done:
+            next_state = self.getScreen()
+        else:
+            next_state = None
+        self.memory.push(state, action, next_state, reward)
+        return next_state, done
+
+
     def train(self):
         time = 0.
         test_start = datetime.datetime.now()
@@ -228,15 +240,7 @@ class Trainer(object):
             synch_now = False
             for _ in count():
                 for _ in range(self.steps_before_refresh):
-                    action = self.selectAction(state)
-                    _, reward, done, _ = self.env.step(action.item())
-                    reward = torch.tensor([reward], device=self.device)
-                    if not done:
-                        next_state = self.getScreen()
-                    else:
-                        next_state = None
-                    self.memory.push(state, action, next_state, reward)
-                    state = next_state
+                    state, done = self.SARS(state)
                     if done:
                         self.optimizeModel()
                         print('DURATION: %s' % (datetime.datetime.now() - test_start).total_seconds())
@@ -252,16 +256,16 @@ class Trainer(object):
                         break
                     skip_update = False
 
-            if self.steps_done % self.target_update == 0 or synch_now:
-                print('SYNCHING NOW')
-                time += (datetime.datetime.now() - start).total_seconds()
-                test_start = datetime.datetime.now()
-                time_counter += 1
-                if time_counter == 3:
-                    print("showing time")
-                    print(time)
-                    import pdb; pdb.set_trace()
-                self.target_net.load_state_dict(self.policy_net.state_dict())
+                if self.steps_done % self.target_update == 0 or synch_now:
+                    print('SYNCHING NOW')
+                    time += (datetime.datetime.now() - start).total_seconds()
+                    test_start = datetime.datetime.now()
+                    time_counter += 1
+                    if time_counter == 3:
+                        print("showing time")
+                        print(time)
+                        import pdb; pdb.set_trace()
+                    self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 try:
                     torch.save(self.target_net, 'pong_%s.pth' % (i_episode))
