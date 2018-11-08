@@ -231,6 +231,8 @@ class Trainer(object):
                         next_state = None
                     self.memory.push(state, action, next_state, reward)
                     state = next_state
+                    if done:
+                        break
 
                 self.optimizeModel()
                 if done:
