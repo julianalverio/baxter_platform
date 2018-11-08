@@ -174,8 +174,7 @@ class Trainer(object):
         img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
         img = np.array(Image.fromarray(img).resize((72, 85)))
         img = torch.from_numpy(img/255.).unsqueeze(0).unsqueeze(0)
-        print('SHOWING TYPE:', img.type())
-        return img.type(torch.FloatTensor).to(self.device)
+        return img.to(self.device)
 
 
     def selectAction(self, state):
