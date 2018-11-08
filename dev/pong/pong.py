@@ -22,10 +22,9 @@ import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 
 import sys
 import copy
-old_path = copy.deepcopy(sys.path)
-sys.path = ['/afs/csail.mit.edu/u/j/jalverio/venv/lib/python3.5/site-fpackages']
+# old_path = copy.deepcopy(sys.path)
+sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/venv/lib/python3.5/site-packages')
 import cv2
-sys.path = old_path
 import pdb; pdb.set_trace()
 
 
