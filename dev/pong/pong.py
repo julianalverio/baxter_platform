@@ -136,6 +136,7 @@ class Trainer(object):
 
     def prefetch(self):
         for iteration in range(self.prefetch_episodes):
+            print(iteration/float(self.prefetch_episodes))
             done = False
             self.env.reset()
             starting_memory = copy.deepcopy(torch.cuda.memory_allocated())
