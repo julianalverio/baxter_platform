@@ -133,8 +133,8 @@ class Trainer(object):
         #     self.steps_done = param_dict['steps_done']
         #     self.memory = ReplayMemory(10000, self.transition)
 
-            self.policy_net = torch.load(warm_start_path + '_model.pth')
-            self.target_net = torch.load(warm_start_path + '_model.pth')
+            # self.policy_net = torch.load(warm_start_path + '_model.pth')
+            # self.target_net = torch.load(warm_start_path + '_model.pth')
 
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=0.0001)
 
