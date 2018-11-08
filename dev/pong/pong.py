@@ -224,6 +224,8 @@ class Trainer(object):
             self.steps_done = 0
             self.env.reset()
             state = self.getScreen()
+            skip_update = False
+            synch_now = False
             for _ in count():
                 for _ in range(self.steps_before_refresh):
                     action = self.selectAction(state)
@@ -236,13 +238,21 @@ class Trainer(object):
                     self.memory.push(state, action, next_state, reward)
                     state = next_state
                     if done:
+                        self.optimizeModel()
+                        print('DURATION: %s' % (datetime.datetime.now() - test_start).total_seconds())
+                        skip_update = True
                         break
+                    if self.steps_done % self.target_update == 0:
+                        synch_now = True
 
-                self.optimizeModel()
-                if done:
-                    print('DURATION: %s' % (datetime.datetime.now() - test_start).total_seconds())
-                    break
-            if self.steps_done % self.target_update == 0:
+                if not skip_update:
+                    self.optimizeModel()
+                    if done:
+                        print('DURATION: %s' % (datetime.datetime.now() - test_start).total_seconds())
+                        break
+                    skip_update = False
+
+            if self.steps_done % self.target_update == 0 or synch_now:
                 print('SYNCHING NOW')
                 time += (datetime.datetime.now() - start).total_seconds()
                 test_start = datetime.datetime.now()
