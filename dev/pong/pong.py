@@ -250,6 +250,7 @@ class Trainer(object):
 
     def SARSProcess(self):
         self.sars_exec = 0
+        import pdb; pdb.set_trace()
         state = self.getScreen()
         while 1:
             while self.sars_exec >= (self.opt_exec + 2):
@@ -268,6 +269,7 @@ class Trainer(object):
                 done = True
             while self.opt_exec == self.sars_exec:
                 time.sleep(0.1)
+            print("I'm optimizing the model now", self.opt_exec)
             self.optimizeModel()
             if self.steps_done % self.target_update in [0,1,2,3]:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
