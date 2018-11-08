@@ -291,7 +291,7 @@ class Trainer(object):
             self.env.reset()
             environment_process = Process(target=self.SARSProcess)
             optimization_process = Process(target=self.optimizeModelProcess)
-            environment_process.start()
+            # environment_process.start()
             # optimization_process.start()
             # environment_process.join()
             self.SARSProcess()
