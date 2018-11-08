@@ -248,7 +248,7 @@ class Trainer(object):
                 if self.steps_done % self.target_update == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
                 global_optimization_time += (datetime.datetime.now() - start).total_seconds()
-                if self.steps_done == 10000:
+                if self.steps_done == 30000:
                     print(global_environment_time, global_environment_time/(global_optimization_time+global_environment_time))
                     print(global_optimization_time, global_optimization_time/(global_environment_time + global_optimization_time))
             if i_episode % 500 == 0:
