@@ -214,13 +214,13 @@ class Trainer(object):
         start = datetime.datetime.now()
         reward, done = self.getReward(self.initial_object_position, task=1)
         done = done or done_input
-        self.time3 += (datetime.datetime.now() - start).total_seconds()
+        self.time4 += (datetime.datetime.now() - start).total_seconds()
         start = datetime.datetime.now()
         if not done:
             next_state = self.getScreen()
         else:
             next_state = None
-        self.time4 += (datetime.datetime.now() - start).total_seconds()
+        self.time5 += (datetime.datetime.now() - start).total_seconds()
         self.memory.push(state, action, next_state, reward)
         self.steps_done += 1
         return next_state, done
