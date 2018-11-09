@@ -22,6 +22,26 @@ EPS_DECAY = 200
 # Preprocessing
 steps_done = 0
 
+class ReplayMemory(object):
+
+    def __init__(self, capacity, transition):
+        self.capacity = capacity
+        self.memory = []
+        self.position = 0
+        self.transition = transition
+
+    def add(self, *args):
+        if len(self.memory) < self.capacity:
+            self.memory.append(None)
+        self.memory[self.position] = self.transition(*args)
+        self.position = (self.position + 1) % self.capacity
+
+    def sample(self, batch_size):
+        return random.sample(self.memory, batch_size)
+
+    def __len__(self):
+        return len(self.memory)
+
 
 def downsample(img):
     return img[::2, ::2]
@@ -204,7 +224,7 @@ if __name__ == '__main__':
                                             kernel_size=3, dense_layer_features=256,
                                             IM_HEIGHT=img_height//2, IM_WIDTH=img_width//2)
 
-    buffer = ReplayBuffer(capacity=10000, seed=0) # Experience Replay
+    buffer = ReplayMemory(capacity=10000) # Experience Replay
     batch_size= 32
     gamma = 0.99 # Discount factor
     num_epochs = 1000
