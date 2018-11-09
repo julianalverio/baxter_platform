@@ -106,6 +106,12 @@ class Trainer(object):
         screen = Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425)).resize((105, 81), Image.NEAREST)
         return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((2, 1, 0))).unsqueeze(0).to(self.device)
 
+    def getScreenNew(self):
+        img = self.env.render(mode='rgb_array')[30:450, 100:425, :]
+        img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
+        img = np.array(Image.fromarray(img).resize((72, 85)))
+        return torch.from_numpy(img / 255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device,
+                                                                                                 non_blocking=True)
 
     def selectAction(self, state):
         sample = random.random()
@@ -258,6 +264,15 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
-trainer.playback('fetchpush_1000.pth')
+# trainer.train()
+start = datetime.datetime.now()
+for _ in range(1000):
+    trainer.getScreen()
+print('time1', (datetime.datetime.now() - start).total_seconds())
+
+start = datetime.datetime.now()
+for _ in range(1000):
+    trainer.getScreenNew()
+print((datetime.datetime.now() - start).total_seconds())
+# completionEmail('%s done' % NUM_EPISODES)
+# trainer.playback('fetchpush_1000.pth')
