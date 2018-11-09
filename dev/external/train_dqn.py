@@ -9,6 +9,7 @@ import random
 import numpy as np
 import torch.optim as optim
 from itertools import count
+from Memory.Buffer import  ReplayBuffer
 import math
 import torch.nn.functional as F
 import datetime
@@ -203,7 +204,7 @@ if __name__ == '__main__':
                                             kernel_size=3, dense_layer_features=256,
                                             IM_HEIGHT=img_height//2, IM_WIDTH=img_width//2)
 
-    buffer = DQN.ReplayBuffer(size_of_buffer=10000) # Experience Replay
+    buffer = ReplayBuffer(capacity=10000, seed=0) # Experience Replay
     batch_size= 32
     gamma = 0.99 # Discount factor
     num_epochs = 1000
