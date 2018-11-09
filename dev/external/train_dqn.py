@@ -11,6 +11,7 @@ import torch.optim as optim
 from itertools import count
 import math
 import torch.nn.functional as F
+import datetime
 # Constants for training
 use_cuda = torch.cuda.is_available()
 EPS_START = 0.9
@@ -146,6 +147,7 @@ def fit_batch(target_dqn_model, dqn_model, buffer, batch_size, gamma, n, criteri
 def train(target_dqn_model, dqn_model, buffer, batch_size, gamma, n, num_epochs, criterion, learning_rate,
           use_double_q_learning = False):
     for iteration in range(num_epochs):
+        start = datetime.datetime.now()
         print("Epoch ", iteration)
         state = env.reset()
         state = preprocess(state)
@@ -179,7 +181,7 @@ def train(target_dqn_model, dqn_model, buffer, batch_size, gamma, n, num_epochs,
                 break
         print("Loss for episode", iteration, " is ", loss.data/t)
         print("Reward for episode", iteration, " is ", re)
-        print("Time for episode", )
+        print("Time for episode", (datetime.datetime.now() - start).total_seconds())
 
 
     return target_dqn_model, dqn_model
