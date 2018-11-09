@@ -192,7 +192,7 @@ def train(target_dqn_model, dqn_model, buffer, batch_size, gamma, n, num_epochs,
                 new_state, reward, done, info = env.step(action)
 
             new_state = preprocess(new_state)
-            buffer.add((state, action, new_state, reward))
+            buffer.add(state, action, new_state, reward)
             state = new_state
             # Fit the model on a batch of data
             loss_n, r = fit_batch(target_dqn_model, dqn_model, buffer, batch_size, gamma, n, criterion, iteration, learning_rate)
