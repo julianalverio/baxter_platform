@@ -227,7 +227,7 @@ if __name__ == '__main__':
 
     transition = namedtuple('Transition',
                                  ('state', 'action', 'next_state', 'reward'))
-    buffer = ReplayMemory(capacity=10000) # Experience Replay
+    buffer = ReplayMemory(capacity=10000, transition=transition) # Experience Replay
     batch_size= 32
     gamma = 0.99 # Discount factor
     num_epochs = 1000
