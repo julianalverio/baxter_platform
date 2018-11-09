@@ -242,7 +242,6 @@ class Trainer(object):
     def train(self):
         self.steps_done = 0
         for i_episode in range(self.num_episodes+1):
-            import pdb; pdb.set_trace()
             state = self.preprocess(self.env.reset())
             done = False
             while not done:
