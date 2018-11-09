@@ -218,7 +218,7 @@ class Trainer(object):
                     break
                 if self.steps_done % self.TARGET_UPDATE == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
-                if self.steps_done == 30000:
+                if self.steps_done == 10000:
                     print((datetime.datetime.now() - global_start).total_seconds())
             if i_episode % 250 == 0:
                 try:
