@@ -213,7 +213,7 @@ class Trainer(object):
     def SARS(self, state):
         action = self.selectAction(state)
         import pdb; pdb.set_trace()
-        _, reward, done, _ = self.env.step(action.item())
+        something, reward, done, info = self.env.step(action.item())
         reward = torch.tensor([reward], device=self.device)
         if not done:
             next_state = self.getScreen()
