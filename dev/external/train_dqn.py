@@ -179,6 +179,8 @@ def train(target_dqn_model, dqn_model, buffer, batch_size, gamma, n, num_epochs,
                 break
         print("Loss for episode", iteration, " is ", loss.data/t)
         print("Reward for episode", iteration, " is ", re)
+        print("Time for episode", )
+
 
     return target_dqn_model, dqn_model
 
