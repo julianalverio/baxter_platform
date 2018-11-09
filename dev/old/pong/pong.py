@@ -90,7 +90,7 @@ class Trainer(object):
         self.num_episodes = num_episodes
 
         if not warm_start_path:
-            test_state = (self.getScreen() - self.getScreen()).to(torch.device('cpu'))
+            test_state =  self.preprocess(self.env.render(mode='rgb_array'))
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
             self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
             torch.save(self.target_net, 'delete_initial_target_net')
@@ -110,7 +110,7 @@ class Trainer(object):
             self.steps_done = 0
             self.prefetch_episodes = 10000
             print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
-            self.prefetch()
+            # self.prefetch()
             self.steps_before_optimize = 4
 
         else:
@@ -167,6 +167,14 @@ class Trainer(object):
         img = np.array(Image.fromarray(img).resize((72, 85)))
         return torch.from_numpy(img/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device, non_blocking=True)
 
+    def preprocess(self, img):
+        # new size: 170 x 146
+        img = img[25:195, 8:152, :]
+        img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
+        img = np.array(Image.fromarray(img).resize((72, 85)))
+        return torch.from_numpy(img/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device, non_blocking=True)
+
+
 
     def selectAction(self, state):
         sample = random.random()
@@ -212,11 +220,10 @@ class Trainer(object):
 
     def SARS(self, state):
         action = self.selectAction(state)
-        import pdb; pdb.set_trace()
-        something, reward, done, info = self.env.step(action.item())
+        next_state, reward, done, _ = self.env.step(action.item())
         reward = torch.tensor([reward], device=self.device)
         if not done:
-            next_state = self.getScreen()
+            next_state = self.preprocess(next_state)
         else:
             next_state = None
         self.memory.push(state, action, next_state, reward)
@@ -235,11 +242,8 @@ class Trainer(object):
     def train(self):
         self.steps_done = 0
         for i_episode in range(self.num_episodes+1):
-            print('steps done:', self.steps_done)
-            start = datetime.datetime.now()
-            print('Beginning Episode %s' % i_episode)
-            self.env.reset()
-            state = self.getScreen()
+            import pdb; pdb.set_trace()
+            state = self.preprocess(self.env.reset())
             done = False
             while not done:
                 state, done = self.SARS(state)
@@ -248,23 +252,20 @@ class Trainer(object):
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 self.saveModel(i_episode)
-            print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
+
 
     def playback(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
         self.env = gym.make('Pong-v0').unwrapped
-        self.env.reset()
+        current_screen = self.preprocess(self.env.reset())
         steps_done = 0
         done = False
-        current_screen = self.getScreen()
         while not done:
             self.env.render(mode='human')
             time.sleep(0.025)
-            previous_screen = current_screen
-            current_screen = self.getScreen()
-            state = current_screen - previous_screen
-            action = self.target_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
-            _, reward, done, _ = self.env.step(action.item())
+            action = self.target_net(current_screen).max(1)[1].view(1, 1).type(torch.LongTensor)
+            current_screen, reward, done, _ = self.env.step(action.item())
+            current_screen = self.preprocess(current_screen)
             steps_done += 1
         print("Steps Done: ", steps_done)
 
@@ -276,6 +277,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
-# trainer.playback('pong_4500.pth')
+# trainer.train()
+# completionEmail('%s done' % NUM_EPISODES)
+trainer.playback('pong_4500.pth')
