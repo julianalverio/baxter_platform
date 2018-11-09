@@ -210,9 +210,13 @@ class Trainer(object):
         self.optimizer.step()
 
 
+    # def getState(self, current_screen, last_screen):
+    #     difference = current_screen - last_screen
+    #     return torch.cat([current_screen, difference], dim=1)
+    #
+
     def SARS(self, state):
         action = self.selectAction(state)
-        import pdb; pdb.set_trace()
         _, reward, done, _ = self.env.step(action.item())
         reward = torch.tensor([reward], device=self.device)
         if not done:
@@ -242,9 +246,12 @@ class Trainer(object):
             state = self.getScreen()
             done = False
             while not done:
-                state, done = self.SARS(state)
+                for _ in range(self.steps_before_optimize):
+                    state, done = self.SARS(state)
+                    if done: break
                 self.optimizeModel()
                 if self.steps_done % self.target_update == 0:
+                    print('synching target network')
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 self.saveModel(i_episode)
