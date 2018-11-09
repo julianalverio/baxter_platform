@@ -238,7 +238,6 @@ class Trainer(object):
 
     def train(self):
         self.steps_done = 0
-        global_start_time = datetime.datetime.now()
         for i_episode in range(self.num_episodes+1):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
@@ -248,13 +247,8 @@ class Trainer(object):
             while not done:
                 for _ in range(self.steps_before_optimize):
                     state, done = self.SARS(state)
-                    if self.steps_done == 30000:
-                        print((datetime.datetime.now() - global_start_time).total_seconds())
-                        import pdb;
-                        pdb.set_trace()
                     if done: break
                 self.optimizeModel()
-
                 if self.steps_done % self.target_update == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
