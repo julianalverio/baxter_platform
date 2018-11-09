@@ -343,6 +343,7 @@ class QNetwork(nn.Module):
 
 
 if __name__ == '__main__':
+    pass
     # # Create the mario environment
     # env = me.get_mario_bros_env()
     # # Add the required environment wrappers
