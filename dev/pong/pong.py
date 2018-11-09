@@ -332,7 +332,7 @@ class Trainer(object):
 
 
 if __name__ == '__main__':
-    multiprocessing.set_start_method('fork')
+    multiprocessing.set_start_method('forkserver')
     trainer = Trainer(num_episodes=NUM_EPISODES)
     print("Trainer Initialized")
     trainer.train()
