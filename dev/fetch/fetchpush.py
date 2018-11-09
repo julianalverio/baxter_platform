@@ -104,6 +104,12 @@ class Trainer(object):
         self.initial_object_position = None
         self.steps_before_optimize = 4
 
+        self.time1 = 0.
+        self.time2 = 0.
+        self.time3 = 0.
+        self.time4 = 0.
+        self.time5 = 0.
+
 
     # Grab and image, crop it, downsample and resize, then convert to tensor
     def getScreen(self):
@@ -188,19 +194,29 @@ class Trainer(object):
 
 
     def SARS(self, state, done_input):
+        start = datetime.datetime.now()
         action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
+        self.time1 += (datetime.datetime.now() - start).total_seconds()
+        start = datetime.datetime.now()
         movement = np.zeros(4)
         if action.item() % 2 == 0:
             movement[action.item() // 2] += 1
         else:
             movement[action.item() // 2] -= 1
+        self.time2 += (datetime.datetime.now() - start).total_seconds()
+        start = datetime.datetime.now()
         self.env.step(movement)
+        self.time3 += (datetime.datetime.now() - start).total_seconds()
+        start = datetime.datetime.now()
         reward, done = self.getReward(self.initial_object_position, task=1)
         done = done or done_input
+        self.time3 += (datetime.datetime.now() - start).total_seconds()
+        start = datetime.datetime.now()
         if not done:
             next_state = self.getScreen()
         else:
             next_state = None
+        self.time4 += (datetime.datetime.now() - start).total_seconds()
         self.memory.push(state, action, next_state, reward)
         self.steps_done += 1
         return next_state, done
@@ -265,14 +281,15 @@ def completionEmail(message=''):
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
 # trainer.train()
-start = datetime.datetime.now()
-for _ in range(1000):
-    trainer.getScreen()
-print('time1', (datetime.datetime.now() - start).total_seconds())
-
-start = datetime.datetime.now()
-for _ in range(1000):
-    trainer.getScreenNew()
-print((datetime.datetime.now() - start).total_seconds())
 # completionEmail('%s done' % NUM_EPISODES)
 # trainer.playback('fetchpush_1000.pth')
+
+
+state = trainer.getScreen()
+for _ in range(500):
+    trainer.SARS(state, False)
+denom = trainer.time1 + trainer.time2 + trainer.time3 + trainer.time4
+print(trainer.time1/denom)
+print(trainer.time2/denom)
+print(trainer.time3/denom)
+print(trainer.time4/denom)
