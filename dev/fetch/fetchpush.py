@@ -17,6 +17,10 @@ import torch.nn.functional as F
 import yagmail
 import os
 import datetime
+import cv2
+from cv2 import resize
+print(cv2.__file__)
+assert False
 
 
 NUM_EPISODES = 15000
@@ -103,10 +107,6 @@ class Trainer(object):
 
     # Grab and image, crop it, downsample and resize, then convert to tensor
     def getScreen(self):
-        screen = Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425)).resize((105, 81), Image.NEAREST)
-        return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((2, 1, 0))).unsqueeze(0).to(self.device)
-
-    def getScreenNew(self):
         img = self.env.render(mode='rgb_array')[30:450, 100:425, :]
         img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
         img = np.array(Image.fromarray(img).resize((72, 85)))
