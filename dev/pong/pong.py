@@ -119,7 +119,7 @@ class Trainer(object):
             self.memory = ReplayMemory(100000, self.transition)
 
             self.steps_done = 0
-            self.prefetch_episodes = 10000
+            self.prefetch_episodes = 1000
             print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
             self.prefetch()
             self.steps_before_optimize = 4
@@ -299,7 +299,7 @@ class Trainer(object):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
-            environment_process = Process(target=startEnvironmentProcess, args=(self))
+            environment_process = Process(target=startEnvironmentProcess, args=((self)))
             optimization_process = Process(target=self.optimizeModelProcess)
             environment_process.start()
             # optimization_process.start()
