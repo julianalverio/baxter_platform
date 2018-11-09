@@ -42,6 +42,13 @@ torch.backends.cudnn.deterministic = True
 torch.cuda.manual_seed_all(999)
 np.random.seed(999)
 
+
+def completionEmail(message=''):
+  yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
+  yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
+
+
+
 class ReplayMemory(object):
 
     def __init__(self, capacity, transition):
@@ -287,7 +294,6 @@ class Trainer(object):
 
     def train(self):
         self.steps_done = 0
-        multiprocessing.set_start_method('spawn')
         self.global_start_time = datetime.datetime.now()
         for i_episode in range(self.num_episodes+1):
             start = datetime.datetime.now()
@@ -325,19 +331,10 @@ class Trainer(object):
 
 
 
-
-
-
-
-def completionEmail(message=''):
-  yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
-  yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
-
-
-
-
-trainer = Trainer(num_episodes=NUM_EPISODES)
-print("Trainer Initialized")
-trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
-# trainer.playback('pong_4000.pth')
+if __name__ == '__main__':
+    multiprocessing.set_start_method('spawn')
+    trainer = Trainer(num_episodes=NUM_EPISODES)
+    print("Trainer Initialized")
+    trainer.train()
+    completionEmail('%s done' % NUM_EPISODES)
+    # trainer.playback('pong_4000.pth')
