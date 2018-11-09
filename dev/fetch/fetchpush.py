@@ -229,11 +229,12 @@ class Trainer(object):
             state = self.getScreen()
             done = False
             while not done:
-                if self.steps_done == 5000:
-                    print((datetime.datetime.now() - global_start).total_seconds())
-                    import pdb; pdb.set_trace()
                 timer_start = datetime.datetime.now()
                 for _ in range(self.steps_before_optimize):
+                    if self.steps_done == 5000:
+                        print((datetime.datetime.now() - global_start).total_seconds())
+                        import pdb;
+                        pdb.set_trace()
                     state, done = self.SARS(state, self.steps_done % 1000 == 998) # done from too many steps or touching the block
                     if done: break
                 environment_time += (datetime.datetime.now() - timer_start).total_seconds()
@@ -245,10 +246,10 @@ class Trainer(object):
             if i_episode % 250 == 0:
                 self.saveModel(i_episode)
             print('Episode Duration: %s seconds ' % (datetime.datetime.now() - start).total_seconds())
-            if i_episode == 5:
-                print('optimization time:', optimization_time/(optimization_time+environment_time))
-                print('environment time: ', environment_time/(environment_time+optimization_time))
-                import pdb; pdb.set_trace()
+            # if i_episode == 5:
+            #     print('optimization time:', optimization_time/(optimization_time+environment_time))
+            #     print('environment time: ', environment_time/(environment_time+optimization_time))
+            #     import pdb; pdb.set_trace()
 
     def playback(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
