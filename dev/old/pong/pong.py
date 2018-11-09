@@ -29,7 +29,7 @@ import gym
 
 
 GPU_NUM = '0'
-NUM_EPISODES = 25000
+NUM_EPISODES = 100000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
 torch.backends.cudnn.deterministic = True
@@ -110,7 +110,7 @@ class Trainer(object):
             self.steps_done = 0
             self.prefetch_episodes = 10000
             print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
-            # self.prefetch()
+            self.prefetch()
             self.steps_before_optimize = 4
 
         else:
