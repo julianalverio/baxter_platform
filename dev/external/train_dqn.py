@@ -193,12 +193,12 @@ if __name__ == '__main__':
     img_height, img_width, img_channels = input_shape
     num_actions = env.action_space.n
 
-    dqn_model = DQN.ActionPredictionNetwork(num_conv_layers=16, input_channels=img_channels,
+    dqn_model = DQN.ConvQNetwork(num_conv_layers=16, input_channels=img_channels,
                                             output_q_value=num_actions, pool_kernel_size=3,
                                             kernel_size=3, dense_layer_features=256,
                                             IM_HEIGHT=img_height//2, IM_WIDTH=img_width//2)
 
-    target_dqn_model = DQN.ActionPredictionNetwork(num_conv_layers=16, input_channels=img_channels,
+    target_dqn_model = DQN.ConvQNetwork(num_conv_layers=16, input_channels=img_channels,
                                             output_q_value=num_actions, pool_kernel_size=3,
                                             kernel_size=3, dense_layer_features=256,
                                             IM_HEIGHT=img_height//2, IM_WIDTH=img_width//2)

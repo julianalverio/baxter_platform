@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/external/models/DQN.py" beforeDir="false" afterPath="$PROJECT_DIR$/external/models/DQN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/external/train_dqn.py" beforeDir="false" afterPath="$PROJECT_DIR$/external/train_dqn.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -56,12 +56,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="9800" />
+          <entry key="py" value="9808" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="9800" />
+          <entry key="Python" value="9808" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -81,20 +81,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/external/train_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="18" lean-forward="true" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="18" />
+            <state relative-caret-position="647">
+              <caret line="200" column="39" selection-start-line="200" selection-start-column="39" selection-end-line="200" selection-end-column="39" />
+              <folding>
+                <element signature="e#29#39#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/external/models/DQN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="588">
-              <caret line="345" column="8" selection-start-line="345" selection-start-column="8" selection-end-line="345" selection-end-column="8" />
+            <state relative-caret-position="102">
+              <caret line="256" column="18" selection-start-line="256" selection-start-column="6" selection-end-line="256" selection-end-column="18" />
               <folding>
                 <element signature="e#82#94#0" expanded="true" />
               </folding>
@@ -106,9 +109,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>def</find>
-      <find>import pdb;</find>
-      <find>def sarsprocess</find>
       <find>def prefetch</find>
       <find>args=</find>
       <find>self.policy_net</find>
@@ -136,6 +136,9 @@
       <find>self.time5</find>
       <find>def train</find>
       <find>me.</find>
+      <find>dqn_model =</find>
+      <find>dqn_model</find>
+      <find>dqn_model = dqn</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -150,8 +153,8 @@
         <option value="$PROJECT_DIR$/fetch/fetchpush_not_optimized.py" />
         <option value="$PROJECT_DIR$/pong/pong.py" />
         <option value="$PROJECT_DIR$/fetch/fetchpush.py" />
-        <option value="$PROJECT_DIR$/external/train_dqn.py" />
         <option value="$PROJECT_DIR$/external/models/DQN.py" />
+        <option value="$PROJECT_DIR$/external/train_dqn.py" />
       </list>
     </option>
   </component>
@@ -327,19 +330,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/external/train_dqn.py">
+    <entry file="file://$PROJECT_DIR$/external/models/DQN.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="18" lean-forward="true" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="18" />
+        <state relative-caret-position="102">
+          <caret line="256" column="18" selection-start-line="256" selection-start-column="6" selection-end-line="256" selection-end-column="18" />
+          <folding>
+            <element signature="e#82#94#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/external/models/DQN.py">
+    <entry file="file://$PROJECT_DIR$/external/train_dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="588">
-          <caret line="345" column="8" selection-start-line="345" selection-start-column="8" selection-end-line="345" selection-end-column="8" />
+        <state relative-caret-position="647">
+          <caret line="200" column="39" selection-start-line="200" selection-start-column="39" selection-end-line="200" selection-end-column="39" />
           <folding>
-            <element signature="e#82#94#0" expanded="true" />
+            <element signature="e#29#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
