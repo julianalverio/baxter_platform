@@ -186,11 +186,11 @@ class Trainer(object):
     #last thing I ran: (Pdb) [x for x in dir(self.env.sim.data) if 'get' in x and 'joint' in x]
     def train(self):
         global_start = datetime.datetime.now()
+        self.steps_done = 0
         for i_episode in range(self.num_episodes):
             print('Episode %s' % i_episode)
             start = datetime.datetime.now()
             self.reset()
-            self.steps_done = 0
             initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
             for t in count():
                 state = self.getScreen()
