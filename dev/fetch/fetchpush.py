@@ -86,7 +86,7 @@ class Trainer(object):
         self.EPS_START = 0.9
         self.EPS_END = 0.05
         self.EPS_DECAY = 200
-        self.TARGET_UPDATE = 10
+        self.TARGET_UPDATE = 100
 
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
@@ -217,7 +217,9 @@ class Trainer(object):
     #last thing I ran: (Pdb) [x for x in dir(self.env.sim.data) if 'get' in x and 'joint' in x]
     def train(self):
         self.steps_done = 0
+        global_start = datetime.datetime.now()
         for i_episode in range(self.num_episodes):
+            print('steps done: ', self.steps_done)
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.reset()
@@ -225,11 +227,15 @@ class Trainer(object):
             state = self.getScreen()
             done = False
             while not done:
+                if self.steps_done == 5000:
+                    print((datetime.datetime.now() - global_start).total_seconds())
+                    import pdb; pdb.set_trace()
                 for _ in range(self.steps_before_optimize):
                     state, done = self.SARS(state, self.steps_done % 1000 == 998) # done from too many steps or touching the block
                     if done: break
                 self.optimizeModel()
                 if self.steps_done % self.TARGET_UPDATE == 0:
+                    print('syncing model')
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 250 == 0:
                 self.saveModel(i_episode)
