@@ -2,8 +2,39 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/openai_dqn.py" beforeDir="false" afterPath="$PROJECT_DIR$/openai_dqn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pacman.py" beforeDir="false" afterPath="$PROJECT_DIR$/pacman.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baxter/dqn_baxter.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/baxter/scene_generator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetch/MUJOCO_LOG.TXT" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetch/buggy_fetchpush_1000.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetch/fetchpush.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetch/fetchpush_0.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetch/fetchpush_1000.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetch/fetchpush_250.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetch/fetchpush_500.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetch/fetchpush_750.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetch/fetchpush_not_optimized.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetchpush/fetchpush.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetchpush/fetchpush_0.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetchpush/fetchpush_250.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/breakout.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/failed_pacman_4000.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/final_breakout" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/final_pacman" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/pacman.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/delete_initial_target_net" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_0.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_1000.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_1500.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_2000.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_2500.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_3000.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_4000.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_4500.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_500.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_parallel_broken.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,29 +78,46 @@
         </counts>
       </usages-collector>
     </session>
+    <session id="-940525777">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.open.time.3" value="1" />
+          <entry key="project.open.time.4" value="1" />
+          <entry key="project.opened" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="py" value="9660" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="Python" value="9660" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="py" value="10" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Python" value="10" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="dev" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/openai_dqn.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="256">
-              <caret line="192" column="31" lean-forward="true" selection-start-line="192" selection-start-column="31" selection-end-line="192" selection-end-column="31" />
-              <folding>
-                <element signature="e#0#10#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/pacman.py">
+        <entry file="file://$PROJECT_DIR$/pytorch-rl/train_dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="828">
-              <caret line="236" column="35" selection-start-line="236" selection-start-column="35" selection-end-line="236" selection-end-column="35" />
-              <folding>
-                <element signature="e#0#12#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-739">
+              <caret line="88" column="32" lean-forward="true" selection-start-line="88" selection-start-column="32" selection-end-line="88" selection-end-column="32" />
             </state>
           </provider>
         </entry>
@@ -78,46 +126,50 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>done =</find>
-      <find>def getrewa</find>
-      <find>def getreward</find>
-      <find>steps</find>
-      <find>class trainer</find>
+      <find>def sarsproc</find>
+      <find>def</find>
+      <find>import pdb;</find>
+      <find>def sarsprocess</find>
+      <find>def prefetch</find>
+      <find>args=</find>
+      <find>self.policy_net</find>
+      <find>state =</find>
+      <find>getstate</find>
+      <find>steps or</find>
+      <find>def sa</find>
+      <find>def selec</find>
       <find>self.steps_done</find>
-      <find>def selectaction</find>
-      <find>selectaction</find>
+      <find>self.ste</find>
+      <find>self.steps_done += 1</find>
+      <find>if self.</find>
+      <find>self.target_update</find>
+      <find>s</find>
       <find>def reset</find>
-      <find>falls</find>
-      <find>fall</find>
-      <find>print</find>
-      <find>plotdurations</find>
-      <find>plt.</find>
-      <find>range</find>
-      <find>getscreen</find>
-      <find>yagmail</find>
-      <find>def getsc</find>
-      <find>completionemail</find>
-      <find>email</find>
-      <find>torch.save</find>
-      <find>def getscreen</find>
-      <find>def forward</find>
-      <find>print(</find>
-      <find>self.device =</find>
-      <find>memory_size</find>
-      <find>import pdb</find>
-      <find>self.polict</find>
+      <find>syncing</find>
       <find>def train</find>
-      <find>completion</find>
+      <find>print</find>
+      <find>import pdb</find>
+      <find>def getswcreen</find>
+      <find>class dqn</find>
+      <find>getscreen</find>
+      <find>def getscreen</find>
+      <find>def sars</find>
+      <find>class trainer</find>
+      <find>self.time5</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/pytorch-rl" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/openai_dqn.py" />
         <option value="$PROJECT_DIR$/pacman.py" />
+        <option value="$PROJECT_DIR$/fetchpush/fetchpush.py" />
+        <option value="$PROJECT_DIR$/fetch/fetchpush_not_optimized.py" />
+        <option value="$PROJECT_DIR$/pong/pong.py" />
+        <option value="$PROJECT_DIR$/fetch/fetchpush.py" />
       </list>
     </option>
   </component>
@@ -137,6 +189,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -148,7 +201,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -215,9 +267,9 @@
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24847375" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4989796" visible="true" weight="0.25457877" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info id="Favorites" order="2" sideWeight="0.50102043" side_tool="true" weight="0.25457877" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -245,23 +297,40 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/openai_dqn.py">
+    <entry file="file://$PROJECT_DIR$/openai_dqn.py" />
+    <entry file="file://$PROJECT_DIR$/pacman.py" />
+    <entry file="file://$PROJECT_DIR$/fetchpush/fetchpush.py" />
+    <entry file="file://$PROJECT_DIR$/fetch/fetchpush_not_optimized.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="192" column="31" lean-forward="true" selection-start-line="192" selection-start-column="31" selection-end-line="192" selection-end-column="31" />
+        <state relative-caret-position="314">
+          <caret line="213" column="43" lean-forward="true" selection-start-line="213" selection-start-column="43" selection-end-line="213" selection-end-column="43" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pacman.py">
+    <entry file="file://$PROJECT_DIR$/fetch/fetchpush.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="828">
-          <caret line="236" column="35" selection-start-line="236" selection-start-column="35" selection-end-line="236" selection-end-column="35" />
+        <state relative-caret-position="491">
+          <caret line="255" column="34" lean-forward="true" selection-start-line="255" selection-start-column="34" selection-end-line="255" selection-end-column="34" />
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
+            <element signature="e#0#10#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pong/pong.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="310">
+          <caret line="243" column="53" lean-forward="true" selection-start-line="243" selection-start-column="53" selection-end-line="243" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pytorch-rl/train_dqn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-739">
+          <caret line="88" column="32" lean-forward="true" selection-start-line="88" selection-start-column="32" selection-end-line="88" selection-end-column="32" />
         </state>
       </provider>
     </entry>

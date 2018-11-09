@@ -28,7 +28,7 @@ sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-pa
 import gym
 
 
-GPU_NUM = '0,1,2,3'
+GPU_NUM = '0'
 NUM_EPISODES = 25000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
@@ -239,6 +239,7 @@ class Trainer(object):
     def train(self):
         self.steps_done = 0
         for i_episode in range(self.num_episodes+1):
+            print('steps done:', self.steps_done)
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
@@ -250,6 +251,7 @@ class Trainer(object):
                     if done: break
                 self.optimizeModel()
                 if self.steps_done % self.target_update == 0:
+                    print('synching target network')
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 self.saveModel(i_episode)
@@ -274,20 +276,13 @@ class Trainer(object):
         print("Steps Done: ", steps_done)
 
 
-
-
-
-
-
 def completionEmail(message=''):
   yag = yagmail.SMTP('infolab.rl.bot@gmail.com', 'baxter!@')
   yag.send('julian.a.alverio@gmail.com', 'Training Completed', [message])
 
 
-
-
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
-# trainer.playback('pong_4000.pth')
+# trainer.train()
+# completionEmail('%s done' % NUM_EPISODES)
+trainer.playback('pong_4500.pth')
