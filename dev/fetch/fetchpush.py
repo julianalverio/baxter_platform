@@ -20,7 +20,7 @@ import datetime
 
 
 NUM_EPISODES = 5000
-os.environ['CUDA_VISIBLE_DEVICES']='1,2,3'
+os.environ['CUDA_VISIBLE_DEVICES']='2,3'
 torch.backends.cudnn.deterministic = True
 torch.manual_seed(999)
 torch.backends.cudnn.deterministic = True
@@ -186,7 +186,7 @@ class Trainer(object):
         return torch.tensor(reward, device=self.device).view(1, 1), done
 
 
-    def SARS(self, state, done):
+    def SARS(self, state, done_input):
         action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
         movement = np.zeros(4)
         if action.item() % 2 == 0:
@@ -195,14 +195,13 @@ class Trainer(object):
             movement[action.item() // 2] -= 1
         self.env.step(movement)
         reward, done = self.getReward(self.initial_object_position, task=1)
-
-        if t == 1000:
-            done = True
+        done = done or done_input
         if not done:
             next_state = self.getScreen()
         else:
             next_state = None
         self.memory.push(state, action, next_state, reward)
+        return next_state, done
 
     def saveModel(self, i_episode):
         try:
@@ -231,7 +230,7 @@ class Trainer(object):
             done = False
             while not done:
                 for _ in range(self.steps_before_optimize):
-                    state, done = self.SARS(state, t==999)
+                    state, done = self.SARS(state, self.steps_done % 1000 == 999)
                     if done: break
                 self.optimizeModel()
                 if self.steps_done % self.TARGET_UPDATE == 0:
