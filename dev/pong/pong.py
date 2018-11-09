@@ -7,6 +7,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import time
 from torch.multiprocessing import Process, Lock
+from torch import multiprocessing
 
 
 
@@ -286,6 +287,7 @@ class Trainer(object):
 
     def train(self):
         self.steps_done = 0
+        multiprocessing.set_start_method('spawn')
         self.global_start_time = datetime.datetime.now()
         for i_episode in range(self.num_episodes+1):
             start = datetime.datetime.now()
