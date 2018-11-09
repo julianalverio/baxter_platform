@@ -148,11 +148,6 @@ class Trainer(object):
         del loss
 
 
-    def getState(self, current_screen, last_screen):
-        difference = current_screen - last_screen
-        return torch.cat([current_screen, difference], 1)
-
-
     def reset(self):
         self.env.reset()
         self.env.viewer.cam.lookat[0] = 1.
@@ -230,7 +225,7 @@ class Trainer(object):
             done = False
             while not done:
                 for _ in range(self.steps_before_optimize):
-                    state, done = self.SARS(state, self.steps_done % 1000 == 999)
+                    state, done = self.SARS(state, self.steps_done % 1000 == 999) # done from too many steps or touching the block
                     if done: break
                 self.optimizeModel()
                 if self.steps_done % self.TARGET_UPDATE == 0:
@@ -244,11 +239,9 @@ class Trainer(object):
         self.env = gym.make('FetchPush-v1').unwrapped
         self.env.reset()
         steps_done = 0
-        current_screen = self.getScreen()
         for _ in range(1000):
             self.env.render(mode='human')
-            previous_screen = current_screen
-            current_screen = self.getScreen()
+            state = self.getScreen()
             action = self.target_net(state).max(1)[1].view(1, 1).type(torch.LongTensor)
             _, reward, done, _ = self.env.step(action.item())
             steps_done += 1

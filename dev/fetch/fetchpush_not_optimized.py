@@ -189,6 +189,7 @@ class Trainer(object):
         self.steps_done = 0
         for i_episode in range(self.num_episodes):
             print('Episode %s' % i_episode)
+            print('steps done', self.steps_done)
             start = datetime.datetime.now()
             self.reset()
             initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
