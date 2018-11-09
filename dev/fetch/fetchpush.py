@@ -19,8 +19,8 @@ import os
 import datetime
 # import cv2
 # from cv2 import resize
-print(cv2.__file__)
-assert False
+# print(cv2.__file__)
+# assert False
 
 
 NUM_EPISODES = 15000
