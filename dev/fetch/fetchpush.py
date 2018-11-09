@@ -19,7 +19,7 @@ import os
 import datetime
 
 
-NUM_EPISODES = 5000
+NUM_EPISODES = 15000
 os.environ['CUDA_VISIBLE_DEVICES']='2,3'
 torch.backends.cudnn.deterministic = True
 torch.manual_seed(999)
@@ -218,7 +218,6 @@ class Trainer(object):
     def train(self):
         self.steps_done = 0
         for i_episode in range(self.num_episodes):
-            print('steps done: ', self.steps_done)
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.reset()
