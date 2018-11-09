@@ -9,8 +9,8 @@ from Memory import Buffer
 import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
-import Environments.super_mario_bros_env as me
-import Environments.env_wrappers as env_wrappers
+# import Environments.super_mario_bros_env as me
+# import Environments.env_wrappers as env_wrappers
 from Utils.utils import to_tensor
 
 USE_CUDA = torch.cuda.is_available()
@@ -343,20 +343,20 @@ class QNetwork(nn.Module):
 
 
 if __name__ == '__main__':
-    # Create the mario environment
-    env = me.get_mario_bros_env()
-    # Add the required environment wrappers
-    env = env_wrappers.wrap_wrap(env, height=84, width=84)
-    env = env_wrappers.wrap_pytorch(env)
-
-    # Create the DQN Model
-    dqn = DQN(env=env, num_hidden_units=128,
-              num_epochs=10, learning_rate=1e-3,
-              action_space=env.action_space.n, state_space=64,
-              batch_size=16, buffer_size=50000, discount_factor=0.99,
-              height_img=84, width_img=84, num_frames=100000,
-              num_rollouts=10, num_training_steps=10, random_seed=1000000, train_limit_buffer=10000)
-    dqn.train()
+    # # Create the mario environment
+    # env = me.get_mario_bros_env()
+    # # Add the required environment wrappers
+    # env = env_wrappers.wrap_wrap(env, height=84, width=84)
+    # env = env_wrappers.wrap_pytorch(env)
+    #
+    # # Create the DQN Model
+    # dqn = DQN(env=env, num_hidden_units=128,
+    #           num_epochs=10, learning_rate=1e-3,
+    #           action_space=env.action_space.n, state_space=64,
+    #           batch_size=16, buffer_size=50000, discount_factor=0.99,
+    #           height_img=84, width_img=84, num_frames=100000,
+    #           num_rollouts=10, num_training_steps=10, random_seed=1000000, train_limit_buffer=10000)
+    # dqn.train()
 
 
 
