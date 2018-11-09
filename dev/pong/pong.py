@@ -299,7 +299,7 @@ class Trainer(object):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
-            environment_process = Process(target=startEnvironmentProcess, args={'trainer':self})
+            environment_process = Process(target=startEnvironmentProcess, args=(self))
             optimization_process = Process(target=self.optimizeModelProcess)
             environment_process.start()
             # optimization_process.start()
