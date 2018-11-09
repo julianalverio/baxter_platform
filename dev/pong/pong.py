@@ -91,8 +91,8 @@ class Trainer(object):
 
         if not warm_start_path:
             test_state = (self.getScreen() - self.getScreen()).to(torch.device('cpu'))
-            self.policy_net = torch.nn.DataParallel(DQN(self.env.action_space.n, self.device, test_state)).to(self.device, non_blocking=True)
-            self.target_net = torch.nn.DataParallel(DQN(self.env.action_space.n, self.device, test_state)).to(self.device, non_blocking=True)
+            self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
+            self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
             torch.save(self.target_net, 'delete_initial_target_net')
 
             self.batch_size = 32
