@@ -299,7 +299,7 @@ class Trainer(object):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
-            environment_process = Process(target=self.SARSProcess)
+            environment_process = Process(target=startEnvironmentProcess, args={'trainer':self})
             optimization_process = Process(target=self.optimizeModelProcess)
             environment_process.start()
             # optimization_process.start()
@@ -329,10 +329,14 @@ class Trainer(object):
             steps_done += 1
         print("Steps Done: ", steps_done)
 
+def startEnvironmentProcess(trainer):
+    trainer.SARSProcess()
 
+def startOptimizerProcess(trainer):
+    trainer.optmizeModelProcess()
 
 if __name__ == '__main__':
-    multiprocessing.set_start_method('forkserver')
+    multiprocessing.set_start_method('spawn')
     trainer = Trainer(num_episodes=NUM_EPISODES)
     print("Trainer Initialized")
     trainer.train()
