@@ -17,8 +17,8 @@ import torch.nn.functional as F
 import yagmail
 import os
 import datetime
-import cv2
-from cv2 import resize
+# import cv2
+# from cv2 import resize
 print(cv2.__file__)
 assert False
 
