@@ -291,7 +291,7 @@ print("Trainer Initialized")
 
 state = trainer.getScreen()
 trainer.initial_object_position = np.array([0,0,0])
-for _ in range(500):
+for _ in range(10000):
     trainer.SARS(state, False)
 denom = trainer.time1 + trainer.time2 + trainer.time3 + trainer.time4
 print(trainer.time1/denom)
