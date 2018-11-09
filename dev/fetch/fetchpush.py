@@ -217,9 +217,6 @@ class Trainer(object):
     #last thing I ran: (Pdb) [x for x in dir(self.env.sim.data) if 'get' in x and 'joint' in x]
     def train(self):
         self.steps_done = 0
-        global_start = datetime.datetime.now()
-        optimization_time = 0.
-        environment_time = 0.
         for i_episode in range(self.num_episodes):
             print('steps done: ', self.steps_done)
             start = datetime.datetime.now()
@@ -229,27 +226,16 @@ class Trainer(object):
             state = self.getScreen()
             done = False
             while not done:
-                timer_start = datetime.datetime.now()
                 for _ in range(self.steps_before_optimize):
-                    if self.steps_done == 5000:
-                        print((datetime.datetime.now() - global_start).total_seconds())
-                        import pdb;
-                        pdb.set_trace()
                     state, done = self.SARS(state, self.steps_done % 1000 == 998) # done from too many steps or touching the block
                     if done: break
-                environment_time += (datetime.datetime.now() - timer_start).total_seconds()
-                timer_start = datetime.datetime.now()
                 self.optimizeModel()
-                optimization_time += (datetime.datetime.now() - timer_start).total_seconds()
                 if self.steps_done % self.TARGET_UPDATE == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 250 == 0:
                 self.saveModel(i_episode)
             print('Episode Duration: %s seconds ' % (datetime.datetime.now() - start).total_seconds())
-            # if i_episode == 5:
-            #     print('optimization time:', optimization_time/(optimization_time+environment_time))
-            #     print('environment time: ', environment_time/(environment_time+optimization_time))
-            #     import pdb; pdb.set_trace()
+
 
     def playback(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
