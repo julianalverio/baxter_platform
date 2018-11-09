@@ -156,7 +156,7 @@ class Trainer(object):
         self.env.viewer.cam.azimuth = 165.
         self.env.viewer.cam.elevation = 10.
         self.env.viewer.cam.distance = 2.5
-        self.env.sim.nsubsteps = 3
+        self.env.sim.nsubsteps = 2
         self.env.block_gripper = True
         self.getScreen()
 
@@ -235,7 +235,6 @@ class Trainer(object):
                     if done: break
                 self.optimizeModel()
                 if self.steps_done % self.TARGET_UPDATE == 0:
-                    print('syncing model')
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 250 == 0:
                 self.saveModel(i_episode)
