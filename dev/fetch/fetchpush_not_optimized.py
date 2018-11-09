@@ -21,12 +21,6 @@ import datetime
 
 NUM_EPISODES = 5000
 os.environ['CUDA_VISIBLE_DEVICES']='1,2,3'
-torch.backends.cudnn.deterministic = True
-torch.manual_seed(999)
-torch.backends.cudnn.deterministic = True
-torch.cuda.manual_seed_all(999)
-np.random.seed(999)
-
 
 class ReplayMemory(object):
 
@@ -96,9 +90,6 @@ class Trainer(object):
 
         self.num_episodes = num_episodes
         self.steps_done = 0
-
-        self.initial_object_position = None
-        self.steps_before_optimize = 4
 
 
     # Grab and image, crop it, downsample and resize, then convert to tensor
@@ -186,33 +177,6 @@ class Trainer(object):
         return torch.tensor(reward, device=self.device).view(1, 1), done
 
 
-    def SARS(self, state, done):
-        action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
-        movement = np.zeros(4)
-        if action.item() % 2 == 0:
-            movement[action.item() // 2] += 1
-        else:
-            movement[action.item() // 2] -= 1
-        self.env.step(movement)
-        reward, done = self.getReward(self.initial_object_position, task=1)
-
-        if t == 1000:
-            done = True
-        if not done:
-            next_state = self.getScreen()
-        else:
-            next_state = None
-        self.memory.push(state, action, next_state, reward)
-
-    def saveModel(self, i_episode):
-        try:
-            torch.save(self.target_net, 'fetchpush_%s.pth' % i_episode)
-            completionEmail('SUCCESS OPENAI GYM')
-        except Exception as e:
-            completionEmail('ERROR IN OPENAI GYM')
-            import pdb; pdb.set_trace()
-
-
     # initial_block_position = self.env.sim.data.get_site_xpos('object0')
     # initial_block_joint_position = self.env.sim.data.get_site_xpos('object0:joint')
     # initial_gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
@@ -221,24 +185,49 @@ class Trainer(object):
     #to see all "joint names" look at self.env.sim.model.joint_names --> only object0:joint doesn't have 'robot' as a prefix
     #last thing I ran: (Pdb) [x for x in dir(self.env.sim.data) if 'get' in x and 'joint' in x]
     def train(self):
-        self.steps_done = 0
-        for i_episode in range(self.num_episodes+1):
+        global_start = datetime.datetime.now()
+        for i_episode in range(self.num_episodes):
+            print('Episode %s' % i_episode)
             start = datetime.datetime.now()
-            print('Beginning Episode %s' % i_episode)
             self.reset()
-            self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
-            state = self.getScreen()
-            done = False
-            while not done:
-                for _ in range(self.steps_before_optimize):
-                    state, done = self.SARS(state, t==999)
-                    if done: break
+            self.steps_done = 0
+            initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
+            for t in count():
+                state = self.getScreen()
+                action = torch.tensor(self.selectAction(state), device=self.device).view(1, 1)
+                movement = np.zeros(4)
+                if action.item() % 2 == 0:
+                    movement[action.item() // 2] += 1
+                else:
+                    movement[action.item() // 2] -= 1
+                self.env.step(movement)
+                reward, done = self.getReward(initial_object_position, task=1)
+
+                if t == 1000:
+                    done = True
+                if not done:
+                    next_state = self.getScreen()
+                else:
+                    next_state = None
+
+                self.memory.push(state, action, next_state, reward)
                 self.optimizeModel()
+                if done:
+                    duration = (datetime.datetime.now() - start).total_seconds()
+                    print('Episode Duration: %s seconds ' % duration)
+                    break
                 if self.steps_done % self.TARGET_UPDATE == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
+                if self.steps_done == 30000:
+                    print((datetime.datetime.now() - global_start).total_seconds())
             if i_episode % 250 == 0:
-                self.saveModel(i_episode)
-            print('Episode Duration: %s seconds ' % (datetime.datetime.now() - start).total_seconds())
+                try:
+                    torch.save(self.target_net, 'fetchpush_%s.pth' % i_episode)
+                    completionEmail('SUCCESS OPENAI GYM')
+                except Exception as e:
+                    completionEmail('ERROR IN OPENAI GYM')
+                    import pdb; pdb.set_trace()
+
 
     def playback(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
