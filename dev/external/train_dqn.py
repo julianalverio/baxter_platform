@@ -2,6 +2,7 @@
 
 import gym
 import torch
+from collections import namedtuple
 from torch.autograd import Variable
 import torch.nn as nn
 from models import DQN
@@ -224,6 +225,8 @@ if __name__ == '__main__':
                                             kernel_size=3, dense_layer_features=256,
                                             IM_HEIGHT=img_height//2, IM_WIDTH=img_width//2)
 
+    transition = namedtuple('Transition',
+                                 ('state', 'action', 'next_state', 'reward'))
     buffer = ReplayMemory(capacity=10000) # Experience Replay
     batch_size= 32
     gamma = 0.99 # Discount factor
