@@ -196,6 +196,7 @@ class Trainer(object):
         else:
             next_state = None
         self.memory.push(state, action, next_state, reward)
+        self.steps_done += 1
         return next_state, done
 
     def saveModel(self, i_episode):
@@ -216,7 +217,7 @@ class Trainer(object):
     #last thing I ran: (Pdb) [x for x in dir(self.env.sim.data) if 'get' in x and 'joint' in x]
     def train(self):
         self.steps_done = 0
-        for i_episode in range(self.num_episodes+1):
+        for i_episode in range(self.num_episodes):
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.reset()
@@ -225,7 +226,7 @@ class Trainer(object):
             done = False
             while not done:
                 for _ in range(self.steps_before_optimize):
-                    state, done = self.SARS(state, self.steps_done % 1000 == 999) # done from too many steps or touching the block
+                    state, done = self.SARS(state, self.steps_done % 1000 == 998) # done from too many steps or touching the block
                     if done: break
                 self.optimizeModel()
                 if self.steps_done % self.TARGET_UPDATE == 0:

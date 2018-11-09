@@ -211,6 +211,8 @@ class Trainer(object):
                     next_state = self.getScreen()
                 else:
                     next_state = None
+                if self.steps_done == 5000:
+                    print((datetime.datetime.now() - global_start).total_seconds())
 
                 self.memory.push(state, action, next_state, reward)
                 self.optimizeModel()
@@ -220,8 +222,7 @@ class Trainer(object):
                     break
                 if self.steps_done % self.TARGET_UPDATE == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
-                if self.steps_done == 10000:
-                    print((datetime.datetime.now() - global_start).total_seconds())
+
             if i_episode % 250 == 0:
                 try:
                     torch.save(self.target_net, 'fetchpush_%s.pth' % i_episode)
