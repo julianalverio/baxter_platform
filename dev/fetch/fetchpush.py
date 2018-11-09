@@ -228,7 +228,7 @@ class Trainer(object):
     def saveModel(self, i_episode):
         try:
             torch.save(self.target_net, 'fetchpush_%s.pth' % i_episode)
-            completionEmail('SUCCESS OPENAI GYM')
+            completionEmail('SUCCESS Fetchpush %s' % i_episode)
         except Exception as e:
             completionEmail('ERROR IN OPENAI GYM')
             import pdb; pdb.set_trace()
@@ -284,18 +284,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-# trainer.train()
-# completionEmail('%s done' % NUM_EPISODES)
-# trainer.playback('fetchpush_1000.pth')
-
-
-state = trainer.getScreen()
-trainer.initial_object_position = np.array([0,0,0])
-for _ in range(10000):
-    trainer.SARS(state, False)
-denom = trainer.time1 + trainer.time2 + trainer.time3 + trainer.time4
-print(trainer.time1/denom)
-print(trainer.time2/denom)
-print(trainer.time3/denom)
-print(trainer.time4/denom)
-print(trainer.time5/denom)
+trainer.train()
+completionEmail('%s done' % NUM_EPISODES)
+trainer.playback('fetchpush_750.pth')
