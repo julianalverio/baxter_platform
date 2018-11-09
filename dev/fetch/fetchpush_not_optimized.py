@@ -99,6 +99,7 @@ class Trainer(object):
 
 
     def selectAction(self, state):
+        self.steps_done += 1
         sample = random.random()
         eps_threshold = self.EPS_END + (self.EPS_START - self.EPS_END) * \
             math.exp(-1. * self.steps_done / self.EPS_DECAY)
