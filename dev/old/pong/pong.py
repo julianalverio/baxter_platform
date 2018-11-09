@@ -242,6 +242,8 @@ class Trainer(object):
     def train(self):
         self.steps_done = 0
         for i_episode in range(self.num_episodes+1):
+            start = datetime.datetime.now()
+            print("Beginning Episode: ", i_episode)
             state = self.preprocess(self.env.reset())
             done = False
             while not done:
@@ -251,6 +253,7 @@ class Trainer(object):
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 500 == 0:
                 self.saveModel(i_episode)
+            print("Time Elapsed: ", (datetime.datetime.now() - start).total_seconds())
 
 
     def playback(self, target_net_path):
