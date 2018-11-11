@@ -15,11 +15,11 @@ from lib import dqn_model, common
 if __name__ == "__main__":
     params = common.HYPERPARAMS['pong']
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cuda", default=False, action="store_true", help="Enable cuda")
-    parser.add_argument("-s", "--steps", type=int, default=1, help="Play steps to use, default=1")
-    parser.add_argument("--seed", type=int, help="Random seed to use")
+    # parser.add_argument("--cuda", default=False, action="store_true", help="Enable cuda")
+    parser.add_argument("-s", "--steps", type=int, default=4, help="Play steps to use, default=1")
+    parser.add_argument("--seed", type=int, default=1, help="Random seed to use")
     args = parser.parse_args()
-    device = torch.device("cuda" if args.cuda else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if args.seed is not None:
         np.random.seed(args.seed)
