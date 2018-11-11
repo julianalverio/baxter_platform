@@ -15,7 +15,7 @@ from collections import deque
 import csv
 
 
-VALID_ACTION = [0, 3, 4]
+VALID_ACTION = [0, 2, 3]
 GAMMA = 0.99
 epsilon = 0.5
 update_step = 1000

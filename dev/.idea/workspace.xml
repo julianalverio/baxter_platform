@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/external/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/external/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/external/pong.py" beforeDir="false" afterPath="$PROJECT_DIR$/external/pong.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/external/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/external/train.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

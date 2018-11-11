@@ -7,8 +7,6 @@ class Pong(object):
 	def __init__(self):
 
 		self.env = gym.make('PongDeterministic-v4')
-		print(self.env.unwrapped.get_action_meanings())
-		assert False
 		self.current_phi = None
 		self.reset()
 
