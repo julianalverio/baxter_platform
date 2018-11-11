@@ -30,15 +30,20 @@ class ReplayMemory(object):
         self.memory = []
         self.position = 0
         self.transition = transition
+        self.size = 0
 
     def add(self, *args):
         if len(self.memory) < self.capacity:
             self.memory.append(None)
         self.memory[self.position] = self.transition(*args)
         self.position = (self.position + 1) % self.capacity
+        self.size += 1
 
     def sample(self, batch_size):
         return random.sample(self.memory, batch_size)
+
+    def get_buffer_size(self):
+        return len(self.memory)
 
     def __len__(self):
         return len(self.memory)
