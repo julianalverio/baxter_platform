@@ -86,10 +86,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pong/pong.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="245" column="27" lean-forward="true" selection-start-line="245" selection-start-column="27" selection-end-line="245" selection-end-column="27" />
+            <state relative-caret-position="344">
+              <caret line="200" column="37" lean-forward="true" selection-start-line="200" selection-start-column="37" selection-end-line="200" selection-end-column="37" />
               <folding>
-                <marker date="1541979060771" expanded="true" signature="9369:9375" ph="..." />
+                <marker date="1541979148278" expanded="true" signature="9373:9379" ph="..." />
               </folding>
             </state>
           </provider>
@@ -117,7 +117,6 @@
       <find>class dqn</find>
       <find>num_actions</find>
       <find>def selection</find>
-      <find>import pdb</find>
       <find>def seelct</find>
       <find>self.device =</find>
       <find>import pdb; pdb</find>
@@ -129,6 +128,7 @@
       <find>next_state_values =</find>
       <find>def sars</find>
       <find>self.valid</find>
+      <find>import pdb</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -314,10 +314,10 @@
     <entry file="file://$PROJECT_DIR$/ptan/samples/dqn_speedup/02_play_steps.py" />
     <entry file="file://$PROJECT_DIR$/pong/pong.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="245" column="27" lean-forward="true" selection-start-line="245" selection-start-column="27" selection-end-line="245" selection-end-column="27" />
+        <state relative-caret-position="344">
+          <caret line="200" column="37" lean-forward="true" selection-start-line="200" selection-start-column="37" selection-end-line="200" selection-end-column="37" />
           <folding>
-            <marker date="1541979060771" expanded="true" signature="9369:9375" ph="..." />
+            <marker date="1541979148278" expanded="true" signature="9373:9379" ph="..." />
           </folding>
         </state>
       </provider>
