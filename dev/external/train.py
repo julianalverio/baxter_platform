@@ -14,6 +14,10 @@ from utils import (sample_action, save_statistic)
 from collections import deque
 import csv
 
+import os
+`os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
+
 
 VALID_ACTION = [0, 2, 3]
 GAMMA = 0.99
