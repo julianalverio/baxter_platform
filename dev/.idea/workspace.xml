@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/external/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/external/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pong/pong.py" beforeDir="false" afterPath="$PROJECT_DIR$/pong/pong.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -85,10 +86,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pong/pong.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="314">
-              <caret line="199" column="35" selection-start-line="199" selection-start-column="35" selection-end-line="199" selection-end-column="35" />
+            <state relative-caret-position="374">
+              <caret line="245" column="27" lean-forward="true" selection-start-line="245" selection-start-column="27" selection-end-line="245" selection-end-column="27" />
               <folding>
-                <marker date="1541978745530" expanded="true" signature="9363:9369" ph="..." />
+                <marker date="1541979060771" expanded="true" signature="9369:9375" ph="..." />
               </folding>
             </state>
           </provider>
@@ -112,14 +113,12 @@
       <find>loss =</find>
       <find>savemodel</find>
       <find>def train</find>
-      <find>self.valid</find>
       <find>dqn(</find>
       <find>class dqn</find>
       <find>num_actions</find>
       <find>def selection</find>
       <find>import pdb</find>
       <find>def seelct</find>
-      <find>def sars</find>
       <find>self.device =</find>
       <find>import pdb; pdb</find>
       <find>cuda</find>
@@ -128,6 +127,8 @@
       <find>class trainer</find>
       <find>self.steps_before_optimize</find>
       <find>next_state_values =</find>
+      <find>def sars</find>
+      <find>self.valid</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -313,10 +314,10 @@
     <entry file="file://$PROJECT_DIR$/ptan/samples/dqn_speedup/02_play_steps.py" />
     <entry file="file://$PROJECT_DIR$/pong/pong.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="199" column="35" selection-start-line="199" selection-start-column="35" selection-end-line="199" selection-end-column="35" />
+        <state relative-caret-position="374">
+          <caret line="245" column="27" lean-forward="true" selection-start-line="245" selection-start-column="27" selection-end-line="245" selection-end-column="27" />
           <folding>
-            <marker date="1541978745530" expanded="true" signature="9363:9369" ph="..." />
+            <marker date="1541979060771" expanded="true" signature="9369:9375" ph="..." />
           </folding>
         </state>
       </provider>
