@@ -89,7 +89,7 @@ class Trainer(object):
                                     ('state', 'action', 'next_state', 'reward'))
         self.num_episodes = num_episodes
 
-        # self.VALID = [0, 2, 3]
+        self.VALID = [0, 2, 3]
 
         if not warm_start_path:
             test_state =  self.preprocess(self.env.render(mode='rgb_array')).to(torch.device('cpu'))
@@ -176,9 +176,12 @@ class Trainer(object):
         #     math.exp(-1. * self.steps_done / self.eps_decay)
         if sample > eps_threshold:
             with torch.no_grad():
-                return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device, non_blocking=True)
+                # return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device, non_blocking=True)
+                action_number = self.VALID[self.policy_net(state).max(1)[1]]
+                torch.tensor([[action_number]], dtype=torch.long).to(self.device, non_blocking=True)
         else:
-            return torch.tensor([[random.randint(0, 2)]], dtype=torch.long).to(self.device, non_blocking=True)
+            # return torch.tensor([[random.randint(0, 2)]], dtype=torch.long).to(self.device, non_blocking=True)
+            return torch.tensor([[random.choice(self.VALID)]], dtype=torch.long).to(self.device, non_blocking=True)
 
 
 
