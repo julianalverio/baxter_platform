@@ -70,7 +70,7 @@ class DQN(nn.Module):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        self.head = nn.Linear(np.product(x.size()), num_actions)
+        self.head = nn.Linear(np.product(x.size()), 3)
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
@@ -90,9 +90,6 @@ class Trainer(object):
         self.num_episodes = num_episodes
 
         self.VALID = [0, 2, 3]
-        import pdb; pdb.set_trace()
-        print(self.env.action_space.n)
-        assert False
 
         if not warm_start_path:
             test_state =  self.preprocess(self.env.render(mode='rgb_array')).to(torch.device('cpu'))
