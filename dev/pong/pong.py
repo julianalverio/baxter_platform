@@ -28,7 +28,7 @@ sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-pa
 import gym
 
 
-GPU_NUM = '1'
+GPU_NUM = '2'
 NUM_EPISODES = 400
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
@@ -89,6 +89,8 @@ class Trainer(object):
                                     ('state', 'action', 'next_state', 'reward'))
         self.num_episodes = num_episodes
 
+        self.valid = [0, 2, 3]
+
         if not warm_start_path:
             test_state =  self.preprocess(self.env.render(mode='rgb_array')).to(torch.device('cpu'))
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
@@ -100,7 +102,7 @@ class Trainer(object):
             self.eps_start = 1.
             self.eps_end = 0.2
             # self.eps_decay = 200
-            self.decay_steps = 100000 #100K
+            self.decay_steps = 100
             self.target_update = 1000
 
             self.target_net.load_state_dict(self.policy_net.state_dict())
@@ -130,31 +132,22 @@ class Trainer(object):
 
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr = 0.0001)
 
-        # self.param_dict = {
-        # 'batch_size' : self.batch_size,
-        # 'gamma': self.gamma,
-        # 'eps_start' : self.eps_start,
-        # 'eps_end': self.eps_end,
-        # 'eps_decay': self.eps_decay,
-        # 'target_update': self.target_update
-        # }
 
-    #
-    # def prefetch(self):
-    #     counter = 0
-    #     while 1:
-    #         done = False
-    #         self.env.reset()
-    #         while not done:
-    #             counter += 1
-    #             state = self.getScreen()
-    #             action = torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
-    #             _, reward, done, _ = self.env.step(action.item())
-    #             reward = torch.tensor([reward], device=self.device)
-    #             next_state = self.getScreen()
-    #             self.memory.push(state, action, next_state, reward)
-    #             if counter == self.prefetch_episodes:
-    #                 return
+    def prefetch(self):
+        counter = 0
+        while 1:
+            done = False
+            self.env.reset()
+            while not done:
+                counter += 1
+                state = self.getScreen()
+                action = torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
+                _, reward, done, _ = self.env.step(action.item())
+                reward = torch.tensor([reward], device=self.device)
+                next_state = self.getScreen()
+                self.memory.push(state, action, next_state, reward)
+                if counter == self.prefetch_episodes:
+                    return
 
 
 
@@ -220,7 +213,7 @@ class Trainer(object):
 
     def SARS(self, state):
         action = self.selectAction(state)
-        action = [0, 3, 4][action]
+        action = self.VALID[action]
         next_state, reward, done, _ = self.env.step(action.item())
         reward = torch.tensor([reward], device=self.device)
         if not done:
@@ -252,7 +245,7 @@ class Trainer(object):
                 self.optimizeModel()
                 if self.steps_done % self.target_update == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
-            if i_episode % 500 == 0:
+            if i_episode % 100 == 0:
                 self.saveModel(i_episode)
             print("Time Elapsed: ", (datetime.datetime.now() - start).total_seconds())
 
