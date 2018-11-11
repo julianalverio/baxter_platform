@@ -52,7 +52,7 @@ for i in range(memory_size):
 	phi = pong.current_phi
 	act_index = random.randrange(3)
 	phi_next, r, done = pong.step(VALID_ACTION[act_index])
-	pong.display()
+	# pong.display()
 	MP.put((phi_next, act_index, r, done))
 
 	if done:
@@ -94,7 +94,7 @@ while(epoch < max_epoch):
 		epsilon = (epsilon - 1e-6) if epsilon > 0.1 else  0.1
 
 		phi_next, r, done = pong.step(VALID_ACTION[act_index])
-		pong.display()
+		# pong.display()
 		MP.put((phi_next, act_index, r, done))
 		r = np.clip(r, -1, 1)
 		score += r
