@@ -29,7 +29,7 @@ import gym
 
 
 GPU_NUM = '1'
-NUM_EPISODES = 100000
+NUM_EPISODES = 400
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
 torch.backends.cudnn.deterministic = True
@@ -84,8 +84,6 @@ class DQN(nn.Module):
 class Trainer(object):
     def __init__(self, num_episodes=5000, warm_start_path=''):
         self.env = gym.make('Pong-v0').unwrapped
-        print(self.env.get_action_meanings())
-        assert False
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.transition = namedtuple('Transition',
                                     ('state', 'action', 'next_state', 'reward'))
@@ -141,22 +139,22 @@ class Trainer(object):
         # 'target_update': self.target_update
         # }
 
-
-    def prefetch(self):
-        counter = 0
-        while 1:
-            done = False
-            self.env.reset()
-            while not done:
-                counter += 1
-                state = self.getScreen()
-                action = torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
-                _, reward, done, _ = self.env.step(action.item())
-                reward = torch.tensor([reward], device=self.device)
-                next_state = self.getScreen()
-                self.memory.push(state, action, next_state, reward)
-                if counter == self.prefetch_episodes:
-                    return
+    #
+    # def prefetch(self):
+    #     counter = 0
+    #     while 1:
+    #         done = False
+    #         self.env.reset()
+    #         while not done:
+    #             counter += 1
+    #             state = self.getScreen()
+    #             action = torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
+    #             _, reward, done, _ = self.env.step(action.item())
+    #             reward = torch.tensor([reward], device=self.device)
+    #             next_state = self.getScreen()
+    #             self.memory.push(state, action, next_state, reward)
+    #             if counter == self.prefetch_episodes:
+    #                 return
 
 
 
@@ -222,6 +220,7 @@ class Trainer(object):
 
     def SARS(self, state):
         action = self.selectAction(state)
+        action = [0, 3, 4][action]
         next_state, reward, done, _ = self.env.step(action.item())
         reward = torch.tensor([reward], device=self.device)
         if not done:
