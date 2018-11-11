@@ -176,12 +176,9 @@ class Trainer(object):
         #     math.exp(-1. * self.steps_done / self.eps_decay)
         if sample > eps_threshold:
             with torch.no_grad():
-                # return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device, non_blocking=True)
-                action_number = self.VALID[self.policy_net(state).max(1)[1]]
-                return torch.tensor([[action_number]], dtype=torch.long).to(self.device, non_blocking=True)
+                return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device, non_blocking=True)
         else:
-            # return torch.tensor([[random.randint(0, 2)]], dtype=torch.long).to(self.device, non_blocking=True)
-            return torch.tensor([[random.choice(self.VALID)]], dtype=torch.long).to(self.device, non_blocking=True)
+            return torch.tensor([[random.randint(0, 2)]], dtype=torch.long).to(self.device, non_blocking=True)
 
 
 
@@ -218,7 +215,8 @@ class Trainer(object):
     def SARS(self, state):
         action = self.selectAction(state)
         # action[0][0] = self.VALID[action]
-        next_state, reward, done, _ = self.env.step(action.item())
+        action_number = [0, 2, 3][action]
+        next_state, reward, done, _ = self.env.step(action_number)
         reward = torch.tensor([reward], device=self.device)
         if not done:
             next_state = self.preprocess(next_state)
