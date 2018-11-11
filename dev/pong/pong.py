@@ -111,8 +111,8 @@ class Trainer(object):
 
             self.steps_done = 0
             self.prefetch_episodes = 10000
-            print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
-            self.prefetch()
+            # print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
+            # self.prefetch()
             self.steps_before_optimize = 4
 
         else:
@@ -233,6 +233,20 @@ class Trainer(object):
             completionEmail('ERROR IN PONG %s' % i_episode)
             import pdb; pdb.set_trace()
 
+    def getScore(self):
+        current_screen = self.preprocess(self.env.reset())
+        done = False
+        score = 0
+        while not done:
+            action = self.target_net(current_screen).max(1)[1].view(1, 1).type(torch.LongTensor)
+            action = self.valid[action]
+            current_screen, reward, done, _ = self.env.step(action.item())
+            current_screen = self.preprocess(current_screen)
+            score += reward
+        return score
+
+
+
     def train(self):
         self.steps_done = 0
         for i_episode in range(self.num_episodes+1):
@@ -245,6 +259,7 @@ class Trainer(object):
                 self.optimizeModel()
                 if self.steps_done % self.target_update == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
+            print('Score at end of epoch %s: %s' % (i_episode, self.getScore()))
             if i_episode % 100 == 0:
                 self.saveModel(i_episode)
             print("Time Elapsed: ", (datetime.datetime.now() - start).total_seconds())
