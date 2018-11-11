@@ -25,7 +25,8 @@ batch_size = 64
 save_path = './tmp'
 
 # Variables
-var_phi = autograd.Variable(torch.Tensor(1, 4, 84, 84), volatile=True).cuda()
+with torch.no_grad():
+	var_phi = autograd.Variable(torch.Tensor(1, 4, 84, 84), volatile=True).cuda()
 
 # For training
 var_batch_phi = autograd.Variable(torch.Tensor(batch_size, 4, 84, 84)).cuda()

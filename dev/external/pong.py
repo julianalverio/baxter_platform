@@ -6,7 +6,7 @@ class Pong(object):
 
 	def __init__(self):
 
-		self.env = gym.make('PongDeterministic-v3')
+		self.env = gym.make('PongDeterministic-v4')
 		self.current_phi = None
 		self.reset()
 
