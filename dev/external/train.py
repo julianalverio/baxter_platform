@@ -12,6 +12,7 @@ from memory import MemoryReplay
 import time
 from utils import (sample_action, save_statistic)
 from collections import deque
+import csv
 
 
 VALID_ACTION = [0, 3, 4]
@@ -74,9 +75,16 @@ QVALUE = []
 QVALUE_MEAN = []
 QVALUE_STD = []
 
+csv_file = open('external_library_results.csv', 'w+')
+writer = csv.writer(csv_file)
+
 while(epoch < max_epoch): 
 
 	while(not done):
+		if len(SCORE) < 100:
+			writer.writerow([sum(score)*1.0/len(score)])
+		else:
+			writer.writerow([sum(score[-100:])/100.])
 
 		optimz.zero_grad()
 
