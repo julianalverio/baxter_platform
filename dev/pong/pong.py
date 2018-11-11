@@ -84,7 +84,7 @@ class DQN(nn.Module):
 class Trainer(object):
     def __init__(self, num_episodes=5000, warm_start_path=''):
         self.env = gym.make('Pong-v0').unwrapped
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda[%s]" % GPU_NUM if torch.cuda.is_available() else "cpu")
         self.transition = namedtuple('Transition',
                                     ('state', 'action', 'next_state', 'reward'))
         self.num_episodes = num_episodes
