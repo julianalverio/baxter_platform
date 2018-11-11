@@ -91,6 +91,9 @@ class Trainer(object):
 
         self.VALID = [0, 2, 3]
 
+        print(self.env.action_space.n)
+        assert False
+
         if not warm_start_path:
             test_state =  self.preprocess(self.env.render(mode='rgb_array')).to(torch.device('cpu'))
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
