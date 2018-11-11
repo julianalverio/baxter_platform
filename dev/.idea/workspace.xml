@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/external/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/external/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pong/pong.py" beforeDir="false" afterPath="$PROJECT_DIR$/pong/pong.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -38,12 +39,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="10963" />
+          <entry key="py" value="10987" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="10963" />
+          <entry key="Python" value="10987" />
         </counts>
       </usages-collector>
     </session>
@@ -85,10 +86,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pong/pong.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="470">
-              <caret line="96" column="99" lean-forward="true" selection-start-line="96" selection-start-column="99" selection-end-line="96" selection-end-column="99" />
+            <state relative-caret-position="344">
+              <caret line="201" column="35" selection-start-line="201" selection-start-column="35" selection-end-line="201" selection-end-column="35" />
               <folding>
-                <marker date="1541976801365" expanded="true" signature="9292:9298" ph="..." />
+                <marker date="1541977188382" expanded="true" signature="9328:9334" ph="..." />
               </folding>
             </state>
           </provider>
@@ -98,7 +99,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>def getscreen</find>
       <find>getscreen</find>
       <find>def optimi</find>
       <find>def prepr</find>
@@ -128,6 +128,7 @@
       <find>class trainer</find>
       <find>import pdb; pdb</find>
       <find>cuda</find>
+      <find>next_State_value</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -313,10 +314,10 @@
     <entry file="file://$PROJECT_DIR$/ptan/samples/dqn_speedup/02_play_steps.py" />
     <entry file="file://$PROJECT_DIR$/pong/pong.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="470">
-          <caret line="96" column="99" lean-forward="true" selection-start-line="96" selection-start-column="99" selection-end-line="96" selection-end-column="99" />
+        <state relative-caret-position="344">
+          <caret line="201" column="35" selection-start-line="201" selection-start-column="35" selection-end-line="201" selection-end-column="35" />
           <folding>
-            <marker date="1541976801365" expanded="true" signature="9292:9298" ph="..." />
+            <marker date="1541977188382" expanded="true" signature="9328:9334" ph="..." />
           </folding>
         </state>
       </provider>
