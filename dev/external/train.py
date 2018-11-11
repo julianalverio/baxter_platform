@@ -83,7 +83,7 @@ while(epoch < max_epoch):
 
 	while(not done):
 		if len(SCORE) < 100:
-			writer.writerow([sum(SCORE)*1.0/len(score)])
+			writer.writerow([sum(SCORE)*1.0/len(SCORE)])
 		else:
 			writer.writerow([sum(SCORE[-100:])/100.])
 
