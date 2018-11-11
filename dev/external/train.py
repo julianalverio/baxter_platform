@@ -26,7 +26,7 @@ save_path = './tmp'
 
 # Variables
 with torch.no_grad():
-	var_phi = autograd.Variable(torch.Tensor(1, 4, 84, 84), volatile=True).cuda()
+	var_phi = autograd.Variable(torch.Tensor(1, 4, 84, 84)).cuda()
 
 # For training
 var_batch_phi = autograd.Variable(torch.Tensor(batch_size, 4, 84, 84)).cuda()
@@ -83,9 +83,9 @@ while(epoch < max_epoch):
 
 	while(not done):
 		if len(SCORE) < 100:
-			writer.writerow([sum(score)*1.0/len(score)])
+			writer.writerow([sum(SCORE)*1.0/len(score)])
 		else:
-			writer.writerow([sum(score[-100:])/100.])
+			writer.writerow([sum(SCORE[-100:])/100.])
 
 		optimz.zero_grad()
 
