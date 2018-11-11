@@ -178,7 +178,7 @@ class Trainer(object):
             with torch.no_grad():
                 return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device, non_blocking=True)
         else:
-            return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
+            return torch.tensor([[random.randint(0, 2)]], dtype=torch.long).to(self.device, non_blocking=True)
 
 
 
