@@ -28,7 +28,7 @@ sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-pa
 import gym
 
 
-GPU_NUM = '2'
+GPU_NUM = '0'
 NUM_EPISODES = 400
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
