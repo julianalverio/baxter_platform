@@ -89,7 +89,7 @@ class Trainer(object):
                                     ('state', 'action', 'next_state', 'reward'))
         self.num_episodes = num_episodes
 
-        self.valid = [0, 2, 3]
+        self.VALID = [0, 2, 3]
 
         if not warm_start_path:
             test_state =  self.preprocess(self.env.render(mode='rgb_array')).to(torch.device('cpu'))
@@ -239,7 +239,7 @@ class Trainer(object):
         score = 0
         while not done:
             action = self.target_net(current_screen).max(1)[1].view(1, 1).type(torch.LongTensor)
-            action = self.valid[action]
+            action = self.VALID[action]
             current_screen, reward, done, _ = self.env.step(action.item())
             current_screen = self.preprocess(current_screen)
             score += reward
