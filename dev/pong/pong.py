@@ -113,7 +113,7 @@ class Trainer(object):
             self.prefetch_episodes = 10000
             # print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
             # self.prefetch()
-            self.steps_before_optimize = 4
+            self.steps_before_optimize = 1
 
         else:
             f = open(warm_start_path + '_params', 'r')
