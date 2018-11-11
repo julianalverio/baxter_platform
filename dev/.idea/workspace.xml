@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/external/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/external/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pong/pong.py" beforeDir="false" afterPath="$PROJECT_DIR$/pong/pong.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -39,12 +38,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="10932" />
+          <entry key="py" value="10939" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="10932" />
+          <entry key="Python" value="10939" />
         </counts>
       </usages-collector>
     </session>
@@ -86,10 +85,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pong/pong.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="719">
-              <caret line="89" column="40" selection-start-line="89" selection-start-column="28" selection-end-line="89" selection-end-column="40" />
+            <state relative-caret-position="329">
+              <caret line="86" column="41" selection-start-line="86" selection-start-column="41" selection-end-line="86" selection-end-column="41" />
               <folding>
-                <marker date="1541976171465" expanded="true" signature="9344:9350" ph="..." />
+                <marker date="1541976414378" expanded="true" signature="9292:9298" ph="..." />
               </folding>
             </state>
           </provider>
@@ -115,7 +114,6 @@
       <find>torch.device</find>
       <find>args.p</find>
       <find>action =</find>
-      <find>class trainer</find>
       <find>class train</find>
       <find>loss =</find>
       <find>savemodel</find>
@@ -128,6 +126,7 @@
       <find>import pdb</find>
       <find>def seelct</find>
       <find>def sars</find>
+      <find>class trainer</find>
       <find>self.device =</find>
     </findStrings>
   </component>
@@ -314,10 +313,10 @@
     <entry file="file://$PROJECT_DIR$/ptan/samples/dqn_speedup/02_play_steps.py" />
     <entry file="file://$PROJECT_DIR$/pong/pong.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="719">
-          <caret line="89" column="40" selection-start-line="89" selection-start-column="28" selection-end-line="89" selection-end-column="40" />
+        <state relative-caret-position="329">
+          <caret line="86" column="41" selection-start-line="86" selection-start-column="41" selection-end-line="86" selection-end-column="41" />
           <folding>
-            <marker date="1541976171465" expanded="true" signature="9344:9350" ph="..." />
+            <marker date="1541976414378" expanded="true" signature="9292:9298" ph="..." />
           </folding>
         </state>
       </provider>
