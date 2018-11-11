@@ -107,6 +107,8 @@ while(epoch < max_epoch):
 		mask_index = np.ones((batch_size, 1))
 		mask_index[batch_done] = 0.0
 		var_batch_r_mask.data.copy_(torch.from_numpy(mask_index))
+		import pdb; pdb.set_trace()
+		
 		var_batch_r.data.copy_(torch.from_numpy(batch_r).unsqueeze(0))
 
 		y = var_batch_r + batch_target_q.mul(GAMMA).mul(var_batch_r_mask)
