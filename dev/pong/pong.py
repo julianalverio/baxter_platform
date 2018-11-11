@@ -90,7 +90,7 @@ class Trainer(object):
         self.num_episodes = num_episodes
 
         self.VALID = [0, 2, 3]
-
+        import pdb; pdb.set_trace()
         print(self.env.action_space.n)
         assert False
 
