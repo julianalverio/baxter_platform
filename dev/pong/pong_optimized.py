@@ -29,7 +29,7 @@ import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 import gym
 
 
-GPU_NUM = '1'
+GPU_NUM = '3'
 NUM_EPISODES = 1000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
