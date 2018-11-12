@@ -279,15 +279,18 @@ class Trainer(object):
         current_screen = self.preprocess(self.env.reset())
         steps_done = 0
         done = False
+        total_reward = 0
         while not done:
             self.env.render(mode='human')
-            time.sleep(0.025)
+            time.sleep(0.01)
             action = self.target_net(current_screen).max(1)[1].view(1, 1).type(torch.LongTensor)
             action_number = [0,2,3][action]
             current_screen, reward, done, _ = self.env.step(action_number)
             current_screen = self.preprocess(current_screen)
             steps_done += 1
+            total_reward += reward
         print("Steps Done: ", steps_done)
+        print(total_reward)
 
 
 def completionEmail(message=''):
@@ -297,6 +300,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
-# trainer.playback('pong_200.pth')
+# trainer.train()
+# completionEmail('%s done' % NUM_EPISODES)
+trainer.playback('pong_1000.pth')
