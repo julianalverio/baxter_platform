@@ -183,7 +183,9 @@ class Trainer(object):
                 import pdb; pdb.set_trace()
                 return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device, non_blocking=True)
         else:
-            return torch.tensor([[random.randint(0, 2)]], dtype=torch.long).to(self.device, non_blocking=True)
+            value = torch.tensor([[random.randint(0, 2)]], dtype=torch.long).to(self.device, non_blocking=True)
+            import pdb; pdb.set_trace()
+            return value
 
 
 
