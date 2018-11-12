@@ -244,7 +244,7 @@ class Trainer(object):
             next_state = None
         self.memory.push(state, action, next_state, reward)
         self.steps_done += 1
-        return next_state, done
+        return next_state, done, reward.item()
 
 
     def saveModel(self, i_episode):
@@ -273,17 +273,19 @@ class Trainer(object):
         loss_tracker = LossTracker(10)
         self.steps_done = 0
         for i_episode in range(self.num_episodes+1):
+            total_reward = 0
             state = self.preprocess(self.env.reset())
             done = False
             while not done:
-                state, done = self.SARS(state)
+                state, done, reward = self.SARS(state)
+                total_reward += reward
                 loss = self.optimizeModel()
                 if self.steps_done % self.target_update == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             loss_tracker.add(loss)
             if i_episode % 100 == 0:
                 self.saveModel(i_episode)
-            print('Game %s: Score: %s Loss: %s' % (i_episode, self.getScore(), loss))
+            print('Game %s: Score: %s Loss: %s' % (i_episode, total_reward, loss))
 
 
     def playback(self, target_net_path):
