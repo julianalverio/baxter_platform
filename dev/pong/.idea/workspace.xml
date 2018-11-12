@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0c672154-4637-4715-b775-29671c9abb5e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/optimized/regular/pong_optimized.py" beforeDir="false" afterPath="$PROJECT_DIR$/optimized/regular/pong_optimized.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/original/regular/pong.py" beforeDir="false" afterPath="$PROJECT_DIR$/original/regular/pong.py" afterDir="false" />
-    </list>
+    <list default="true" id="0c672154-4637-4715-b775-29671c9abb5e" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,6 +12,7 @@
     <session id="124259780">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
+          <entry key="project.closed" value="1" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.opened" value="1" />
         </counts>
@@ -154,7 +151,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="66" y="23" width="1614" height="1027" extended-state="6" />
+    <frame x="66" y="24" width="1614" height="1027" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
