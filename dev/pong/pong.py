@@ -81,10 +81,26 @@ class DQN(nn.Module):
 
 
 
+class LossTracker(object):
+    def __init__(self, length):
+        self.losses = []
+        self.position = 0
+        self.length = float(length)
+
+    def add(self, loss):
+        self.losses[self.position] = loss
+        self.position = (self.position + 1) % self.length
+
+    def average(self):
+        return sum(self.losses) / self.length
+
+
 
 class Trainer(object):
     def __init__(self, num_episodes=5000, warm_start_path=''):
-        self.env = gym.make('Pong-v0').unwrapped
+        self.env = gym.make('PongNoFrameskip-v4').unwrapped
+        import pdb; pdb.set_trace
+        print(self.env.get_action_meanings())
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.transition = namedtuple('Transition',
                                     ('state', 'action', 'next_state', 'reward'))
@@ -254,6 +270,7 @@ class Trainer(object):
 
 
     def train(self):
+        loss_tracker = LossTracker(10)
         self.steps_done = 0
         for i_episode in range(self.num_episodes+1):
             state = self.preprocess(self.env.reset())
@@ -263,6 +280,7 @@ class Trainer(object):
                 loss = self.optimizeModel()
                 if self.steps_done % self.target_update == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
+            loss_tracker.add(loss)
             if i_episode % 100 == 0:
                 self.saveModel(i_episode)
             print('Game %s: Score: %s Loss: %s' % (i_episode, self.getScore(), loss))
@@ -270,7 +288,7 @@ class Trainer(object):
 
     def playback(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')
-        self.env = gym.make('Pong-v0').unwrapped
+        self.env = gym.make('PongNoFrameskip-v4').unwrapped
         current_screen = self.preprocess(self.env.reset())
         steps_done = 0
         done = False
