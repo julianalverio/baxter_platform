@@ -35,6 +35,7 @@ class Trainer(object):
 
     def train(self):
         frame_idx = 0
+        game_count = 0
         for episode in count():
             frame_idx += 1
             self.buffer.populate(1)
@@ -42,6 +43,7 @@ class Trainer(object):
 
             new_rewards = self.exp_source.pop_total_rewards()
             if new_rewards:
+                game_count += 1
                 done = self.reward_tracker.add(new_rewards[0])
                 if done:
                     break
@@ -54,7 +56,7 @@ class Trainer(object):
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
             loss_v.backward()
             self.optimizer.step()
-            print('Game: %s Score: %s' % (episode, self.reward_tracker.rewards[-1]))
+            print('Game: %s Score: %s' % (game_count, self.reward_tracker.rewards[-1]))
 
             if frame_idx % self.params['target_net_sync'] == 0:
                 self.target_net.sync()
