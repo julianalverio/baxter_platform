@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/external/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/external/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pong/pong.py" beforeDir="false" afterPath="$PROJECT_DIR$/pong/pong.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pong/pong_optimized.py" beforeDir="false" afterPath="$PROJECT_DIR$/pong/pong_optimized.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -84,10 +82,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pong/pong.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="492">
+            <state relative-caret-position="70">
               <caret line="272" column="39" selection-start-line="272" selection-start-column="39" selection-end-line="272" selection-end-column="39" />
               <folding>
                 <marker date="1541990920022" expanded="true" signature="9558:9564" ph="..." />
@@ -96,13 +94,13 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pong/pong_optimized.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="537">
-              <caret line="276" column="41" lean-forward="true" selection-start-line="276" selection-start-column="41" selection-end-line="276" selection-end-column="41" />
+            <state relative-caret-position="520">
+              <caret line="307" lean-forward="true" selection-start-line="307" selection-end-line="307" />
               <folding>
-                <marker date="1541990784828" expanded="true" signature="8737:8742" ph="..." />
+                <marker date="1541991054651" expanded="true" signature="8737:8742" ph="..." />
               </folding>
             </state>
           </provider>
@@ -160,8 +158,8 @@
         <option value="$PROJECT_DIR$/external/train_dqn.py" />
         <option value="$USER_HOME$/ptan/samples/dqn_speedup/02_play_steps.py" />
         <option value="$PROJECT_DIR$/ptan/samples/dqn_speedup/02_play_steps.py" />
-        <option value="$PROJECT_DIR$/pong/pong_optimized.py" />
         <option value="$PROJECT_DIR$/pong/pong.py" />
+        <option value="$PROJECT_DIR$/pong/pong_optimized.py" />
       </list>
     </option>
   </component>
@@ -326,22 +324,22 @@
     <entry file="file://$PROJECT_DIR$/external/train_dqn.py" />
     <entry file="file://$USER_HOME$/ptan/samples/dqn_speedup/02_play_steps.py" />
     <entry file="file://$PROJECT_DIR$/ptan/samples/dqn_speedup/02_play_steps.py" />
-    <entry file="file://$PROJECT_DIR$/pong/pong_optimized.py">
+    <entry file="file://$PROJECT_DIR$/pong/pong.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="537">
-          <caret line="276" column="41" lean-forward="true" selection-start-line="276" selection-start-column="41" selection-end-line="276" selection-end-column="41" />
+        <state relative-caret-position="70">
+          <caret line="272" column="39" selection-start-line="272" selection-start-column="39" selection-end-line="272" selection-end-column="39" />
           <folding>
-            <marker date="1541990784828" expanded="true" signature="8737:8742" ph="..." />
+            <marker date="1541990920022" expanded="true" signature="9558:9564" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pong/pong.py">
+    <entry file="file://$PROJECT_DIR$/pong/pong_optimized.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="492">
-          <caret line="272" column="39" selection-start-line="272" selection-start-column="39" selection-end-line="272" selection-end-column="39" />
+        <state relative-caret-position="520">
+          <caret line="307" lean-forward="true" selection-start-line="307" selection-end-line="307" />
           <folding>
-            <marker date="1541990920022" expanded="true" signature="9558:9564" ph="..." />
+            <marker date="1541991054651" expanded="true" signature="8737:8742" ph="..." />
           </folding>
         </state>
       </provider>
