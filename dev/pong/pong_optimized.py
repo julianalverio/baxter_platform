@@ -219,7 +219,8 @@ class Trainer(object):
     #
 
     def getScore(self):
-        current_screen = self.preprocess(self.env.reset())
+        self.env.reset()
+        current_screen = self.getScreen()
         done = False
         score = 0
         while not done:
