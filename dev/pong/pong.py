@@ -60,7 +60,7 @@ class ReplayMemory(object):
         return len(self.memory)
 
 class DQN(nn.Module):
-    def __init__(self, num_actions, device, x):
+    def __init__(self, x):
         super(DQN, self).__init__()
         self.conv1 = nn.Conv2d(1, 16, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(16)
@@ -94,8 +94,8 @@ class Trainer(object):
 
         if not warm_start_path:
             test_state =  self.preprocess(self.env.render(mode='rgb_array')).to(torch.device('cpu'))
-            self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
-            self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
+            self.policy_net = DQN(test_state).to(self.device)
+            self.target_net = DQN(test_state).to(self.device)
 
             self.batch_size = 32
             self.gamma = 0.99
@@ -111,8 +111,8 @@ class Trainer(object):
 
             self.steps_done = 0
             self.prefetch_episodes = 10000
-            print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
-            self.prefetch()
+            # print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
+            # self.prefetch()
             self.steps_before_optimize = 1
             csv_file = open("results_not_optimized_with_prefetch.csv", 'w+')
             self.writer = csv.writer(csv_file)
@@ -297,6 +297,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
-# trainer.playback('pong_200.pth')
+# trainer.train()
+# completionEmail('%s done' % NUM_EPISODES)
+trainer.playback('ptan_100.pth')
