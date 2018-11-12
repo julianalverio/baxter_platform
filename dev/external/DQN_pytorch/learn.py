@@ -226,7 +226,8 @@ def dqn_learning(env,
 
             # backwards pass
             optimizer.zero_grad()
-            q_s_a.backward(clipped_error.data.unsqueeze(1))
+            import pdb; pdb.set_trace()
+            q_s_a.backward(clipped_error.data)
 
             # update
             optimizer.step()
