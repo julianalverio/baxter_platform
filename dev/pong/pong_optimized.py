@@ -227,7 +227,7 @@ class Trainer(object):
             action = self.target_net(current_screen).max(1)[1].view(1, 1).type(torch.LongTensor)
             action_number = self.VALID[action]
             current_screen, reward, done, _ = self.env.step(action_number)
-            current_screen = self.preprocess(current_screen)
+            current_screen = self.getScreen()
             score += reward
         return score
 
