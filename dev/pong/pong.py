@@ -88,11 +88,13 @@ class LossTracker(object):
         self.length = float(length)
 
     def add(self, loss):
+        if len(self.losses) < self.length:
+            self.losses.append(loss)
         self.losses[self.position] = loss
         self.position = (self.position + 1) % self.length
 
     def average(self):
-        return sum(self.losses) / self.length
+        return sum(self.losses) / len(self.losses)
 
 
 
