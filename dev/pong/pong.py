@@ -291,6 +291,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-# trainer.train()
-# completionEmail('%s done' % NUM_EPISODES)
-trainer.playback('pong_200.pth')
+trainer.train()
+completionEmail('%s done' % NUM_EPISODES)
+# trainer.playback('pong_200.pth')

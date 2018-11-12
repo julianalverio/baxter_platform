@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/external/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/external/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pong/pong.py" beforeDir="false" afterPath="$PROJECT_DIR$/pong/pong.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -86,10 +86,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pong/pong.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="430">
-              <caret line="31" column="19" selection-start-line="31" selection-start-column="19" selection-end-line="31" selection-end-column="19" />
+            <state relative-caret-position="520">
+              <caret line="296" lean-forward="true" selection-start-line="296" selection-end-line="296" />
               <folding>
-                <marker date="1541986262509" expanded="true" signature="9419:9425" ph="..." />
+                <marker date="1541989978253" expanded="true" signature="9419:9425" ph="..." />
               </folding>
             </state>
           </provider>
@@ -314,10 +314,10 @@
     <entry file="file://$PROJECT_DIR$/ptan/samples/dqn_speedup/02_play_steps.py" />
     <entry file="file://$PROJECT_DIR$/pong/pong.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="430">
-          <caret line="31" column="19" selection-start-line="31" selection-start-column="19" selection-end-line="31" selection-end-column="19" />
+        <state relative-caret-position="520">
+          <caret line="296" lean-forward="true" selection-start-line="296" selection-end-line="296" />
           <folding>
-            <marker date="1541986262509" expanded="true" signature="9419:9425" ph="..." />
+            <marker date="1541989978253" expanded="true" signature="9419:9425" ph="..." />
           </folding>
         </state>
       </provider>
