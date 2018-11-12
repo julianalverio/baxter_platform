@@ -11,6 +11,8 @@ from tensorboardX import SummaryWriter
 from lib import dqn_model, common
 from itertools import count
 
+import os; os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+
 
 class Trainer(object):
     def __init__(self):
