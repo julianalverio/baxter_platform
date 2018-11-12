@@ -23,7 +23,7 @@ def get_env(seed, vid_dir_name, double_dqn, dueling_dqn):
     # env_id = task.env_id
 
     # env = gym.make(env_id)
-    env = gym.make('Pong-v0')
+    env = gym.make('PongNoFrameskip-v4')
 
     set_global_seeds(seed)
     env.seed(seed)
