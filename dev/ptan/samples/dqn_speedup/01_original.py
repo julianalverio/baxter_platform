@@ -34,6 +34,7 @@ class Trainer(object):
         with common.RewardTracker(self.writer, self.params['stop_reward']) as reward_tracker:
             while True:
                 frame_idx += 1
+                import pdb; pdb.set_trace()
                 self.buffer.populate(1)
                 self.epsilon_tracker.frame(frame_idx)
 
