@@ -96,7 +96,6 @@ class Trainer(object):
             test_state =  self.preprocess(self.env.render(mode='rgb_array')).to(torch.device('cpu'))
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
             self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device)
-            torch.save(self.target_net, 'delete_initial_target_net')
 
             self.batch_size = 32
             self.gamma = 0.99
@@ -104,7 +103,7 @@ class Trainer(object):
             self.eps_end = 0.2
             # self.eps_decay = 200
             self.decay_steps = 100
-            self.target_update = 1000
+            self.target_update = 100
 
             self.target_net.load_state_dict(self.policy_net.state_dict())
             self.target_net.eval()

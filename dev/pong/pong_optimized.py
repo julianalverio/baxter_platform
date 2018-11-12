@@ -71,7 +71,7 @@ class DQN(nn.Module):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        self.head = nn.Linear(np.product(x.size()), num_actions)
+        self.head = nn.Linear(np.product(x.size()), 3)
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
@@ -93,7 +93,6 @@ class Trainer(object):
             test_state = (self.getScreen() - self.getScreen()).to(torch.device('cpu'))
             self.policy_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
             self.target_net = DQN(self.env.action_space.n, self.device, test_state).to(self.device, non_blocking=True)
-            torch.save(self.target_net, 'delete_initial_target_net')
 
             self.batch_size = 32
             self.gamma = 0.99
@@ -101,7 +100,7 @@ class Trainer(object):
             self.eps_end = 0.2
             # self.eps_decay = 200
             self.decay_steps = 100000 #100K
-            self.target_update = 1000
+            self.target_update = 100
 
             self.target_net.load_state_dict(self.policy_net.state_dict())
             self.target_net.eval()
@@ -180,7 +179,7 @@ class Trainer(object):
             with torch.no_grad():
                 return self.policy_net(state).max(1)[1].view(1, 1).type(torch.LongTensor).to(self.device, non_blocking=True)
         else:
-            return torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
+            return torch.tensor([[random.randint(0, 2)]], dtype=torch.long).to(self.device, non_blocking=True)
 
 
 
@@ -267,7 +266,6 @@ class Trainer(object):
                     if done: break
                 self.optimizeModel()
                 if self.steps_done % self.target_update == 0:
-                    print('synching target network')
                     self.target_net.load_state_dict(self.policy_net.state_dict())
             if i_episode % 100 == 0:
                 self.saveModel(i_episode)
