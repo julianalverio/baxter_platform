@@ -9,6 +9,7 @@ import torch.optim as optim
 from tensorboardX import SummaryWriter
 
 from lib import dqn_model, common
+from itertools import count
 
 
 class Trainer(object):
@@ -32,7 +33,7 @@ class Trainer(object):
 
     def train(self):
         frame_idx = 0
-        while True:
+        for episode in count():
             frame_idx += 1
             self.buffer.populate(1)
             self.epsilon_tracker.frame(frame_idx)
@@ -51,6 +52,7 @@ class Trainer(object):
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
             loss_v.backward()
             self.optimizer.step()
+            print('Game: %s Score: %s' % (episode, self.reward_tracker.rewards[-1]))
 
             if frame_idx % self.params['target_net_sync'] == 0:
                 self.target_net.sync()
