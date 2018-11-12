@@ -111,10 +111,10 @@ class Trainer(object):
 
             self.steps_done = 0
             self.prefetch_episodes = 10000
-            # print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
-            # self.prefetch()
+            print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
+            self.prefetch()
             self.steps_before_optimize = 1
-            csv_file = open("results_not_optimized_no_prefetch.csv", 'w+')
+            csv_file = open("results_not_optimized_with_prefetch.csv", 'w+')
             self.writer = csv.writer(csv_file)
 
         else:
