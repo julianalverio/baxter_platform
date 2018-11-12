@@ -94,7 +94,7 @@ def main():
             print("CUDA Device: %d" %torch.cuda.current_device())
 
     # Get Atari games.
-    benchmark = gym.benchmark_spec('Atari40M') 
+    # benchmark = gym.benchmark_spec('Atari40M')
 
     # Change the index to select a different game.
     # 0 = BeamRider
@@ -104,17 +104,21 @@ def main():
     # 4 = Qbert
     # 5 = Seaquest
     # 6 = Spaceinvaders
-    for i in benchmark.tasks:
-        print(i)
-    task = benchmark.tasks[args.task_id]
+    # for i in benchmark.tasks:
+    #     print(i)
+    # task = benchmark.tasks[args.task_id]
 
     # Run training
     seed = 0 # Use a seed of zero (you may want to randomize the seed!)
     double_dqn = (args.double_dqn == 1)
     dueling_dqn = (args.dueling_dqn == 1)
-    env = get_env(task, seed, task.env_id, double_dqn, dueling_dqn)
-    print("Training on %s, double_dqn %d, dueling_dqn %d" %(task.env_id, double_dqn, dueling_dqn))
-    atari_learn(env, task.env_id, num_timesteps=task.max_timesteps, double_dqn=double_dqn, dueling_dqn=dueling_dqn)
+    # env = get_env(task, seed, task.env_id, double_dqn, dueling_dqn)
+    env = get_env(seed, 3, double_dqn, dueling_dqn)
+    import pdb; pdb.set_trace()
+    # print("Training on %s, double_dqn %d, dueling_dqn %d" %(task.env_id, double_dqn, dueling_dqn))
+    # atari_learn(env, 3, num_timesteps=task.max_timesteps, double_dqn=double_dqn, dueling_dqn=dueling_dqn)
+    atari_learn(env, 3, num_timesteps=1e10, double_dqn=double_dqn, dueling_dqn=dueling_dqn)
+
 
 if __name__ == '__main__':
     main()
