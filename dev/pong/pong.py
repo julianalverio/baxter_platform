@@ -268,8 +268,8 @@ class Trainer(object):
             if i_episode % 100 == 0:
                 self.saveModel(i_episode)
             print("Time Elapsed: ", (datetime.datetime.now() - start).total_seconds())
-            score = self.getScore()
             if i_episode % 25 == 0:
+                score = self.getScore()
                 print("Score for Episode %s: %s" % (i_episode, score))
                 self.writer.writerow([score])
 
