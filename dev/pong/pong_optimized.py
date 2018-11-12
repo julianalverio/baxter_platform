@@ -256,7 +256,6 @@ class Trainer(object):
     def train(self):
         self.steps_done = 0
         for i_episode in range(self.num_episodes+1):
-            print('steps done:', self.steps_done)
             start = datetime.datetime.now()
             print('Beginning Episode %s' % i_episode)
             self.env.reset()
