@@ -29,7 +29,7 @@ import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 import gym
 
 
-GPU_NUM = '0'
+GPU_NUM = '1'
 NUM_EPISODES = 1000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
@@ -62,24 +62,68 @@ class ReplayMemory(object):
 class DQN(nn.Module):
     def __init__(self, num_actions, device, x):
         super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(1, 16, kernel_size=5, stride=2)
-        self.bn1 = nn.BatchNorm2d(16)
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=5, stride=2)
-        self.bn2 = nn.BatchNorm2d(32)
-        self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
-        self.bn3 = nn.BatchNorm2d(32)
-        x = F.relu(self.bn1(self.conv1(x)))
-        x = F.relu(self.bn2(self.conv2(x)))
-        x = F.relu(self.bn3(self.conv3(x)))
-        self.head = nn.Linear(np.product(x.size()), 3)
+        self.conv = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=8, stride=4),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=4, stride=2),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1),
+            nn.ReLU()
+        )
+        # self.conv1 = nn.Conv2d(1, 16, kernel_size=5, stride=2)
+        # self.bn1 = nn.BatchNorm2d(16)
+        # self.conv2 = nn.Conv2d(16, 32, kernel_size=5, stride=2)
+        # self.bn2 = nn.BatchNorm2d(32)
+        # self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
+        # self.bn3 = nn.BatchNorm2d(32)
+        # x = F.relu(self.bn1(self.conv1(x)))
+        # x = F.relu(self.bn2(self.conv2(x)))
+        # x = F.relu(self.bn3(self.conv3(x)))
+        # self.head = nn.Linear(np.product(x.size()), 3)
+        conv_out_size = np.product(self.conv(x).size())
+        self.fc = nn.sequential(
+            nn.Linear(conv_out_size, 512),
+            nn.ReLU(),
+            nn.Linear(512, 3)
+        )
 
     def forward(self, x):
-        x = F.relu(self.bn1(self.conv1(x)))
-        x = F.relu(self.bn2(self.conv2(x)))
-        x = F.relu(self.bn3(self.conv3(x)))
-        return self.head(x.view(x.size(0), -1))
+        # x = F.relu(self.bn1(self.conv1(x)))
+        # x = F.relu(self.bn2(self.conv2(x)))
+        # x = F.relu(self.bn3(self.conv3(x)))
+        # return self.head(x.view(x.size(0), -1))
+        conv_out = self.conv(x).view(x.size()[0], -1)
+        self.fc(conv_oput)
 
 
+class DQN(nn.Module):
+    def __init__(self, input_shape, n_actions):
+        super(DQN, self).__init__()
+
+        self.conv = nn.Sequential(
+            nn.Conv2d(input_shape[0], 32, kernel_size=8, stride=4),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=4, stride=2),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1),
+            nn.ReLU()
+        )
+
+        conv_out_size = self._get_conv_out(input_shape)
+        self.fc = nn.Sequential(
+            nn.Linear(conv_out_size, 512),
+            nn.ReLU(),
+            nn.Linear(512, n_actions)
+        )
+
+    def _get_conv_out(self, shape):
+        o = self.conv(Variable(torch.zeros(1, *shape)))
+        return int(np.prod(o.size()))
+
+    def forward(self, x):
+        fx = x.float() / 256
+        conv_out = self.conv(fx).view(fx.size()[0], -1)
+        return self.fc(conv_out)
 
 
 class Trainer(object):
@@ -161,7 +205,9 @@ class Trainer(object):
         img = self.env.render(mode='rgb_array')[25:195, 8:152, :]
         img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
         img = np.array(Image.fromarray(img).resize((72, 85)))
-        return torch.from_numpy(img/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device, non_blocking=True)
+        # return torch.from_numpy(img/255.).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device, non_blocking=True) #modified
+        return torch.from_numpy(img).unsqueeze(0).unsqueeze(0).type(torch.FloatTensor).to(self.device, non_blocking=True)
+
 
     def preprocess(self, img):
         # new size: 170 x 146
