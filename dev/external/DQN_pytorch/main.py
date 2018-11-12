@@ -114,7 +114,6 @@ def main():
     dueling_dqn = (args.dueling_dqn == 1)
     # env = get_env(task, seed, task.env_id, double_dqn, dueling_dqn)
     env = get_env(seed, 3, double_dqn, dueling_dqn)
-    import pdb; pdb.set_trace()
     # print("Training on %s, double_dqn %d, dueling_dqn %d" %(task.env_id, double_dqn, dueling_dqn))
     # atari_learn(env, 3, num_timesteps=task.max_timesteps, double_dqn=double_dqn, dueling_dqn=dueling_dqn)
     atari_learn(env, 3, num_timesteps=1e10, double_dqn=double_dqn, dueling_dqn=dueling_dqn)
