@@ -29,7 +29,7 @@ import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 import gym
 
 
-GPU_NUM = '3'
+GPU_NUM = '2'
 NUM_EPISODES = 1000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
@@ -108,10 +108,10 @@ class Trainer(object):
 
             self.steps_done = 0
             self.prefetch_episodes = 10000
-            print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
-            self.prefetch()
+            # print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
+            # self.prefetch()
             self.steps_before_optimize = 4
-            csv_file = open('results_optimized_with_prefetch.csv', 'w+')
+            csv_file = open('results_optimized_no_prefetch.csv', 'w+')
             self.writer = csv.writer(csv_file)
             self.VALID = [0,2,3]
 
