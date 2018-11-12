@@ -264,7 +264,6 @@ class Trainer(object):
                 self.optimizeModel()
                 if self.steps_done % self.target_update == 0:
                     self.target_net.load_state_dict(self.policy_net.state_dict())
-            print('Score at end of epoch %s: %s' % (i_episode, self.getScore()))
             if i_episode % 100 == 0:
                 self.saveModel(i_episode)
             print("Time Elapsed: ", (datetime.datetime.now() - start).total_seconds())
