@@ -108,12 +108,12 @@ class Trainer(object):
 
             self.steps_done = 0
             self.prefetch_episodes = 10000
+            self.VALID = [0,2,3]
             print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
             self.prefetch()
             self.steps_before_optimize = 4
             csv_file = open('results_optimized_with_prefetch.csv', 'w+')
             self.writer = csv.writer(csv_file)
-            self.VALID = [0,2,3]
 
         else:
             f = open(warm_start_path + '_params', 'r')
