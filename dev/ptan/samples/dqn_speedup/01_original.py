@@ -57,5 +57,5 @@ if __name__ == "__main__":
 
             if frame_idx % params['target_net_sync'] == 0:
                 tgt_net.sync()
-            if frame_idx % 100 == 0:
-                torch.save(tgt_net, 'ptan_%s.pth' % frame_idx)
+            if len(reward_tracker.total_rewards) % 100 == 0:
+                torch.save(tgt_net, 'ptan_%s.pth' % len(reward_tracker.total_rewards))
