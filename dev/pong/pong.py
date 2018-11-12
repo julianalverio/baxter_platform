@@ -29,7 +29,7 @@ import gym
 
 
 GPU_NUM = '0'
-NUM_EPISODES = 400
+NUM_EPISODES = 1000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
 torch.backends.cudnn.deterministic = True
@@ -241,8 +241,8 @@ class Trainer(object):
         score = 0
         while not done:
             action = self.target_net(current_screen).max(1)[1].view(1, 1).type(torch.LongTensor)
-            # action = self.VALID[action]
-            current_screen, reward, done, _ = self.env.step(action.item())
+            action_number = self.VALID[action]
+            current_screen, reward, done, _ = self.env.step(action_number)
             current_screen = self.preprocess(current_screen)
             score += reward
         return score
@@ -277,7 +277,8 @@ class Trainer(object):
             self.env.render(mode='human')
             time.sleep(0.025)
             action = self.target_net(current_screen).max(1)[1].view(1, 1).type(torch.LongTensor)
-            current_screen, reward, done, _ = self.env.step(action.item())
+            action_number = [0,2,3][action]
+            current_screen, reward, done, _ = self.env.step(action_number)
             current_screen = self.preprocess(current_screen)
             steps_done += 1
         print("Steps Done: ", steps_done)
@@ -290,6 +291,6 @@ def completionEmail(message=''):
 
 trainer = Trainer(num_episodes=NUM_EPISODES)
 print("Trainer Initialized")
-trainer.train()
-completionEmail('%s done' % NUM_EPISODES)
-# trainer.playback('pong_4500.pth')
+# trainer.train()
+# completionEmail('%s done' % NUM_EPISODES)
+trainer.playback('pong_200.pth')
