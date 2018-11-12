@@ -99,7 +99,6 @@ class LossTracker(object):
 class Trainer(object):
     def __init__(self, num_episodes=5000, warm_start_path=''):
         self.env = gym.make('PongNoFrameskip-v4').unwrapped
-        import pdb; pdb.set_trace
         print(self.env.get_action_meanings())
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.transition = namedtuple('Transition',
@@ -132,6 +131,7 @@ class Trainer(object):
             self.steps_before_optimize = 1
             csv_file = open("results_not_optimized_with_prefetch.csv", 'w+')
             self.writer = csv.writer(csv_file)
+            self.VALID = [0, 2, 3]
 
         else:
             f = open(warm_start_path + '_params', 'r')
@@ -234,8 +234,7 @@ class Trainer(object):
 
     def SARS(self, state):
         action = self.selectAction(state)
-        # action[0][0] = self.VALID[action]
-        action_number = [0, 2, 3][action]
+        action_number = self.VALID[action]
         next_state, reward, done, _ = self.env.step(action_number)
         reward = torch.tensor([reward], device=self.device)
         if not done:
