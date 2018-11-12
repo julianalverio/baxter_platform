@@ -112,7 +112,7 @@ class RewardTracker:
         self.length = length
 
     def add(self, reward):
-        if len(self.rewards < self.length):
+        if len(self.rewards) < self.length:
             self.rewards.append(reward)
         else:
             self.rewards[self.position] = reward
