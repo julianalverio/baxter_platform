@@ -85,7 +85,7 @@ class LossTracker(object):
     def __init__(self, length):
         self.losses = []
         self.position = 0
-        self.length = float(length)
+        self.length = length
 
     def add(self, loss):
         if len(self.losses) < self.length:
@@ -94,7 +94,7 @@ class LossTracker(object):
         self.position = (self.position + 1) % self.length
 
     def average(self):
-        return sum(self.losses) / len(self.losses)
+        return 1. * sum(self.losses) / len(self.losses)
 
 
 
@@ -230,7 +230,7 @@ class Trainer(object):
         for param in self.policy_net.parameters():
             param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
-        return loss
+        return loss.item()
 
 
     def SARS(self, state):
