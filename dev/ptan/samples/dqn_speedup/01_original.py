@@ -27,35 +27,35 @@ class Trainer(object):
         self.exp_source = ptan.experience.ExperienceSourceFirstLast(self.env, agent, gamma=self.params['gamma'], steps_count=1)
         self.buffer = ptan.experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
+        self.reward_tracker = common.RewardTracker()
 
 
     def train(self):
         frame_idx = 0
-        with common.RewardTracker(self.writer, self.params['stop_reward']) as reward_tracker:
-            while True:
-                frame_idx += 1
-                import pdb; pdb.set_trace()
-                self.buffer.populate(1)
-                self.epsilon_tracker.frame(frame_idx)
+        while True:
+            frame_idx += 1
+            self.buffer.populate(1)
+            self.epsilon_tracker.frame(frame_idx)
 
-                new_rewards = self.exp_source.pop_total_rewards()
-                if new_rewards:
-                    if reward_tracker.reward(new_rewards[0], frame_idx, self.selector.epsilon):
-                        break
+            new_rewards = self.exp_source.pop_total_rewards()
+            if new_rewards:
+                done = self.reward_tracker.add(new_rewards[0])
+                if done:
+                    break
 
-                if len(self.buffer) < self.params['replay_initial']:
-                    continue
+            if len(self.buffer) < self.params['replay_initial']:
+                continue
 
-                self.optimizer.zero_grad()
-                batch = self.buffer.sample(self.params['batch_size'])
-                loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
-                loss_v.backward()
-                self.optimizer.step()
+            self.optimizer.zero_grad()
+            batch = self.buffer.sample(self.params['batch_size'])
+            loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
+            loss_v.backward()
+            self.optimizer.step()
 
-                if frame_idx % self.params['target_net_sync'] == 0:
-                    self.target_net.sync()
-                if len(reward_tracker.total_rewards) % 100 == 0:
-                    torch.save(self.target_net, 'ptan_%s.pth' % len(reward_tracker.total_rewards))
+            if frame_idx % self.params['target_net_sync'] == 0:
+                self.target_net.sync()
+            if len(self.reward_tracker.rewards) % 100 == 0:
+                torch.save(self.target_net, 'ptan_%s.pth' % len(self.reward_tracker.rewards))
 
 
 if __name__ == "__main__":
