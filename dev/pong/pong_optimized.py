@@ -113,6 +113,7 @@ class Trainer(object):
             self.steps_before_optimize = 4
             csv_file = open('results_optimized_no_prefetch.csv', 'w+')
             self.writer = csv.writer(csv_file)
+            self.VALID = [0,2,3]
 
         else:
             f = open(warm_start_path + '_params', 'r')
@@ -218,16 +219,16 @@ class Trainer(object):
     #
 
     def getScore(self):
-        self.env.reset()
+        current_screen = self.preprocess(self.env.reset())
         done = False
-        total_reward = 0
+        score = 0
         while not done:
-            current_screen = self.getScreen()
             action = self.target_net(current_screen).max(1)[1].view(1, 1).type(torch.LongTensor)
-            action_number = [0,2,3][action]
-            _, reward, done, _ = self.env.step(action_number)
-            total_reward += reward
-        return reward
+            action_number = self.VALID[action]
+            current_screen, reward, done, _ = self.env.step(action_number)
+            current_screen = self.preprocess(current_screen)
+            score += reward
+        return score
 
 
     def SARS(self, state):
