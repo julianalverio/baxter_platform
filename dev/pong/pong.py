@@ -269,8 +269,9 @@ class Trainer(object):
                 self.saveModel(i_episode)
             print("Time Elapsed: ", (datetime.datetime.now() - start).total_seconds())
             score = self.getScore()
-            print("Score for Episode %s: %s" % (i_episode, score))
-            self.writer.writerow([score])
+            if i_episode % 25 == 0:
+                print("Score for Episode %s: %s" % (i_episode, score))
+                self.writer.writerow([score])
 
 
     def playback(self, target_net_path):
