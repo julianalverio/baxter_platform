@@ -57,3 +57,5 @@ if __name__ == "__main__":
 
             if frame_idx % params['target_net_sync'] == 0:
                 tgt_net.sync()
+            if frame_ids % 100 == 0:
+                torch.save(tgt_net, 'ptan_%s.pth' % frame_idx)
