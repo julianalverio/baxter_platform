@@ -105,7 +105,7 @@ def main():
     # 5 = Seaquest
     # 6 = Spaceinvaders
     for i in benchmark.tasks:
-        print i
+        print(i)
     task = benchmark.tasks[args.task_id]
 
     # Run training
