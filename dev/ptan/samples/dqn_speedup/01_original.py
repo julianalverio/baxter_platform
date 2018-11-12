@@ -34,7 +34,7 @@ class Trainer(object):
         with common.RewardTracker(self.writer, self.params['stop_reward']) as reward_tracker:
             while True:
                 frame_idx += 1
-                buffer.populate(1)
+                self.buffer.populate(1)
                 self.epsilon_tracker.frame(frame_idx)
 
                 new_rewards = self.exp_source.pop_total_rewards()
@@ -42,11 +42,11 @@ class Trainer(object):
                     if reward_tracker.reward(new_rewards[0], frame_idx, self.selector.epsilon):
                         break
 
-                if len(buffer) < self.params['replay_initial']:
+                if len(self.buffer) < self.params['replay_initial']:
                     continue
 
                 self.optimizer.zero_grad()
-                batch = buffer.sample(self.params['batch_size'])
+                batch = self.buffer.sample(self.params['batch_size'])
                 loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
                 loss_v.backward()
                 self.optimizer.step()
