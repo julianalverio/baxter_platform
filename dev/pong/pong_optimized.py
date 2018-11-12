@@ -151,7 +151,7 @@ class Trainer(object):
                 counter += 1
                 state = self.getScreen()
                 action = torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
-                action_number = [0,2,3][action]
+                action_number = self.VALID[action]
                 _, reward, done, _ = self.env.step(action_number)
                 reward = torch.tensor([reward], device=self.device)
                 next_state = self.getScreen()
@@ -234,7 +234,8 @@ class Trainer(object):
 
     def SARS(self, state):
         action = self.selectAction(state)
-        _, reward, done, _ = self.env.step(action.item())
+        action_number = self.VALID[action]
+        _, reward, done, _ = self.env.step(action_number)
         reward = torch.tensor([reward], device=self.device)
         if not done:
             next_state = self.getScreen()

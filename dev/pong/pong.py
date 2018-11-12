@@ -29,7 +29,7 @@ import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 import gym
 
 
-GPU_NUM = '2'
+GPU_NUM = '1'
 NUM_EPISODES = 1000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
@@ -144,7 +144,8 @@ class Trainer(object):
                 counter += 1
                 state = self.getScreen()
                 action = torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
-                _, reward, done, _ = self.env.step(action.item())
+                action_number = self.VALID[action]
+                _, reward, done, _ = self.env.step(action_number)
                 reward = torch.tensor([reward], device=self.device)
                 next_state = self.getScreen()
                 self.memory.push(state, action, next_state, reward)
