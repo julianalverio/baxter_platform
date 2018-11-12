@@ -9,7 +9,7 @@ from utils.atari_wrappers import *
 from utils.gym_setup import *
 from utils.schedules import *
 
-# Global Variables
+# Global Variable=
 # Extended data table 1 of nature paper
 BATCH_SIZE = 32
 REPLAY_BUFFER_SIZE = 1000000

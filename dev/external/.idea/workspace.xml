@@ -2,44 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="817ef19f-7a25-4344-97be-a4ad2589ded6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/external.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/assets/breakout.gif" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/assets/double_q_target.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/assets/dueling_q_arch.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/assets/dueling_q_target.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/assets/nature_dqn_model.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/assets/nature_dqn_target.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/assets/pong.gif" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/assets/qbert_all.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/assets/spaceinvaders.gif" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/learn.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/logger.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/model.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/utils/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/utils/atari_wrappers.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/utils/gym_setup.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/utils/replay_buffer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DQN_pytorch/utils/schedules.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/external_library_results.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/play.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pong.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp/Average Action Value.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp/Average-Action-Value.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp/Score.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp/model.pth" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../other/breakout.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../other/failed_pacman_4000.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../other/final_breakout" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../other/final_pacman" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../other/pacman.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pong/pong.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pong/pong_0.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pong/pong_100.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pong/ptan_100.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pong/results_not_optimized_no_prefetch.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pong/results_not_optimized_with_prefetch.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pong/results_optimized_no_prefetch.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pong/results_optimized_with_prefetch.csv" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -79,29 +55,40 @@
     <session id="1096984617">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
+          <entry key="project.closed" value="1" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.opened" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="1" />
+          <entry key="py" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="1" />
+          <entry key="Python" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="py" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Python" value="2" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+            <state relative-caret-position="-87">
+              <caret line="9" column="29" lean-forward="true" selection-start-line="9" selection-start-column="29" selection-end-line="9" selection-end-column="29" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -109,11 +96,23 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/learn.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="539">
               <caret line="228" selection-start-line="228" selection-end-line="228" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/utils/atari_wrappers.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="80" column="33" lean-forward="true" selection-start-line="80" selection-start-column="33" selection-end-line="80" selection-end-column="33" />
+              <folding>
+                <element signature="e#92#102#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -137,8 +136,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/utils/gym_setup.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/learn.py" />
+        <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
@@ -163,12 +162,12 @@
         <subPane>
           <expand>
             <path>
-              <item name="DQN_pytorch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="DQN_pytorch" type="462c0819:PsiDirectoryNode" />
+              <item name="external" type="b2602c69:ProjectViewProjectNode" />
+              <item name="external" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="DQN_pytorch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="DQN_pytorch" type="462c0819:PsiDirectoryNode" />
+              <item name="external" type="b2602c69:ProjectViewProjectNode" />
+              <item name="external" type="462c0819:PsiDirectoryNode" />
               <item name="utils" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -241,13 +240,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/utils/gym_setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="25" column="38" selection-start-line="25" selection-start-column="38" selection-end-line="25" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/schedules.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
@@ -262,20 +254,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/learn.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="539">
           <caret line="228" selection-start-line="228" selection-end-line="228" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/atari_wrappers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="80" column="33" lean-forward="true" selection-start-line="80" selection-start-column="33" selection-end-line="80" selection-end-column="33" />
+          <folding>
+            <element signature="e#92#102#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/gym_setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="36" column="4" selection-start-line="36" selection-start-column="4" selection-end-line="37" selection-end-column="28" />
+          <folding>
+            <element signature="e#169#179#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-87">
+          <caret line="9" column="29" lean-forward="true" selection-start-line="9" selection-start-column="29" selection-end-line="9" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
