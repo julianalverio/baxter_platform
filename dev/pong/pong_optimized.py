@@ -17,19 +17,20 @@ from PIL import Image
 import os
 import datetime
 import yagmail
+import csv
 import copy
 #HACK SPECIFIC TO MELVILLE
 import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
 
 # THIS IS A HACK SPECIFIC TO BAFFIN
-import sys
-sys.path.pop(0)
-sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
+# import sys
+# sys.path.pop(0)
+# sys.path.insert(0, '/afs/csail.mit.edu/u/j/jalverio/.local/lib/python3.5/site-packages')
 import gym
 
 
-GPU_NUM = '0'
-NUM_EPISODES = 25000
+GPU_NUM = '1'
+NUM_EPISODES = 1000
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_NUM
 
 torch.backends.cudnn.deterministic = True
@@ -80,7 +81,6 @@ class DQN(nn.Module):
 
 
 
-
 class Trainer(object):
     def __init__(self, num_episodes=5000, warm_start_path=''):
         self.env = gym.make('Pong-v0').unwrapped
@@ -110,8 +110,10 @@ class Trainer(object):
             self.steps_done = 0
             self.prefetch_episodes = 10000
             print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
-            self.prefetch()
+            # self.prefetch()
             self.steps_before_optimize = 4
+            csv_file = open('results_optimized_no_prefetch.csv', 'w+')
+            self.writer = csv.writer(csv_file)
 
         else:
             f = open(warm_start_path + '_params', 'r')
@@ -149,7 +151,8 @@ class Trainer(object):
                 counter += 1
                 state = self.getScreen()
                 action = torch.tensor([[self.env.action_space.sample()]], dtype=torch.long).to(self.device, non_blocking=True)
-                _, reward, done, _ = self.env.step(action.item())
+                action_number = [0,2,3][action]
+                _, reward, done, _ = self.env.step(action_number)
                 reward = torch.tensor([reward], device=self.device)
                 next_state = self.getScreen()
                 self.memory.push(state, action, next_state, reward)
@@ -215,6 +218,19 @@ class Trainer(object):
     #     return torch.cat([current_screen, difference], dim=1)
     #
 
+    def getScore(self):
+        self.env.reset()
+        done = False
+        total_reward = 0
+        while not done:
+            current_screen = self.getScreen()
+            action = self.target_net(current_screen).max(1)[1].view(1, 1).type(torch.LongTensor)
+            action_number = [0,2,3][action]
+            _, reward, done, _ = self.env.step(action_number)
+            total_reward += reward
+        return reward
+
+
     def SARS(self, state):
         action = self.selectAction(state)
         _, reward, done, _ = self.env.step(action.item())
@@ -230,7 +246,7 @@ class Trainer(object):
 
     def saveModel(self, i_episode):
         try:
-            torch.save(self.target_net, 'pong_%s.pth' % (i_episode))
+            torch.save(self.target_net, 'pong_optimized_%s.pth' % (i_episode))
             completionEmail('Pong %s episodes completed' % i_episode)
         except Exception as e:
             completionEmail('ERROR IN PONG %s' % i_episode)
@@ -253,9 +269,12 @@ class Trainer(object):
                 if self.steps_done % self.target_update == 0:
                     print('synching target network')
                     self.target_net.load_state_dict(self.policy_net.state_dict())
-            if i_episode % 500 == 0:
+            if i_episode % 100 == 0:
                 self.saveModel(i_episode)
             print('DURATION: %s' % (datetime.datetime.now() - start).total_seconds())
+            score = self.getScore()
+            print('Score for Episode %s: %s' % (i_episode, score))
+            self.writer.writerow([score])
 
     def playback(self, target_net_path):
         self.target_net = torch.load(target_net_path, map_location='cpu')

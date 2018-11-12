@@ -17,6 +17,7 @@ from PIL import Image
 import os
 import datetime
 import yagmail
+import csv
 import copy
 #HACK SPECIFIC TO MELVILLE
 import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
@@ -114,6 +115,8 @@ class Trainer(object):
             # print('Prefetching %s Random State Transitions...' % self.prefetch_episodes)
             # self.prefetch()
             self.steps_before_optimize = 1
+            csv_file = open("results_not_optimized_no_prefetch.csv", 'w+')
+            self.writer = csv.writer(csv_file)
 
         else:
             f = open(warm_start_path + '_params', 'r')
@@ -265,6 +268,9 @@ class Trainer(object):
             if i_episode % 100 == 0:
                 self.saveModel(i_episode)
             print("Time Elapsed: ", (datetime.datetime.now() - start).total_seconds())
+            score = self.getScore()
+            print("Score for Episode %s: %s" % (i_episode, score))
+            self.writer.writerow([score])
 
 
     def playback(self, target_net_path):

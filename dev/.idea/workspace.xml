@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8dca749e-6d0e-4c79-a452-74903bf70700" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/external/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/external/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pong/pong.py" beforeDir="false" afterPath="$PROJECT_DIR$/pong/pong.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pong/pong_optimized.py" beforeDir="false" afterPath="$PROJECT_DIR$/pong/pong_optimized.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,22 +30,22 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="5" />
+          <entry key="py" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="5" />
+          <entry key="Python" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="11249" />
+          <entry key="py" value="11978" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="11249" />
+          <entry key="Python" value="11978" />
         </counts>
       </usages-collector>
     </session>
@@ -85,10 +87,22 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pong/pong.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="405">
-              <caret line="27" column="10" lean-forward="true" selection-start-line="27" selection-start-column="10" selection-end-line="27" selection-end-column="10" />
+            <state relative-caret-position="492">
+              <caret line="272" column="39" selection-start-line="272" selection-start-column="39" selection-end-line="272" selection-end-column="39" />
               <folding>
-                <marker date="1541990132922" expanded="true" signature="9425:9431" ph="..." />
+                <marker date="1541990920022" expanded="true" signature="9558:9564" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pong/pong_optimized.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="537">
+              <caret line="276" column="41" lean-forward="true" selection-start-line="276" selection-start-column="41" selection-end-line="276" selection-end-column="41" />
+              <folding>
+                <marker date="1541990784828" expanded="true" signature="8737:8742" ph="..." />
               </folding>
             </state>
           </provider>
@@ -98,17 +112,10 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>.add(</find>
-      <find>get_buffer_size</find>
-      <find>torch.device</find>
-      <find>args.p</find>
       <find>action =</find>
       <find>class train</find>
       <find>loss =</find>
-      <find>savemodel</find>
-      <find>def train</find>
       <find>dqn(</find>
-      <find>class dqn</find>
       <find>num_actions</find>
       <find>def selection</find>
       <find>def seelct</find>
@@ -123,11 +130,18 @@
       <find>self.valid</find>
       <find>import pdb</find>
       <find>def selectactioni</find>
-      <find>class trainer</find>
       <find>def sele</find>
-      <find>env.step</find>
       <find>def getscocre</find>
       <find>getscroe</find>
+      <find>savemodel</find>
+      <find>def savemodel</find>
+      <find>action -</find>
+      <find>env.step</find>
+      <find>def playback</find>
+      <find>class dqn</find>
+      <find>def getscore</find>
+      <find>class trainer</find>
+      <find>def train</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -146,6 +160,7 @@
         <option value="$PROJECT_DIR$/external/train_dqn.py" />
         <option value="$USER_HOME$/ptan/samples/dqn_speedup/02_play_steps.py" />
         <option value="$PROJECT_DIR$/ptan/samples/dqn_speedup/02_play_steps.py" />
+        <option value="$PROJECT_DIR$/pong/pong_optimized.py" />
         <option value="$PROJECT_DIR$/pong/pong.py" />
       </list>
     </option>
@@ -251,12 +266,12 @@
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4989796" visible="true" weight="0.25763127" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4989796" visible="true" weight="0.25763127" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.50102043" side_tool="true" weight="0.25457877" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32959184" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32959184" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -311,12 +326,22 @@
     <entry file="file://$PROJECT_DIR$/external/train_dqn.py" />
     <entry file="file://$USER_HOME$/ptan/samples/dqn_speedup/02_play_steps.py" />
     <entry file="file://$PROJECT_DIR$/ptan/samples/dqn_speedup/02_play_steps.py" />
+    <entry file="file://$PROJECT_DIR$/pong/pong_optimized.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="537">
+          <caret line="276" column="41" lean-forward="true" selection-start-line="276" selection-start-column="41" selection-end-line="276" selection-end-column="41" />
+          <folding>
+            <marker date="1541990784828" expanded="true" signature="8737:8742" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pong/pong.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="10" lean-forward="true" selection-start-line="27" selection-start-column="10" selection-end-line="27" selection-end-column="10" />
+        <state relative-caret-position="492">
+          <caret line="272" column="39" selection-start-line="272" selection-start-column="39" selection-end-line="272" selection-end-column="39" />
           <folding>
-            <marker date="1541990132922" expanded="true" signature="9425:9431" ph="..." />
+            <marker date="1541990920022" expanded="true" signature="9558:9564" ph="..." />
           </folding>
         </state>
       </provider>
