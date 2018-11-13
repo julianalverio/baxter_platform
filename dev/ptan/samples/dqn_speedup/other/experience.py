@@ -56,7 +56,8 @@ class ExperienceSource:
         self.vectorized = vectorized
 
     def __iter__(self):
-        states, agent_states, histories, cur_rewards, cur_steps = [], [], [], [], []
+        # states, agent_states, histories, cur_rewards, cur_steps = [], [], [], [], []
+        states, histories, cur_rewards, cur_steps = [], [], [], []
         env_lens = []
         for env in self.pool:
             obs = env.reset()
@@ -66,7 +67,7 @@ class ExperienceSource:
             histories.append(deque(maxlen=self.steps_count))
             cur_rewards.append(0.0)
             cur_steps.append(0)
-            agent_states.append(self.agent.initial_state())
+            # agent_states.append(self.agent.initial_state())
 
         iter_idx = 0
         while True:
@@ -80,11 +81,12 @@ class ExperienceSource:
                     states_input.append(state)
                     states_indices.append(idx)
             if states_input:
-                states_actions, new_agent_states = self.agent(states_input, agent_states)
+                states_actions = self.agent(states_input)
+                # states_actions, new_agent_states = self.agent(states_input, agent_states)
                 for idx, action in enumerate(states_actions):
                     g_idx = states_indices[idx]
                     actions[g_idx] = action
-                    agent_states[g_idx] = new_agent_states[idx]
+                    # agent_states[g_idx] = new_agent_states[idx]
             grouped_actions = _group_list(actions, env_lens)
 
             global_ofs = 0
@@ -114,7 +116,7 @@ class ExperienceSource:
                         cur_rewards[idx] = 0.0
                         cur_steps[idx] = 0
                         states[idx] = env.reset()
-                        agent_states[idx] = self.agent.initial_state()
+                        # agent_states[idx] = self.agent.initial_state()
                         history.clear()
                 global_ofs += len(action_n)
             iter_idx += 1

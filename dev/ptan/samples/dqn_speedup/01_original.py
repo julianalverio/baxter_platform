@@ -73,7 +73,9 @@ class Trainer(object):
                 import pdb;
                 pdb.set_trace()
             counter += 1
-            if counter == 3000:
+            if counter == 1:
+                print("CHECKING NOW")
+            if counter == 5000:
                 print('ALL GOOD')
                 break
             loss_v.backward()
