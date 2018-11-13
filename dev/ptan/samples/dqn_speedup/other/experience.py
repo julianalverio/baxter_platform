@@ -69,33 +69,30 @@ class ExperienceSource:
 
         iter_idx = 0
         while True:
-            global_ofs = 0
             action_n = self.agent(states) #length of action_n is always 1
             next_state, r, is_done, _ = env.step(action_n[0])
             action = action_n[0]
-            idx = global_ofs
-            state = states[idx]
-            history = histories[idx]
+            state = states[0]
+            history = histories[0]
 
-            cur_rewards[idx] += r
-            cur_steps[idx] += 1
+            cur_rewards[0] += r
+            cur_steps[0] += 1
             if state is not None:
                 history.append(Experience(state=state, action=action, reward=r, done=is_done))
             if len(history) == self.steps_count and iter_idx % self.steps_delta == 0:
                 yield tuple(history)
-            states[idx] = next_state
+            states[0] = next_state
             if is_done:
                 # generate tail of history
                 while len(history) >= 1:
                     yield tuple(history)
                     history.popleft()
-                self.total_rewards.append(cur_rewards[idx])
-                self.total_steps.append(cur_steps[idx])
-                cur_rewards[idx] = 0.0
-                cur_steps[idx] = 0
-                states[idx] = env.reset()
+                self.total_rewards.append(cur_rewards[0])
+                self.total_steps.append(cur_steps[0])
+                cur_rewards[0] = 0.0
+                cur_steps[0] = 0
+                states[0] = env.reset()
                 history.clear()
-            # global_ofs += len(action_n)
             iter_idx += 1
 
     def pop_total_rewards(self):
