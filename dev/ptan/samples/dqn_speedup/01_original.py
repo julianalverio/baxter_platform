@@ -23,12 +23,14 @@ from tensorboardX import SummaryWriter
 from lib import dqn_model, common
 import csv
 
+import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
+
 
 
 if __name__ == "__main__":
     params = common.HYPERPARAMS['pong']
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cuda", default=False, action="store_true", help="Enable cuda")
+    parser.add_argument("--cuda", default=True, action="store_true", help="Enable cuda")
     args = parser.parse_args()
     device = torch.device("cuda" if args.cuda else "cpu")
 
