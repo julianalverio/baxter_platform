@@ -27,22 +27,12 @@ class BaseAgent:
         raise NotImplementedError
 
 
-def default_states_preprocessor(states):
-    # if len(states) == 1:
-    np_states = np.expand_dims(states[0], 0)
-    # else:
-    #     np_states = np.array([np.array(s, copy=False) for s in states], copy=False)
-    return torch.tensor(np_states)
-
-
-
-
 class DQNAgent(BaseAgent):
     """
     DQNAgent is a memoryless DQN agent which calculates Q values
     from the observations and  converts them into the actions using action_selector
     """
-    def __init__(self, dqn_model, action_selector, device="cpu", preprocessor=default_states_preprocessor):
+    def __init__(self, dqn_model, action_selector, device="cpu"):
         self.dqn_model = dqn_model
         self.action_selector = action_selector
         self.preprocessor = preprocessor
@@ -50,7 +40,7 @@ class DQNAgent(BaseAgent):
 
     def __call__(self, states):
         if self.preprocessor is not None:
-            states = self.preprocessor(states)
+            states = torch.tensor(np.expand_dims(states[0], 0))
             if torch.is_tensor(states):
                 states = states.to(self.device)
         q_v = self.dqn_model(states)
