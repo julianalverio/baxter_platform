@@ -74,6 +74,7 @@ class ExperienceSource:
                     yield tuple(history)
                     history.popleft()
                 self.total_rewards.append(sum(cumulative_reward))
+                cumulative_reward = []
                 self.total_steps.append(1)
                 state = env.reset()
                 history.clear()
