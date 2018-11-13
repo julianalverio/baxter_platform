@@ -21,6 +21,7 @@ import torch.optim as optim
 from tensorboardX import SummaryWriter
 
 from lib import dqn_model, common
+import csv
 
 
 
@@ -47,7 +48,10 @@ if __name__ == "__main__":
     optimizer = optim.Adam(net.parameters(), lr=params['learning_rate'])
 
     frame_idx = 0
+    csv_file = open('losses.csv', 'w+')
+    writer = csv.writer(csv_file)
 
+    counter = 0
     with common.RewardTracker(writer, params['stop_reward']) as reward_tracker:
         while True:
             frame_idx += 1
@@ -65,6 +69,11 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             batch = buffer.sample(params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, net, tgt_net.target_model, gamma=params['gamma'], cuda=args.cuda)
+            writer.writerow([loss_v.item()])
+            counter += 1
+            if counter == 5000:
+                print('DONE')
+                break
             loss_v.backward()
             optimizer.step()
 
