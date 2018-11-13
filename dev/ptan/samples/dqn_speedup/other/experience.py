@@ -73,6 +73,7 @@ class ExperienceSource:
 
             global_ofs = 0
             counter = 0
+            import pdb; pdb.set_trace()
             for env_idx, (env, action_n) in enumerate(zip(self.pool, grouped_actions)):
                 counter += 1
                 if counter > 1:
