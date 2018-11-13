@@ -68,11 +68,7 @@ class ExperienceSource:
         cur_steps.append(0)
 
         iter_idx = 0
-        counter = 0
         while True:
-            counter += 1
-            if counter > 1:
-                import pdb; pdb.set_trace()
             global_ofs = 0
             action_n = self.agent(states) #length of action_n is always 1
             next_state, r, is_done, _ = env.step(action_n[0])
@@ -99,7 +95,7 @@ class ExperienceSource:
                 cur_steps[idx] = 0
                 states[idx] = env.reset()
                 history.clear()
-            global_ofs += len(action_n)
+            # global_ofs += len(action_n)
             iter_idx += 1
 
     def pop_total_rewards(self):
