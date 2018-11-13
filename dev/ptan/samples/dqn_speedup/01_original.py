@@ -52,7 +52,6 @@ class Trainer(object):
         frame_idx = 0
         counter = 0
         while True:
-            print(len(self.buffer))
             frame_idx += 1
             self.buffer.populate(1)
             self.epsilon_tracker.frame(frame_idx)
@@ -70,6 +69,7 @@ class Trainer(object):
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.CUDA)
             self.csv_writer.writerow([loss_v.item()])
             counter += 1
+            print(counter)
             if counter == 5000:
                 print('DONE')
                 break
