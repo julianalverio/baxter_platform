@@ -119,6 +119,7 @@ class RewardTracker:
         self.length = length
         self.rewards = []
         self.position = []
+        self.stop_reward = stop_reward
 
     def add(self, reward):
         if len(self.rewards) < self.length:
@@ -126,7 +127,7 @@ class RewardTracker:
         else:
             self.rewards[self.position] = reward
             self.position = (self.position + 1) % self.length
-        if np.mean(self.rewards) >= stop_reward:
+        if np.mean(self.rewards) >= self.stop_reward:
             return True
         return False
 
