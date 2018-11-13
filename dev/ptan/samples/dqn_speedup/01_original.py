@@ -57,13 +57,13 @@ class Trainer(object):
 
             new_rewards = self.exp_source.pop_total_rewards()
             if new_rewards:
+                done = self.reward_tracker.add(new_rewards[0])
                 print('Game: %s Score: %s Mean Score: %s' % (
                 len(self.reward_tracker.rewards), self.reward_tracker.rewards[-1],
                 np.mean(self.reward_tracker.rewards)))
                 if (len(self.reward_tracker.rewards) % 100 == 0):
                     self.target_net.save('pong_%s.pth' % len(self.reward_tracker.rewards))
                     print('Model Saved!')
-                done = self.reward_tracker.add(new_rewards[0])
                 if done:
                     break
 
