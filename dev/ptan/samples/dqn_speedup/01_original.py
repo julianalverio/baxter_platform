@@ -43,8 +43,8 @@ class Trainer(object):
         self.buffer = other.experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = common.RewardTracker()
-        # csv_file = open('losses.csv', 'r')
-        # self.reader = csv.reader(csv_file)
+        csv_file = open('losses.csv', 'w+')
+        self.writer = csv.writer(csv_file)
         # self.losses_compare = []
         #
         # for row in self.reader:
@@ -76,7 +76,7 @@ class Trainer(object):
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
-            print(loss_v)
+            writer.writerow([loss_v.item()])
             # if loss_v != float(self.losses_compare[counter]):
             #     import pdb; pdb.set_trace()
             counter += 1
