@@ -29,48 +29,6 @@ HYPERPARAMS = {
         'gamma':            0.99,
         'batch_size':       32
     },
-    'breakout-small': {
-        'env_name':         "BreakoutNoFrameskip-v4",
-        'stop_reward':      500.0,
-        'run_name':         'breakout-small',
-        'replay_size':      3*10 ** 5,
-        'replay_initial':   20000,
-        'target_net_sync':  1000,
-        'epsilon_frames':   10 ** 6,
-        'epsilon_start':    1.0,
-        'epsilon_final':    0.1,
-        'learning_rate':    0.0001,
-        'gamma':            0.99,
-        'batch_size':       64
-    },
-    'breakout': {
-        'env_name':         "BreakoutNoFrameskip-v4",
-        'stop_reward':      500.0,
-        'run_name':         'breakout',
-        'replay_size':      10 ** 6,
-        'replay_initial':   50000,
-        'target_net_sync':  10000,
-        'epsilon_frames':   10 ** 6,
-        'epsilon_start':    1.0,
-        'epsilon_final':    0.1,
-        'learning_rate':    0.00025,
-        'gamma':            0.99,
-        'batch_size':       32
-    },
-    'invaders': {
-        'env_name': "SpaceInvadersNoFrameskip-v4",
-        'stop_reward': 500.0,
-        'run_name': 'breakout',
-        'replay_size': 10 ** 6,
-        'replay_initial': 50000,
-        'target_net_sync': 10000,
-        'epsilon_frames': 10 ** 6,
-        'epsilon_start': 1.0,
-        'epsilon_final': 0.1,
-        'learning_rate': 0.00025,
-        'gamma': 0.99,
-        'batch_size': 32
-    },
 }
 
 
@@ -90,7 +48,7 @@ def unpack_batch(batch):
            np.array(dones, dtype=np.uint8), np.array(last_states, copy=False)
 
 
-def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=False, cuda_async=False):
+def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
     states, actions, rewards, dones, next_states = unpack_batch(batch)
 
     states_v = torch.tensor(states)
@@ -113,33 +71,4 @@ def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=False, cuda_async=False):
     return nn.MSELoss()(state_action_values, expected_state_action_values)
 
 
-class RewardTracker:
-    def __init__(self, length=100, stop_reward=20):
-        self.stop_reward = stop_reward
-        self.length = length
-        self.rewards = []
-        self.position = 0
-        self.stop_reward = stop_reward
 
-    def add(self, reward):
-        if len(self.rewards) < self.length:
-            self.rewards.append(reward)
-        else:
-            self.rewards[self.position] = reward
-            self.position = (self.position + 1) % self.length
-        if np.mean(self.rewards) >= self.stop_reward:
-            return True
-        return False
-
-
-class EpsilonTracker:
-    def __init__(self, epsilon_greedy_selector, params):
-        self.epsilon_greedy_selector = epsilon_greedy_selector
-        self.epsilon_start = params['epsilon_start']
-        self.epsilon_final = params['epsilon_final']
-        self.epsilon_frames = params['epsilon_frames']
-        self.frame(0)
-
-    def frame(self, frame):
-        self.epsilon_greedy_selector.epsilon = \
-            max(self.epsilon_final, self.epsilon_start - frame / self.epsilon_frames)

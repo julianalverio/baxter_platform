@@ -24,22 +24,53 @@ import csv
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 
+class RewardTracker:
+    def __init__(self, length=100, stop_reward=20):
+        self.stop_reward = stop_reward
+        self.length = length
+        self.rewards = []
+        self.position = 0
+        self.stop_reward = stop_reward
+
+    def add(self, reward):
+        if len(self.rewards) < self.length:
+            self.rewards.append(reward)
+        else:
+            self.rewards[self.position] = reward
+            self.position = (self.position + 1) % self.length
+        if np.mean(self.rewards) >= self.stop_reward:
+            return True
+        return False
+
+
+class EpsilonTracker:
+    def __init__(self, epsilon_greedy_selector, params):
+        self.epsilon_greedy_selector = epsilon_greedy_selector
+        self.epsilon_start = params['epsilon_start']
+        self.epsilon_final = params['epsilon_final']
+        self.epsilon_frames = params['epsilon_frames']
+        self.frame(0)
+
+    def frame(self, frame):
+        self.epsilon_greedy_selector.epsilon = \
+            max(self.epsilon_final, self.epsilon_start - frame / self.epsilon_frames)
+
+
 class Trainer(object):
     def __init__(self):
         self.params = common.HYPERPARAMS['pong']
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.CUDA = True if torch.cuda.is_available() else False
         self.env = gym.make('PongNoFrameskip-v4')
         self.env = other.common.wrappers.wrap_dqn(self.env)
         self.policy_net = dqn_model.DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
         self.target_net = agent.TargetNet(self.policy_net)
         self.selector = actions.EpsilonGreedyActionSelector(epsilon=self.params['epsilon_start'])
-        self.epsilon_tracker = common.EpsilonTracker(self.selector, self.params)
+        self.epsilon_tracker = EpsilonTracker(self.selector, self.params)
         self.agent = agent.DQNAgent(self.policy_net, self.selector, device=self.device)
         self.exp_source = experience.ExperienceSourceFirstLast(self.env, self.agent, gamma=self.params['gamma'], steps_count=1)
         self.buffer = experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
-        self.reward_tracker = common.RewardTracker()
+        self.reward_tracker = RewardTracker()
         csv_file = open('losses.csv', 'r')
         csv_reader = csv.reader(csv_file)
         self.losses = []
@@ -73,7 +104,7 @@ class Trainer(object):
                 continue
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
-            loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.CUDA)
+            loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'])
 
             if loss_v.item() != float(self.losses[counter]):
                 print('FAILURE')
