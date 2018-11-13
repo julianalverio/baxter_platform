@@ -85,7 +85,7 @@ class ExperienceSource:
                     actions[g_idx] = action
             if len(actions) != 1:
                 import pdb; pdb.set_trace()
-            grouped_actions = [actions[0]]
+            grouped_actions = [actions]
             # grouped_actions = _group_list(actions)
 
             global_ofs = 0
