@@ -79,6 +79,7 @@ class ExperienceSource:
                 history.clear()
 
     def pop_total_rewards(self):
+        import pdb; pdb.set_trace()
         r = self.total_rewards
         if r:
             self.total_rewards = []
