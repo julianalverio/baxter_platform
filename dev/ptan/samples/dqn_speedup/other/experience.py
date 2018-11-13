@@ -68,14 +68,15 @@ class ExperienceSource:
         cur_steps.append(0)
 
         iter_idx = 0
+        counter = 0
         while True:
+            counter += 1
+            if counter > 1:
+                import pdb; pdb.set_trace()
             global_ofs = 0
-            # env = self.pool[0]
             action_n = self.agent(states) #length of action_n is always 1
             next_state, r, is_done, _ = env.step(action_n[0])
             action = action_n[0]
-            # next_state_n, r_n, is_done_n = [next_state], [r], [is_done]
-            # for ofs, (action, next_state, r, is_done) in enumerate(zip(action_n, next_state_n, r_n, is_done_n)):
             idx = global_ofs
             state = states[idx]
             history = histories[idx]
