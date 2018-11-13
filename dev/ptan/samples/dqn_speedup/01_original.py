@@ -43,20 +43,20 @@ class Trainer(object):
         self.buffer = other.experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = common.RewardTracker()
-        csv_file = open('losses.csv', 'r')
-        self.reader = csv.reader(csv_file)
-        self.losses_compare = []
+        # csv_file = open('losses.csv', 'r')
+        # self.reader = csv.reader(csv_file)
+        # self.losses_compare = []
 
-        for row in self.reader:
-            self.losses_compare.append(row[0])
+        # for row in self.reader:
+        #     self.losses_compare.append(row[0])
 
 
 
     def train(self):
-        counter = 0
+        # counter = 0
         frame_idx = 0
         game_count = 0
-        for episode in count():
+        for _ in count():
             frame_idx += 1
             self.buffer.populate(1)
             self.epsilon_tracker.frame(frame_idx)
@@ -76,13 +76,12 @@ class Trainer(object):
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
-            # self.writer.writerow([loss_v.item()])
-            if loss_v.item() != float(self.losses_compare[counter]):
-                import pdb; pdb.set_trace()
-            counter += 1
-            if counter == 10000:
-                print("done")
-                return
+            # if loss_v.item() != float(self.losses_compare[counter]):
+            #     import pdb; pdb.set_trace()
+            # counter += 1
+            # if counter == 10000:
+            #     print("done")
+            #     return
             loss_v.backward()
             self.optimizer.step()
 
