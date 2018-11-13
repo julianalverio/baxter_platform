@@ -71,10 +71,9 @@ class ExperienceSource:
         while True:
             actions = [None]
             states_input = states
-            states_indices = [0]
-            # if states_input:
-            states_actions = self.agent(states_input)
-            actions[0] = states_actions[0]
+            actions = self.agent(states_input)
+            # states_actions = self.agent(states_input)
+            # actions[0] = states_actions[0]
             grouped_actions = [actions] #length of actions is always 1
 
             global_ofs = 0
