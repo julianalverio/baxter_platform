@@ -35,14 +35,12 @@ class DQNAgent(BaseAgent):
     def __init__(self, dqn_model, action_selector, device="cpu"):
         self.dqn_model = dqn_model
         self.action_selector = action_selector
-        self.preprocessor = preprocessor
         self.device = device
 
     def __call__(self, states):
-        if self.preprocessor is not None:
-            states = torch.tensor(np.expand_dims(states[0], 0))
-            if torch.is_tensor(states):
-                states = states.to(self.device)
+        states = torch.tensor(np.expand_dims(states[0], 0))
+        if torch.is_tensor(states):
+            states = states.to(self.device)
         q_v = self.dqn_model(states)
         q = q_v.data.cpu().numpy()
         actions = self.action_selector(q)
