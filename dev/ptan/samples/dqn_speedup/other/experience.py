@@ -72,12 +72,9 @@ class ExperienceSource:
             actions = [None]
             states_input = states
             states_indices = [0]
-            if states_input:
-                states_actions = self.agent(states_input)
-                actions[0] = states_actions[0]
-                # for idx, action in enumerate(states_actions):
-                #     g_idx = states_indices[idx]
-                #     actions[g_idx] = action
+            # if states_input:
+            states_actions = self.agent(states_input)
+            actions[0] = states_actions[0]
             grouped_actions = [actions] #length of actions is always 1
 
             global_ofs = 0
