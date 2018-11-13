@@ -83,7 +83,10 @@ class ExperienceSource:
                 for idx, action in enumerate(states_actions):
                     g_idx = states_indices[idx]
                     actions[g_idx] = action
-            grouped_actions = _group_list(actions, env_lens)
+            if len(actions) != 1:
+                import pdb; pdb.set_trace()
+            grouped_actions = [actions[0]]
+            # grouped_actions = _group_list(actions)
 
             global_ofs = 0
             for env_idx, (env, action_n) in enumerate(zip(self.pool, grouped_actions)):
@@ -130,20 +133,14 @@ class ExperienceSource:
         return res
 
 
-def _group_list(items, lens):
+def _group_list(items):
     """
     Unflat the list of items by lens
     :param items: list of items
     :param lens: list of integers
     :return: list of list of items grouped by lengths
     """
-    res = []
-    cur_ofs = 0
-    # for g_len in lens:
-    # res.append(items[cur_ofs:cur_ofs+g_len])
-    res.append(items[cur_ofs:cur_ofs+1])
-    # cur_ofs += g_len
-    cur_ofs += 1
+    res = [items[0]]
     return res
 
 
