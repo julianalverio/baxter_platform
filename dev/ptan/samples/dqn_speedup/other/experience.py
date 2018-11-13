@@ -72,6 +72,8 @@ class ExperienceSource:
             actions = [None] * len(states)
             states_input = []
             states_indices = []
+            if states[0] == None:
+                import pdb; pdb.set_trace()
             if len(states) != 1:
                 import pdb; pdb.set_trace()
             for idx, state in enumerate(states):
