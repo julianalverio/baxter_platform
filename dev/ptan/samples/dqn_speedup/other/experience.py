@@ -57,10 +57,10 @@ class ExperienceSource:
 
     def __iter__(self):
         states, histories, cur_rewards, cur_steps = [], [], [], []
-        env_lens = []
+        env_lens = [1]
         env = self.pool[0]
         obs = env.reset()
-        states.append(obs)
+        states.append(obs) #states is always [LazyFrameObject] in loop; it is never None; always length 1
         env_lens.append(1)
 
         histories.append(deque(maxlen=self.steps_count))
@@ -70,18 +70,13 @@ class ExperienceSource:
         iter_idx = 0
         while True:
             actions = [None] * len(states)
-            states_input = []
+            # states_input = []
             states_indices = []
-            if states[0] == None:
-                import pdb; pdb.set_trace()
-            if len(states) != 1:
-                import pdb; pdb.set_trace()
-            for idx, state in enumerate(states):
-                if state is None:
-                    actions[idx] = self.pool[0].action_space.sample()  # assume that all envs are from the same family
-                else:
-                    states_input.append(state)
-                    states_indices.append(idx)
+            states_input = states
+            states_indices = [0]
+            # for idx, state in enumerate(states):
+            #     states_input.append(state)
+            #     states_indices.append(idx)
             if states_input:
                 states_actions = self.agent(states_input)
                 for idx, action in enumerate(states_actions):
