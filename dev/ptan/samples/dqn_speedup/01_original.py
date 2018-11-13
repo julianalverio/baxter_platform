@@ -13,6 +13,12 @@ from itertools import count
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 
+torch.backends.cudnn.deterministic = True
+torch.manual_seed(999)
+torch.cuda.manual_seed_all(999)
+import csv
+
+
 
 class Trainer(object):
     def __init__(self):
@@ -31,6 +37,8 @@ class Trainer(object):
         self.buffer = ptan.experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = common.RewardTracker()
+        csv_file = open('losses.csv', 'w+')
+        self.writer = csv.writer(csv_file)
 
 
     def train(self):
@@ -56,6 +64,7 @@ class Trainer(object):
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
+            self.writer.writerow([loss_v])
             loss_v.backward()
             self.optimizer.step()
 
