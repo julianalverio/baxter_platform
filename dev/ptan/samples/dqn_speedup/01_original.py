@@ -29,7 +29,7 @@ class Trainer(object):
         self.params = common.HYPERPARAMS['pong']
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.CUDA = True if torch.cuda.is_available() else False
-        self.env = gym.make(params['PongNoFrameskip-v4'])
+        self.env = gym.make(self.params['PongNoFrameskip-v4'])
         self.env = other.common.wrappers.wrap_dqn(env)
         self.policy_net = dqn_model.DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
         self.target_net = agent.TargetNet(self.policy_net)
