@@ -28,7 +28,7 @@ class Trainer(object):
         self.env = ptan.common.wrappers.wrap_dqn(self.env)
         self.policy_net = dqn_model.DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
         self.target_net = ptan.agent.TargetNet(self.policy_net)
-        self.selector = ptan.actions.EpsilonGreedyActionSelector(epsilon=params['epsilon_start'])
+        self.selector = ptan.actions.EpsilonGreedyActionSelector(epsilon=self.params['epsilon_start'])
         self.epsilon_tracker = common.EpsilonTracker(self.selector, self.params)
         self.agent = ptan.agent.DQNAgent(self.policy_net, self.selector, device=self.device)
         self.exp_source = ptan.experience.ExperienceSourceFirstLast(self.env, self.agent, gamma=self.params['gamma'], steps_count=1)
