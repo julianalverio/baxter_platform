@@ -72,7 +72,6 @@ class ExperienceSource:
             grouped_actions = [self.agent(states)] #length of actions is always 1
 
             global_ofs = 0
-            import pdb; pdb.set_trace()
             env = self.pool[0]
             action_n = grouped_actions
             # for (_, action_n) in zip(self.pool, grouped_actions):
