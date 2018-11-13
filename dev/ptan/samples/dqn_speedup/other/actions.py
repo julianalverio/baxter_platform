@@ -1,11 +1,11 @@
 import torch
 torch.backends.cudnn.deterministic = True
-torch.manual_seed(123)
-torch.cuda.manual_seed_all(123)
+torch.manual_seed(124)
+torch.cuda.manual_seed_all(124)
 import random
-random.seed(123)
+random.seed(124)
 import numpy as np
-np.random.seed(123)
+np.random.seed(124)
 
 import numpy as np
 
