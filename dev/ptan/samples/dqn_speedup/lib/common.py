@@ -126,7 +126,7 @@ class RewardTracker:
         else:
             self.rewards[self.position] = reward
             self.position = (self.position + 1) % self.length
-        if np.mean(self.rewards) >= stop_rewards:
+        if np.mean(self.rewards) >= stop_reward:
             return True
         return False
 
