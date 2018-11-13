@@ -45,6 +45,7 @@ class Trainer(object):
         self.losses = []
         for row in csv_reader:
             self.losses.append(row[0])
+        self.episode = 0
 
 
     def train(self):
@@ -57,9 +58,10 @@ class Trainer(object):
 
             new_rewards = self.exp_source.pop_total_rewards()
             if new_rewards:
+                self.episode += 1
                 done = self.reward_tracker.add(new_rewards[0])
                 print('Game: %s Score: %s Mean Score: %s' % (
-                len(self.reward_tracker.rewards), self.reward_tracker.rewards[-1],
+                self.episode, self.reward_tracker.rewards[-1],
                 np.mean(self.reward_tracker.rewards)))
                 if (len(self.reward_tracker.rewards) % 100 == 0):
                     self.target_net.save('pong_%s.pth' % len(self.reward_tracker.rewards))
@@ -73,21 +75,29 @@ class Trainer(object):
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.CUDA)
 
-            # if loss_v.item() != float(self.losses[counter]):
-            #     print('FAILURE')
-            #     import pdb;
-            #     pdb.set_trace()
+            if loss_v.item() != float(self.losses[counter]):
+                print('FAILURE')
+                import pdb;
+                pdb.set_trace()
             counter += 1
-            # if counter == 1:
-            #     print("CHECKING NOW")
-            # if counter == 2000:
-            #     print('ALL GOOD')
-            #     break
+            if counter == 1:
+                print("CHECKING NOW")
+            if counter == 2000:
+                print('ALL GOOD')
+                break
             loss_v.backward()
             self.optimizer.step()
 
             if frame_idx % self.params['target_net_sync'] == 0:
                 self.target_net.sync()
+
+
+def playback(path):
+    target_net = torch.load(path)
+    env = gym.make('PongNoFrameskip-v4')
+
+
+
 
 
 if __name__ == "__main__":
