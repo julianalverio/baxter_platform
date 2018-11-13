@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     frame_idx = 0
     csv_file = open('losses.csv', 'w+')
-    writer = csv.writer(csv_file)
+    csv_writer = csv.writer(csv_file)
 
     counter = 0
     with common.RewardTracker(writer, params['stop_reward']) as reward_tracker:
@@ -71,7 +71,7 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             batch = buffer.sample(params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, net, tgt_net.target_model, gamma=params['gamma'], cuda=args.cuda)
-            writer.writerow([loss_v.item()])
+            csv_writer.writerow([loss_v.item()])
             counter += 1
             if counter == 5000:
                 print('DONE')
