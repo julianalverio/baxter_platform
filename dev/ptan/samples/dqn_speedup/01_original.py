@@ -54,32 +54,33 @@ if __name__ == "__main__":
 
     frame_idx = 0
     counter = 0
-    with common.RewardTracker(writer, params['stop_reward']) as reward_tracker:
-        while True:
-            frame_idx += 1
-            buffer.populate(1)
-            epsilon_tracker.frame(frame_idx)
+    reward_tracker = common.RewardTracker()
+    while True:
+        frame_idx += 1
+        buffer.populate(1)
+        epsilon_tracker.frame(frame_idx)
 
-            new_rewards = exp_source.pop_total_rewards()
-            if new_rewards:
-                if reward_tracker.reward(new_rewards[0], frame_idx, selector.epsilon):
-                    break
-
-            if len(buffer) < params['replay_initial']:
-                continue
-
-            optimizer.zero_grad()
-            batch = buffer.sample(params['batch_size'])
-            loss_v = common.calc_loss_dqn(batch, net, tgt_net.target_model, gamma=params['gamma'], cuda=args.cuda)
-            if loss_v.item() != float(losses[counter]):
-                print('FAILURE')
-                import pdb; pdb.set_trace()
-            counter += 1
-            if counter == 3000:
-                print('ALL GOOD')
+        new_rewards = exp_source.pop_total_rewards()
+        if new_rewards:
+            done = reward_tracker.add(new_rewards[0])
+            if done:
                 break
-            loss_v.backward()
-            optimizer.step()
 
-            if frame_idx % params['target_net_sync'] == 0:
-                tgt_net.sync()
+        if len(buffer) < params['replay_initial']:
+            continue
+
+        optimizer.zero_grad()
+        batch = buffer.sample(params['batch_size'])
+        loss_v = common.calc_loss_dqn(batch, net, tgt_net.target_model, gamma=params['gamma'], cuda=args.cuda)
+        if loss_v.item() != float(losses[counter]):
+            print('FAILURE')
+            import pdb; pdb.set_trace()
+        counter += 1
+        if counter == 3000:
+            print('ALL GOOD')
+            break
+        loss_v.backward()
+        optimizer.step()
+
+        if frame_idx % params['target_net_sync'] == 0:
+            tgt_net.sync()
