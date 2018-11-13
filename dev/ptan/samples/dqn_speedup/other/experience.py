@@ -68,7 +68,6 @@ class ExperienceSource:
         cur_steps.append(0)
 
         iter_idx = 0
-        import pdb; pdb.set_trace()
         while True:
             actions = [None] * len(states)
             states_input = []
