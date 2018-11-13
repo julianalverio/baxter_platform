@@ -1,5 +1,15 @@
 """basic wrappers, useful for reinforcement learning on gym envs"""
 # Mostly copy-pasted from https://github.com/openai/baselines/blob/master/baselines/common/atari_wrappers.py
+import torch
+torch.backends.cudnn.deterministic = True
+torch.manual_seed(123)
+torch.cuda.manual_seed_all(123)
+import random
+random.seed(123)
+import numpy as np
+np.random.seed(123)
+
+
 import numpy as np
 from collections import deque
 import gym

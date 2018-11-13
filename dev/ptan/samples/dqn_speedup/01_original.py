@@ -5,7 +5,7 @@ torch.manual_seed(123)
 torch.cuda.manual_seed_all(123)
 import random
 random.seed(123)
-import np
+import numpy as np
 np.random.seed(123)
 
 import gym
