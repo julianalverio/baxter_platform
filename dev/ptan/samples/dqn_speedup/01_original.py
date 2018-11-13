@@ -76,7 +76,7 @@ class Trainer(object):
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
-            writer.writerow([loss_v.item()])
+            self.writer.writerow([loss_v.item()])
             # if loss_v != float(self.losses_compare[counter]):
             #     import pdb; pdb.set_trace()
             counter += 1
