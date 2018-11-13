@@ -18,6 +18,7 @@ from tensorboardX import SummaryWriter
 
 from lib import dqn_model, common
 from other import actions, agent, experience
+import other
 
 
 if __name__ == "__main__":
