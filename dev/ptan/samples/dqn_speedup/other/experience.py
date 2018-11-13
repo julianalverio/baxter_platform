@@ -72,6 +72,8 @@ class ExperienceSource:
             actions = [None] * len(states)
             states_input = []
             states_indices = []
+            if len(states) != 1:
+                import pdb; pdb.set_trace()
             for idx, state in enumerate(states):
                 if state is None:
                     actions[idx] = self.pool[0].action_space.sample()  # assume that all envs are from the same family
@@ -83,10 +85,7 @@ class ExperienceSource:
                 for idx, action in enumerate(states_actions):
                     g_idx = states_indices[idx]
                     actions[g_idx] = action
-            if len(actions) != 1:
-                import pdb; pdb.set_trace()
-            grouped_actions = [actions]
-            # grouped_actions = _group_list(actions)
+            grouped_actions = [actions] #length of actions is always 1
 
             global_ofs = 0
             for env_idx, (env, action_n) in enumerate(zip(self.pool, grouped_actions)):
@@ -132,16 +131,6 @@ class ExperienceSource:
             self.total_rewards, self.total_steps = [], []
         return res
 
-
-def _group_list(items):
-    """
-    Unflat the list of items by lens
-    :param items: list of items
-    :param lens: list of integers
-    :return: list of list of items grouped by lengths
-    """
-    res = [items[0]]
-    return res
 
 
 # those entries are emitted from ExperienceSourceFirstLast. Reward is discounted over the trajectory piece
