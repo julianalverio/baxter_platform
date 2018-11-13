@@ -66,7 +66,6 @@ class Trainer(object):
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.CUDA)
-            self.csv_writer.writerow([loss_v.item()])
             if loss_v.item() != float(self.losses[counter]):
                 print('FAILURE')
                 import pdb;
