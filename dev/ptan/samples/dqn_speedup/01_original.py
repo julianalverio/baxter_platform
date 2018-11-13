@@ -42,6 +42,7 @@ class Trainer(object):
 
 
     def train(self):
+        counter = 0
         frame_idx = 0
         game_count = 0
         for episode in count():
@@ -65,6 +66,10 @@ class Trainer(object):
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
             self.writer.writerow([loss_v])
+            counter += 1
+            if counter == 10000:
+                print("done")
+                return
             loss_v.backward()
             self.optimizer.step()
 
