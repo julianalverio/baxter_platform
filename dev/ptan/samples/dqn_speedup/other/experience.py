@@ -56,7 +56,7 @@ class ExperienceSource:
         self.vectorized = vectorized
 
     def __iter__(self):
-        histories  = []
+        histories = []
         env = self.pool[0]
         state = env.reset()
 
@@ -69,8 +69,7 @@ class ExperienceSource:
             action = action_n[0]
             history = histories[0]
 
-            if state is not None:
-                history.append(Experience(state=state, action=action, reward=r, done=is_done))
+            history.append(Experience(state=state, action=action, reward=r, done=is_done))
             if len(history) == self.steps_count and iter_idx % self.steps_delta == 0:
                 yield tuple(history)
             state = next_state
