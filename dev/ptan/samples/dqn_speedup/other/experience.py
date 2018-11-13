@@ -61,18 +61,15 @@ class ExperienceSource:
 
         history = deque(maxlen=self.steps_count)
 
-        iter_idx = 0
         while True:
-            action_n = self.agent([state]) #length of action_n is always 1
-            next_state, r, is_done, _ = env.step(action_n[0])
-            action = action_n[0]
+            action = self.agent([state])[0]
+            next_state, r, is_done, _ = env.step(action)
 
             history.append(Experience(state=state, action=action, reward=r, done=is_done))
             if len(history) == self.steps_count:
                 yield tuple(history)
             state = next_state
-            if is_done:
-                # generate tail of history
+            if is_done:  # generate tail of history
                 while len(history) >= 1:
                     yield tuple(history)
                     history.popleft()
@@ -80,7 +77,6 @@ class ExperienceSource:
                 self.total_steps.append(1)
                 state = env.reset()
                 history.clear()
-            iter_idx += 1
 
     def pop_total_rewards(self):
         r = self.total_rewards
