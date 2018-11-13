@@ -1,6 +1,16 @@
+import torch
+torch.backends.cudnn.deterministic = True
+torch.manual_seed(999)
+torch.cuda.manual_seed_all(999)
+import numpy as np
+np.random.seed(999)
+import random
+random.seed(999)
+import csv
+
+
 #!/usr/bin/env python3
 import gym
-import ptan
 import argparse
 
 import torch
@@ -13,11 +23,7 @@ from itertools import count
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 
-torch.backends.cudnn.deterministic = True
-torch.manual_seed(999)
-torch.cuda.manual_seed_all(999)
-import csv
-
+import other
 
 
 class Trainer(object):
@@ -26,23 +32,23 @@ class Trainer(object):
         self.params = common.HYPERPARAMS['pong']
         self.env = gym.make('PongNoFrameskip-v4')
         #switch to wrappers from https://github.com/dxyang/DQN_pytorch (deep mind) #TODO
-        self.env = ptan.common.wrappers.wrap_dqn(self.env)
+        self.env = other.common.wrappers.wrap_dqn(self.env)
         self.writer = SummaryWriter(comment="-" + self.params['run_name'] + "-01_original")
         self.policy_net = dqn_model.DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
-        self.target_net = ptan.agent.TargetNet(self.policy_net)
-        self.selector = ptan.actions.EpsilonGreedyActionSelector(epsilon=self.params['epsilon_start'])
+        self.target_net = other.agent.TargetNet(self.policy_net)
+        self.selector = other.actions.EpsilonGreedyActionSelector(epsilon=self.params['epsilon_start'])
         self.epsilon_tracker = common.EpsilonTracker(self.selector, self.params)
-        agent = ptan.agent.DQNAgent(self.policy_net, self.selector, device=self.device)
-        self.exp_source = ptan.experience.ExperienceSourceFirstLast(self.env, agent, gamma=self.params['gamma'], steps_count=1)
-        self.buffer = ptan.experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
+        agent = other.agent.DQNAgent(self.policy_net, self.selector, device=self.device)
+        self.exp_source = other.experience.ExperienceSourceFirstLast(self.env, agent, gamma=self.params['gamma'], steps_count=1)
+        self.buffer = other.experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = common.RewardTracker()
-        csv_file = open('losses.csv', 'r')
-        self.reader = csv.reader(csv_file)
-        self.losses_compare = []
-
-        for row in self.reader:
-            self.losses_compare.append(row[0])
+        # csv_file = open('losses.csv', 'r')
+        # self.reader = csv.reader(csv_file)
+        # self.losses_compare = []
+        #
+        # for row in self.reader:
+        #     self.losses_compare.append(row[0])
 
 
 
@@ -70,8 +76,9 @@ class Trainer(object):
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
-            if loss_v != float(self.losses_compare[counter]):
-                import pdb; pdb.set_trace()
+            print(loss_v)
+            # if loss_v != float(self.losses_compare[counter]):
+            #     import pdb; pdb.set_trace()
             counter += 1
             if counter == 10000:
                 print("done")
