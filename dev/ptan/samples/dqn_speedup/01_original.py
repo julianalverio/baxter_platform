@@ -54,9 +54,10 @@ if __name__ == "__main__":
     csv_reader = csv.reader(csv_file)
 
     losses = []
-    for row in reader:
+    for row in csv_reader:
         losses.append(row[0])
 
+    print('Starting to compare now')
     counter = 0
     with common.RewardTracker(writer, params['stop_reward']) as reward_tracker:
         while True:
