@@ -69,9 +69,7 @@ class ExperienceSource:
 
         iter_idx = 0
         while True:
-            # states_input = states
-            actions = self.agent(states)
-            grouped_actions = [actions] #length of actions is always 1
+            grouped_actions = [self.agent(states)] #length of actions is always 1
 
             global_ofs = 0
             for env_idx, (env, action_n) in enumerate(zip(self.pool, grouped_actions)):
