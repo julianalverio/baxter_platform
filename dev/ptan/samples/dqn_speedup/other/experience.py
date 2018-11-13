@@ -72,7 +72,11 @@ class ExperienceSource:
             grouped_actions = [self.agent(states)] #length of actions is always 1
 
             global_ofs = 0
+            counter = 0
             for env_idx, (env, action_n) in enumerate(zip(self.pool, grouped_actions)):
+                counter += 1
+                if counter > 1:
+                    import pdb; pdb.set_trace()
                 next_state, r, is_done, _ = env.step(action_n[0])
                 next_state_n, r_n, is_done_n = [next_state], [r], [is_done]
 
