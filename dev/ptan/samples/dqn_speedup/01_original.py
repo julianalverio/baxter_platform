@@ -30,7 +30,7 @@ class Trainer(object):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.CUDA = True if torch.cuda.is_available() else False
         self.env = gym.make('PongNoFrameskip-v4')
-        self.env = other.common.wrappers.wrap_dqn(env)
+        self.env = other.common.wrappers.wrap_dqn(self.env)
         self.policy_net = dqn_model.DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
         self.target_net = agent.TargetNet(self.policy_net)
         self.selector = actions.EpsilonGreedyActionSelector(epsilon=self.params['epsilon_start'])
