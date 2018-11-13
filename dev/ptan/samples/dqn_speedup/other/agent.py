@@ -19,23 +19,7 @@ from . import actions
 
 
 class BaseAgent:
-    """
-    Abstract Agent interface
-    """
-    def initial_state(self):
-        """
-        Should create initial empty state for the agent. It will be called for the start of the episode
-        :return: Anything agent want to remember
-        """
-        return None
-
     def __call__(self, states, agent_states):
-        """
-        Convert observations and states into actions to take
-        :param states: list of environment states to process
-        :param agent_states: list of states with the same length as observations
-        :return: tuple of actions, states
-        """
         assert isinstance(states, list)
         assert isinstance(agent_states, list)
         assert len(agent_states) == len(states)
@@ -44,15 +28,10 @@ class BaseAgent:
 
 
 def default_states_preprocessor(states):
-    """
-    Convert list of states into the form suitable for model. By default we assume Variable
-    :param states: list of numpy arrays with states
-    :return: Variable
-    """
-    if len(states) == 1:
-        np_states = np.expand_dims(states[0], 0)
-    else:
-        np_states = np.array([np.array(s, copy=False) for s in states], copy=False)
+    # if len(states) == 1:
+    np_states = np.expand_dims(states[0], 0)
+    # else:
+    #     np_states = np.array([np.array(s, copy=False) for s in states], copy=False)
     return torch.tensor(np_states)
 
 

@@ -143,12 +143,6 @@ class ExperienceReplayBuffer:
         return iter(self.buffer)
 
     def sample(self, batch_size):
-        """
-        Get one random batch from experience replay
-        TODO: implement sampling order policy
-        :param batch_size:
-        :return:
-        """
         if len(self.buffer) <= batch_size:
             return self.buffer
         # Warning: replace=False makes random.choice O(n)
@@ -163,9 +157,5 @@ class ExperienceReplayBuffer:
             self.pos = (self.pos + 1) % self.capacity
 
     def populate(self):
-        """
-        Populates samples into the buffer
-        :param samples: how many samples to populate
-        """
         entry = next(self.experience_source_iter)
         self._add(entry)
