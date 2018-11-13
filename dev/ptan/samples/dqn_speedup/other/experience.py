@@ -140,9 +140,10 @@ def _group_list(items, lens):
     """
     res = []
     cur_ofs = 0
-    for g_len in lens:
-        res.append(items[cur_ofs:cur_ofs+g_len])
-        cur_ofs += g_len
+    # for g_len in lens:
+    res.append(items[cur_ofs:cur_ofs+g_len])
+    # cur_ofs += g_len
+    cur_ofs += 1
     return res
 
 
