@@ -57,11 +57,8 @@ class ExperienceSource:
 
     def __iter__(self):
         states, histories, cur_rewards, cur_steps = [], [], [], []
-        env_lens = [1]
         env = self.pool[0]
-        obs = env.reset()
-        states.append(obs) #states is always [LazyFrameObject] in loop; it is never None; always length 1
-        env_lens.append(1)
+        state = env.reset()
 
         histories.append(deque(maxlen=self.steps_count))
         cur_rewards.append(0.0)
@@ -69,10 +66,9 @@ class ExperienceSource:
 
         iter_idx = 0
         while True:
-            action_n = self.agent(states) #length of action_n is always 1
+            action_n = self.agent([state]) #length of action_n is always 1
             next_state, r, is_done, _ = env.step(action_n[0])
             action = action_n[0]
-            state = states[0]
             history = histories[0]
 
             cur_rewards[0] += r
@@ -81,7 +77,7 @@ class ExperienceSource:
                 history.append(Experience(state=state, action=action, reward=r, done=is_done))
             if len(history) == self.steps_count and iter_idx % self.steps_delta == 0:
                 yield tuple(history)
-            states[0] = next_state
+            state = next_state
             if is_done:
                 # generate tail of history
                 while len(history) >= 1:
@@ -91,7 +87,7 @@ class ExperienceSource:
                 self.total_steps.append(cur_steps[0])
                 cur_rewards[0] = 0.0
                 cur_steps[0] = 0
-                states[0] = env.reset()
+                state = env.reset()
                 history.clear()
             iter_idx += 1
 
@@ -179,11 +175,10 @@ class ExperienceReplayBuffer:
             self.buffer[self.pos] = sample
             self.pos = (self.pos + 1) % self.capacity
 
-    def populate(self, samples):
+    def populate(self):
         """
         Populates samples into the buffer
         :param samples: how many samples to populate
         """
-        for _ in range(samples):
-            entry = next(self.experience_source_iter)
-            self._add(entry)
+        entry = next(self.experience_source_iter)
+        self._add(entry)

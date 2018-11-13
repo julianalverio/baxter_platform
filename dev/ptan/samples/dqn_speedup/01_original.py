@@ -52,7 +52,7 @@ class Trainer(object):
         counter = 0
         while True:
             frame_idx += 1
-            self.buffer.populate(1)
+            self.buffer.populate()
             self.epsilon_tracker.frame(frame_idx)
 
             new_rewards = self.exp_source.pop_total_rewards()
