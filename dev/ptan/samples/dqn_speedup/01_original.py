@@ -75,7 +75,7 @@ class Trainer(object):
             counter += 1
             if counter == 1:
                 print("CHECKING NOW")
-            if counter == 5000:
+            if counter == 2000:
                 print('ALL GOOD')
                 break
             loss_v.backward()

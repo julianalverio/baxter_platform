@@ -69,7 +69,6 @@ class DQNAgent(BaseAgent):
         self.preprocessor = preprocessor
         self.device = device
 
-    # def __call__(self, states, agent_states=None):
     def __call__(self, states):
         if self.preprocessor is not None:
             states = self.preprocessor(states)
