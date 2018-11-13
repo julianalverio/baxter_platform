@@ -32,8 +32,8 @@ class Trainer(object):
         self.epsilon_tracker = common.EpsilonTracker(self.selector, self.params)
         self.agent = ptan.agent.DQNAgent(self.policy_net, self.selector, device=self.device)
         self.exp_source = ptan.experience.ExperienceSourceFirstLast(self.env, self.agent, gamma=self.params['gamma'], steps_count=1)
-        self.buffer = ptan.experience.ExperienceReplayBuffer(self.exp_source, buffer_size=params['replay_size'])
-        self.optimizer = optim.Adam(net.parameters(), lr=params['learning_rate'])
+        self.buffer = ptan.experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
+        self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         csv_file = open('losses.csv', 'r')
         csv_reader = csv.reader(csv_file)
 
