@@ -56,21 +56,19 @@ class ExperienceSource:
         self.vectorized = vectorized
 
     def __iter__(self):
-        histories = []
         env = self.pool[0]
         state = env.reset()
 
-        histories.append(deque(maxlen=self.steps_count))
+        history = deque(maxlen=self.steps_count)
 
         iter_idx = 0
         while True:
             action_n = self.agent([state]) #length of action_n is always 1
             next_state, r, is_done, _ = env.step(action_n[0])
             action = action_n[0]
-            history = histories[0]
 
             history.append(Experience(state=state, action=action, reward=r, done=is_done))
-            if len(history) == self.steps_count and iter_idx % self.steps_delta == 0:
+            if len(history) == self.steps_count:
                 yield tuple(history)
             state = next_state
             if is_done:
