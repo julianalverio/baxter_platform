@@ -69,41 +69,37 @@ class ExperienceSource:
 
         iter_idx = 0
         while True:
-            grouped_actions = [self.agent(states)] #length of actions is always 1
-
             global_ofs = 0
-            # import pdb; pdb.set_trace()
             env = self.pool[0]
-            action_n = grouped_actions[0]
-            # import pdb; pdb.set_trace()
-            # for (_, action_n) in zip(self.pool, grouped_actions):
+            action_n = self.agent(states) #length of action_n is always 1
             next_state, r, is_done, _ = env.step(action_n[0])
-            next_state_n, r_n, is_done_n = [next_state], [r], [is_done]
+            action = action_n[0]
+            # next_state_n, r_n, is_done_n = [next_state], [r], [is_done]
 
-            for ofs, (action, next_state, r, is_done) in enumerate(zip(action_n, next_state_n, r_n, is_done_n)):
-                idx = global_ofs + ofs
-                state = states[idx]
-                history = histories[idx]
+            # for ofs, (action, next_state, r, is_done) in enumerate(zip(action_n, next_state_n, r_n, is_done_n)):
+            idx = global_ofs + ofs
+            state = states[idx]
+            history = histories[idx]
 
-                cur_rewards[idx] += r
-                cur_steps[idx] += 1
-                if state is not None:
-                    history.append(Experience(state=state, action=action, reward=r, done=is_done))
-                if len(history) == self.steps_count and iter_idx % self.steps_delta == 0:
+            cur_rewards[idx] += r
+            cur_steps[idx] += 1
+            if state is not None:
+                history.append(Experience(state=state, action=action, reward=r, done=is_done))
+            if len(history) == self.steps_count and iter_idx % self.steps_delta == 0:
+                yield tuple(history)
+            states[idx] = next_state
+            if is_done:
+                # generate tail of history
+                while len(history) >= 1:
                     yield tuple(history)
-                states[idx] = next_state
-                if is_done:
-                    # generate tail of history
-                    while len(history) >= 1:
-                        yield tuple(history)
-                        history.popleft()
-                    self.total_rewards.append(cur_rewards[idx])
-                    self.total_steps.append(cur_steps[idx])
-                    cur_rewards[idx] = 0.0
-                    cur_steps[idx] = 0
-                    states[idx] = env.reset()
-                    history.clear()
-                global_ofs += len(action_n)
+                    history.popleft()
+                self.total_rewards.append(cur_rewards[idx])
+                self.total_steps.append(cur_steps[idx])
+                cur_rewards[idx] = 0.0
+                cur_steps[idx] = 0
+                states[idx] = env.reset()
+                history.clear()
+            global_ofs += len(action_n)
             iter_idx += 1
 
     def pop_total_rewards(self):
