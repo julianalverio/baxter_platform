@@ -40,12 +40,11 @@ class Trainer(object):
         self.buffer = experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = common.RewardTracker()
-        csv_file = open('losses.csv', 'w+')
-        # csv_reader = csv.reader(csv_file)
-        self.csv_writer = csv.writer(csv_file)
-        # self.losses = []
-        # for row in csv_reader:
-        #     self.losses.append(row[0])
+        csv_file = open('losses.csv', 'r')
+        csv_reader = csv.reader(csv_file)
+        self.losses = []
+        for row in csv_reader:
+            self.losses.append(row[0])
 
 
     def train(self):
@@ -68,21 +67,16 @@ class Trainer(object):
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.CUDA)
             self.csv_writer.writerow([loss_v.item()])
+            if loss_v.item() != float(self.losses[counter]):
+                print('FAILURE')
+                import pdb;
+                pdb.set_trace()
             counter += 1
-            print(counter)
-            if counter == 5000:
-                print('DONE')
+            if counter == 1:
+                print("CHECKING NOW")
+            if counter == 2000:
+                print('ALL GOOD')
                 break
-            # if loss_v.item() != float(self.losses[counter]):
-            #     print('FAILURE')
-            #     import pdb;
-            #     pdb.set_trace()
-            # counter += 1
-            # if counter == 1:
-            #     print("CHECKING NOW")
-            # if counter == 2000:
-            #     print('ALL GOOD')
-            #     break
             loss_v.backward()
             self.optimizer.step()
 
