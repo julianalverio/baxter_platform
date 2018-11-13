@@ -77,7 +77,8 @@ class Trainer(object):
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.device)
             # self.writer.writerow([loss_v.item()])
-            if loss_v != float(self.losses_compare[counter]):
+            print loss_v.item() == float(self.losses_compare[counter])
+            if loss_v.item() != float(self.losses_compare[counter]):
                 import pdb; pdb.set_trace()
             counter += 1
             if counter == 10000:
