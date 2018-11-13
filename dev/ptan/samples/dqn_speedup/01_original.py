@@ -21,7 +21,7 @@ from other import actions, agent, experience
 import other
 import csv
 
-import os; os.environ["CUDA_VISIBLE_DEVICES"]="0"
+import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 
 if __name__ == "__main__":
@@ -45,8 +45,12 @@ if __name__ == "__main__":
     exp_source = experience.ExperienceSourceFirstLast(env, agent, gamma=params['gamma'], steps_count=1)
     buffer = experience.ExperienceReplayBuffer(exp_source, buffer_size=params['replay_size'])
     optimizer = optim.Adam(net.parameters(), lr=params['learning_rate'])
-    csv_file = open('losses.csv', 'w+')
-    csv_writer = csv.writer(csv_file)
+    csv_file = open('losses.csv', 'r')
+    csv_reader = csv.reader(csv_file)
+
+    losses = []
+    for row in csv_reader:
+        losses.append(row[0])
 
     frame_idx = 0
     counter = 0
@@ -67,10 +71,12 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             batch = buffer.sample(params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, net, tgt_net.target_model, gamma=params['gamma'], cuda=args.cuda)
-            csv_writer.writerow([loss_v.item()])
+            if loss_v.item() != float(losses[counter]):
+                print('FAILURE')
+                import pdb; pdb.set_trace()
             counter += 1
-            if counter == 5000:
-                print('DONE')
+            if counter == 3000:
+                print('ALL GOOD')
                 break
             loss_v.backward()
             optimizer.step()
