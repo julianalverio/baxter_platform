@@ -45,6 +45,7 @@ class Trainer(object):
     def train(self):
         frame_idx = 0
         counter = 0
+        game_counter = 0
         with common.RewardTracker(writer, params['stop_reward']) as reward_tracker:
             while True:
                 frame_idx += 1
@@ -53,6 +54,7 @@ class Trainer(object):
 
                 new_rewards = self.exp_source.pop_total_rewards()
                 if new_rewards:
+                    print("Game: %s Score: %s" % (game_counter, new_rewards[0]))
                     if self.reward_tracker.reward(new_rewards[0], frame_idx, self.selector.epsilon):
                         break
 
