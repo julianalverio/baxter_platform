@@ -118,7 +118,7 @@ class RewardTracker:
         self.stop_reward = stop_reward
         self.length = length
         self.rewards = []
-        self.position = []
+        self.position = 0
         self.stop_reward = stop_reward
 
     def add(self, reward):
