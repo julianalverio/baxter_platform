@@ -23,7 +23,7 @@ from tensorboardX import SummaryWriter
 from lib import dqn_model, common
 import csv
 
-import os; os.environ["CUDA_VISIBLE_DEVICES"]="0"
+import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 
 
@@ -50,10 +50,14 @@ if __name__ == "__main__":
     optimizer = optim.Adam(net.parameters(), lr=params['learning_rate'])
 
     frame_idx = 0
-    # csv_file = open('losses.csv', 'w+')
-    # csv_writer = csv.writer(csv_file)
+    csv_file = open('losses.csv', 'r')
+    csv_reader = csv.reader(csv_file)
 
-    # counter = 0
+    losses = []
+    for row in reader:
+        losses.append(row[0])
+
+    counter = 0
     with common.RewardTracker(writer, params['stop_reward']) as reward_tracker:
         while True:
             frame_idx += 1
@@ -71,11 +75,13 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             batch = buffer.sample(params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, net, tgt_net.target_model, gamma=params['gamma'], cuda=args.cuda)
-            # csv_writer.writerow([loss_v.item()])
-            # counter += 1
-            # if counter == 5000:
-            #     print('DONE')
-            #     break
+            if loss_v.item() != float(losses[counter]):
+                print('MISMATCH')
+                import pdb; pdb.set_trace()
+            counter += 1
+            if counter == 5000:
+                print('ALL GOOD')
+                break
             loss_v.backward()
             optimizer.step()
 
