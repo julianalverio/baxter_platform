@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+import torch
+
+torch.backends.cudnn.deterministic = True
+torch.manual_seed(999)
+torch.cuda.manual_seed_all(999)
+import numpy as np
+
+np.random.seed(999)
+import random
+
+random.seed(999)
+
 import gym
 import ptan
 import argparse
@@ -9,6 +21,7 @@ import torch.optim as optim
 from tensorboardX import SummaryWriter
 
 from lib import dqn_model, common
+
 
 
 if __name__ == "__main__":
