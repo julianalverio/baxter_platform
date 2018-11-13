@@ -240,8 +240,8 @@ def wrap_dqn(env, stack_frames=4, episodic_life=True, reward_clipping=True):
         env = EpisodicLifeEnv(env)
     env = NoopResetEnv(env, noop_max=30)
     env = MaxAndSkipEnv(env, skip=4)
-    if 'FIRE' in env.unwrapped.get_action_meanings():
-        env = FireResetEnv(env)
+    # if 'FIRE' in env.unwrapped.get_action_meanings():
+    #     env = FireResetEnv(env)
     env = ProcessFrame84(env)
     env = ImageToPyTorch(env)
     env = FrameStack(env, stack_frames)
