@@ -104,7 +104,7 @@ class Trainer(object):
                 continue
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
-            import pdb; pdb.set_trace
+            import pdb; pdb.set_trace()
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'])
 
             if loss_v.item() != float(self.losses[counter]):
