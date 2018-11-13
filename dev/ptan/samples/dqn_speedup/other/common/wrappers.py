@@ -2,12 +2,12 @@
 # Mostly copy-pasted from https://github.com/openai/baselines/blob/master/baselines/common/atari_wrappers.py
 import torch
 torch.backends.cudnn.deterministic = True
-torch.manual_seed(42)
-torch.cuda.manual_seed_all(42)
+torch.manual_seed(5)
+torch.cuda.manual_seed_all(5)
 import random
-random.seed(42)
+random.seed(5)
 import numpy as np
-np.random.seed(42)
+np.random.seed(5)
 
 
 import numpy as np
