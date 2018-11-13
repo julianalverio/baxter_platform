@@ -60,11 +60,11 @@ class ExperienceSource:
         state = env.reset()
 
         history = deque(maxlen=self.steps_count)
-
+        cumulative_reward = []
         while True:
             action = self.agent([state])[0]
             next_state, r, is_done, _ = env.step(action)
-
+            cumulative_reward.append(r)
             history.append(Experience(state=state, action=action, reward=r, done=is_done))
             if len(history) == self.steps_count:
                 yield tuple(history)
@@ -73,7 +73,7 @@ class ExperienceSource:
                 while len(history) >= 1:
                     yield tuple(history)
                     history.popleft()
-                self.total_rewards.append(r)
+                self.total_rewards.append(sum(r))
                 self.total_steps.append(1)
                 state = env.reset()
                 history.clear()
