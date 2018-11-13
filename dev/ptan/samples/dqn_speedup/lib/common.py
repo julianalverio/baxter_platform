@@ -1,13 +1,3 @@
-import torch
-torch.backends.cudnn.deterministic = True
-torch.manual_seed(999)
-torch.cuda.manual_seed_all(999)
-import numpy as np
-np.random.seed(999)
-import random
-random.seed(999)
-import csv
-
 import sys
 import time
 import numpy as np
@@ -115,21 +105,37 @@ def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=False, cuda_async=False):
 
 
 class RewardTracker:
-    def __init__(self, stop_reward=18, length=100):
+    def __init__(self, writer, stop_reward):
+        self.writer = writer
         self.stop_reward = stop_reward
-        self.rewards = []
-        self.position = 0
-        self.length = length
 
-    def add(self, reward):
-        if len(self.rewards) < self.length:
-            self.rewards.append(reward)
-        else:
-            self.rewards[self.position] = reward
-            self.position = (self.position + 1) % self.length
+    def __enter__(self):
+        self.ts = time.time()
+        self.ts_frame = 0
+        self.total_rewards = []
+        return self
 
-        # check if done
-        if np.mean(self.rewards) > self.stop_reward:
+    def __exit__(self, *args):
+        self.writer.close()
+
+    def reward(self, reward, frame, epsilon=None):
+        self.total_rewards.append(reward)
+        speed = (frame - self.ts_frame) / (time.time() - self.ts)
+        self.ts_frame = frame
+        self.ts = time.time()
+        mean_reward = np.mean(self.total_rewards[-100:])
+        epsilon_str = "" if epsilon is None else ", eps %.2f" % epsilon
+        print("%d: done %d games, mean reward %.3f, speed %.2f f/s%s" % (
+            frame, len(self.total_rewards), mean_reward, speed, epsilon_str
+        ))
+        sys.stdout.flush()
+        if epsilon is not None:
+            self.writer.add_scalar("epsilon", epsilon, frame)
+        self.writer.add_scalar("speed", speed, frame)
+        self.writer.add_scalar("reward_100", mean_reward, frame)
+        self.writer.add_scalar("reward", reward, frame)
+        if mean_reward > self.stop_reward:
+            print("Solved in %d frames!" % frame)
             return True
         return False
 

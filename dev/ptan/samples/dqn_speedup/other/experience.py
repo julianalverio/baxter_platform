@@ -1,15 +1,3 @@
-import torch
-torch.backends.cudnn.deterministic = True
-torch.manual_seed(999)
-torch.cuda.manual_seed_all(999)
-import numpy as np
-np.random.seed(999)
-import random
-random.seed(999)
-import csv
-
-
-
 import gym
 import torch
 import random
