@@ -69,14 +69,9 @@ class ExperienceSource:
 
         iter_idx = 0
         while True:
-            actions = [None] * len(states)
-            # states_input = []
-            states_indices = []
+            actions = [None]
             states_input = states
             states_indices = [0]
-            # for idx, state in enumerate(states):
-            #     states_input.append(state)
-            #     states_indices.append(idx)
             if states_input:
                 states_actions = self.agent(states_input)
                 for idx, action in enumerate(states_actions):
