@@ -18,15 +18,6 @@ class ActionSelector:
         raise NotImplementedError
 
 
-class ArgmaxActionSelector(ActionSelector):
-    """
-    Selects actions using argmax
-    """
-    def __call__(self, scores):
-        assert isinstance(scores, np.ndarray)
-        return np.argmax(scores, axis=1)
-
-
 class EpsilonGreedyActionSelector(ActionSelector):
     def __init__(self, epsilon=0.05, selector=None):
         self.epsilon = epsilon
@@ -41,14 +32,3 @@ class EpsilonGreedyActionSelector(ActionSelector):
         actions[mask] = rand_actions
         return actions
 
-
-class ProbabilityActionSelector(ActionSelector):
-    """
-    Converts probabilities of actions into action by sampling them
-    """
-    def __call__(self, probs):
-        assert isinstance(probs, np.ndarray)
-        actions = []
-        for prob in probs:
-            actions.append(np.random.choice(len(prob), p=prob))
-        return np.array(actions)
