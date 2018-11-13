@@ -66,16 +66,20 @@ class Trainer(object):
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
             loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'], cuda=self.CUDA)
-            if loss_v.item() != float(self.losses[counter]):
-                print('FAILURE')
-                import pdb;
-                pdb.set_trace()
+            print('Game: %s Score: %s Mean Score: %s' % (len(self.reward_tracker.rewards), self.reward_tracker.rewards[-1], np.mean(self.reward_tracker.rewards)))
+            if (len(self.reward_tracker.rewards) % 100 == 0):
+                self.target_net.save('pong_%s.pth' % len(self.reward_tracker.rewards))
+                print('Model Saved!')
+            # if loss_v.item() != float(self.losses[counter]):
+            #     print('FAILURE')
+            #     import pdb;
+            #     pdb.set_trace()
             counter += 1
-            if counter == 1:
-                print("CHECKING NOW")
-            if counter == 2000:
-                print('ALL GOOD')
-                break
+            # if counter == 1:
+            #     print("CHECKING NOW")
+            # if counter == 2000:
+            #     print('ALL GOOD')
+            #     break
             loss_v.backward()
             self.optimizer.step()
 

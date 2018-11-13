@@ -51,6 +51,9 @@ class TargetNet:
     def sync(self):
         self.target_model.load_state_dict(self.model.state_dict())
 
+    def save(self, name):
+        torch.save(self.target_model, name)
+
 
 
 
