@@ -114,7 +114,7 @@ def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=False, cuda_async=False):
 
 
 class RewardTracker:
-    def __init__(self, length=100, stop_reward=18):
+    def __init__(self, length=100, stop_reward=20):
         self.stop_reward = stop_reward
         self.length = length
         self.rewards = []
