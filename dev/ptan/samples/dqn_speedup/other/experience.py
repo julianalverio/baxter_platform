@@ -56,13 +56,11 @@ class ExperienceSource:
         self.vectorized = vectorized
 
     def __iter__(self):
-        states, histories, cur_rewards, cur_steps = [], [], [], []
+        histories  = []
         env = self.pool[0]
         state = env.reset()
 
         histories.append(deque(maxlen=self.steps_count))
-        cur_rewards.append(0.0)
-        cur_steps.append(0)
 
         iter_idx = 0
         while True:
@@ -71,8 +69,6 @@ class ExperienceSource:
             action = action_n[0]
             history = histories[0]
 
-            cur_rewards[0] += r
-            cur_steps[0] += 1
             if state is not None:
                 history.append(Experience(state=state, action=action, reward=r, done=is_done))
             if len(history) == self.steps_count and iter_idx % self.steps_delta == 0:
@@ -83,10 +79,8 @@ class ExperienceSource:
                 while len(history) >= 1:
                     yield tuple(history)
                     history.popleft()
-                self.total_rewards.append(cur_rewards[0])
-                self.total_steps.append(cur_steps[0])
-                cur_rewards[0] = 0.0
-                cur_steps[0] = 0
+                self.total_rewards.append(r)
+                self.total_steps.append(1)
                 state = env.reset()
                 history.clear()
             iter_idx += 1
