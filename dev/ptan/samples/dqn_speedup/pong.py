@@ -152,7 +152,7 @@ class Trainer(object):
                 continue
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
-            loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'])
+            loss_v = calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'])
 
             if loss_v.item() != float(self.losses[counter]):
                 print('FAILURE')
