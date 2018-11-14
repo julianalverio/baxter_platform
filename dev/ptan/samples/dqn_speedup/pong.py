@@ -75,14 +75,13 @@ def unpack_batch(batch):
 def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
     ExperienceFirstLast = collections.namedtuple('ExperienceFirstLast', ('state', 'action', 'reward', 'next_state'))
     batch = ExperienceFirstLast(*zip(*batch))
-    import pdb; pdb.set_trace()
     non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                             batch.next_state)), device=torch.device('cuda'), dtype=torch.uint8)
     non_final_next_states = [np.array(s, copy=False) for s in batch.next_state if s is not None]
     import pdb; pdb.set_trace()
     state_batch = torch.tensor(np.array([np.array(state, copy=False) for state in batch.state], copy=False))
-    action_batch = torch.cat(batch.action)
-    reward_batch = torch.cat(batch.reward)
+    action_batch = torch.cat([x for x in batch.action])
+    reward_batch = torch.cat([x for x in batch.reward])
     state_action_values = self.policy_net(state_batch).gather(1, action_batch)
     next_state_values = torch.zeros(self.batch_size * self.steps_before_optimize, device=torch.device('cuda'))
     next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
