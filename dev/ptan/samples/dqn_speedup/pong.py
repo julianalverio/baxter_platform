@@ -120,6 +120,29 @@ def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
 
 
 
+class ReplayMemory(object):
+
+    def __init__(self, capacity, transition):
+        self.capacity = capacity
+        self.memory = []
+        self.position = 0
+        self.transition = transition
+
+    def push(self, *args):
+        if len(self.memory) < self.capacity:
+            self.memory.append(None)
+        self.memory[self.position] = self.transition(*args)
+        self.position = (self.position + 1) % self.capacity
+
+    def sample(self, batch_size):
+        return random.sample(self.memory, batch_size)
+
+    def __len__(self):
+        return len(self.memory)
+
+
+
+
 
 class Trainer(object):
     def __init__(self):
@@ -144,6 +167,7 @@ class Trainer(object):
         self.episode = 0
 
 
+
     def train(self):
         frame_idx = 0
         counter = 0
@@ -152,6 +176,7 @@ class Trainer(object):
             self.buffer.populate()
             self.epsilon_tracker.frame(frame_idx)
 
+            #is this round over?
             new_rewards = self.exp_source.pop_total_rewards()
             if new_rewards:
                 self.episode += 1
@@ -162,14 +187,17 @@ class Trainer(object):
                 if (len(self.reward_tracker.rewards) % 100 == 0):
                     self.target_net.save('pong_%s.pth' % len(self.reward_tracker.rewards))
                     print('Model Saved!')
+                #did qwe beat the challenge?
                 if done:
                     break
 
+            #are we not done prefetching?
             if len(self.buffer) < self.params['replay_initial']:
                 continue
+
             self.optimizer.zero_grad()
             batch = self.buffer.sample(self.params['batch_size'])
-            loss_v = calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'])
+            loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'])
 
             if loss_v.item() != float(self.losses[counter]):
                 print('FAILURE')
