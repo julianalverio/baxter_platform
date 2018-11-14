@@ -73,7 +73,7 @@ def unpack_batch(batch):
 
 
 def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
-    ExperienceFirstLast = collections.namedtuple('ExperienceFirstLast', ('state', 'action', 'reward', 'last_state'))
+    ExperienceFirstLast = collections.namedtuple('ExperienceFirstLast', ('state', 'action', 'reward', 'next_state'))
     batch = ExperienceFirstLast(*zip(*batch))
     non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                             batch.next_state)), device=self.device, dtype=torch.uint8)
