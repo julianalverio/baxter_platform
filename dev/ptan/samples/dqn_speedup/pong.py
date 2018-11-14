@@ -80,8 +80,8 @@ def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
     non_final_next_states = [np.array(s, copy=False) for s in batch.next_state if s is not None]
     import pdb; pdb.set_trace()
     state_batch = torch.tensor(np.array([np.array(state, copy=False) for state in batch.state], copy=False))
-    action_batch = torch.cat([torch.tensor(x) for x in batch.action])
-    reward_batch = torch.cat([torch.tensor(x) for x in batch.reward])
+    action_batch = torch.cat([torch.tensor(int(x)) for x in batch.action])
+    reward_batch = torch.cat([torch.tensor(int(x)) for x in batch.reward])
     state_action_values = self.policy_net(state_batch).gather(1, action_batch)
     next_state_values = torch.zeros(self.batch_size * self.steps_before_optimize, device=torch.device('cuda'))
     next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
