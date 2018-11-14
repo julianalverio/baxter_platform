@@ -79,7 +79,7 @@ def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
                                             batch.next_state)), device=torch.device('cuda'), dtype=torch.uint8)
     import pdb; pdb.set_trace()
     non_final_next_states = [np.array(s, copy=False) for s in batch.next_state if s is not None]
-    state_batch = torch.cat(batch.state)
+    state_batch = torch.cat(list(batch.state))
     action_batch = torch.cat(batch.action)
     reward_batch = torch.cat(batch.reward)
     state_action_values = self.policy_net(state_batch).gather(1, action_batch)
