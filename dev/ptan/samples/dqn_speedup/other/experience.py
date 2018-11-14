@@ -95,7 +95,6 @@ class ExperienceSource:
 
 
 # those entries are emitted from ExperienceSourceFirstLast. Reward is discounted over the trajectory piece
-ExperienceFirstLast = collections.namedtuple('ExperienceFirstLast', ('state', 'action', 'reward', 'last_state'))
 
 
 class ExperienceSourceFirstLast(ExperienceSource):
