@@ -76,29 +76,47 @@ def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
     ExperienceFirstLast = collections.namedtuple('ExperienceFirstLast', ('state', 'action', 'reward', 'last_state'))
     import pdb; pdb.set_trace()
     batch = ExperienceFirstLast(*zip(*batch))
-
-    states, actions, rewards, dones, next_states = unpack_batch(batch)
-
-    states_v = torch.tensor(states)
-    next_states_v = torch.tensor(next_states)
-    actions_v = torch.tensor(actions)
-    rewards_v = torch.tensor(rewards)
-    done_mask = torch.ByteTensor(dones)
-    if cuda:
-        states_v = states_v.cuda(non_blocking=cuda_async)
-        next_states_v = next_states_v.cuda(non_blocking=cuda_async)
-        actions_v = actions_v.cuda(non_blocking=cuda_async)
-        rewards_v = rewards_v.cuda(non_blocking=cuda_async)
-        done_mask = done_mask.cuda(non_blocking=cuda_async)
-
-    state_action_values = net(states_v).gather(1, actions_v.unsqueeze(-1)).squeeze(-1)
-    next_state_values = tgt_net(next_states_v).max(1)[0]
-    next_state_values[done_mask] = 0.0
-
-    expected_state_action_values = next_state_values.detach() * gamma + rewards_v
+    non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
+                                            batch.next_state)), device=self.device, dtype=torch.uint8)
+    non_final_next_states = torch.cat([s for s in batch.next_state
+                                       if s is not None])
+    state_batch = torch.cat(batch.state)
+    action_batch = torch.cat(batch.action)
+    reward_batch = torch.cat(batch.reward)
+    state_action_values = self.policy_net(state_batch).gather(1, action_batch)
+    next_state_values = torch.zeros(self.batch_size * self.steps_before_optimize, device=self.device)
+    next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
+    expected_state_action_values = (next_state_values * self.gamma) + reward_batch
     return nn.MSELoss()(state_action_values, expected_state_action_values)
 
+    #From my old pong:
+    # self.optimizer.zero_grad()
+    # loss.backward()
+    # for param in self.policy_net.parameters():
+    #     param.grad.data.clamp_(-1, 1)
+    # self.optimizer.step()
 
+
+    # states, actions, rewards, dones, next_states = unpack_batch(batch)
+    #
+    # states_v = torch.tensor(states)
+    # next_states_v = torch.tensor(next_states)
+    # actions_v = torch.tensor(actions)
+    # rewards_v = torch.tensor(rewards)
+    # done_mask = torch.ByteTensor(dones)
+    # if cuda:
+    #     states_v = states_v.cuda(non_blocking=cuda_async)
+    #     next_states_v = next_states_v.cuda(non_blocking=cuda_async)
+    #     actions_v = actions_v.cuda(non_blocking=cuda_async)
+    #     rewards_v = rewards_v.cuda(non_blocking=cuda_async)
+    #     done_mask = done_mask.cuda(non_blocking=cuda_async)
+    #
+    # state_action_values = net(states_v).gather(1, actions_v.unsqueeze(-1)).squeeze(-1)
+    # next_state_values = tgt_net(next_states_v).max(1)[0]
+    # next_state_values[done_mask] = 0.0
+    #
+    # expected_state_action_values = next_state_values.detach() * gamma + rewards_v
+    # return nn.MSELoss()(state_action_values, expected_state_action_values)
 
 
 
