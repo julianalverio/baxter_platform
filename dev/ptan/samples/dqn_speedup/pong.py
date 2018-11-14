@@ -56,7 +56,6 @@ class EpsilonTracker:
         self.epsilon_greedy_selector.epsilon = \
             max(self.epsilon_final, self.epsilon_start - frame / self.epsilon_frames)
 
-ExperienceFirstLast = collections.namedtuple('ExperienceFirstLast', ('state', 'action', 'reward', 'last_state'))
 def unpack_batch(batch):
     states, actions, rewards, dones, last_states = [], [], [], [], []
     for exp in batch:
@@ -74,6 +73,7 @@ def unpack_batch(batch):
 
 
 def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
+    ExperienceFirstLast = collections.namedtuple('ExperienceFirstLast', ('state', 'action', 'reward', 'last_state'))
     import pdb; pdb.set_trace()
     batch = ExperienceFirstLast(*zip(*batch))
 
