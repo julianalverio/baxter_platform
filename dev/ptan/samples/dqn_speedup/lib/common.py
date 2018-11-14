@@ -50,6 +50,7 @@ def unpack_batch(batch):
 
 def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
     states, actions, rewards, dones, next_states = unpack_batch(batch)
+    import pdb; pdb.set_trace()
 
     states_v = torch.tensor(states)
     next_states_v = torch.tensor(next_states)
