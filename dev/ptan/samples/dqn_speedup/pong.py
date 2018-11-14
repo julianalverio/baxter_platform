@@ -78,7 +78,7 @@ def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
     non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                             batch.next_state)), device=torch.device('cuda'), dtype=torch.uint8)
     import pdb; pdb.set_trace()
-    non_final_next_states = [s for s in batch.next_state
+    non_final_next_states = [np.array(s, copy=False) for s in batch.next_state
                                        if s is not None]
     state_batch = torch.cat(batch.state)
     action_batch = torch.cat(batch.action)
