@@ -181,7 +181,7 @@ class Trainer(object):
             self.state = self.env.reset()
             self.episode += 1
         else:
-            self.memory.push(self.state, action), torch.tensor([reward], device=self.device), next_state)
+            self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state)
             self.state = next_state
         return done
 
