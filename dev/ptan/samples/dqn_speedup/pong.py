@@ -110,13 +110,13 @@ class RewardTracker:
 
 class EpsilonTracker:
     def __init__(self, params):
-        self.epsilon = params['epsilon_start']
+        self._epsilon = params['epsilon_start']
         self.epsilon_final = params['epsilon_final']
         self.epsilon_delta = 1.0 * (params['epsilon_start'] - params['epsilon_final']) / params['epsilon_frames']
 
     def epsilon(self):
-        old_epsilon = self.epsilon
-        self.epsilon -= self.epsilon_delta
+        old_epsilon = self._epsilon
+        self._epsilon -= self.epsilon_delta
         return max(old_epsilon, self.epsilon_final)
 
 
