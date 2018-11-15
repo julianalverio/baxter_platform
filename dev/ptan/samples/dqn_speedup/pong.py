@@ -32,8 +32,9 @@ import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 
 class DQN(nn.Module):
-    def __init__(self, input_shape, n_actions):
+    def __init__(self, input_shape, n_actions, device):
         super(DQN, self).__init__()
+        self.device = device
 
         self.conv = nn.Sequential(
             nn.Conv2d(input_shape[0], 32, kernel_size=8, stride=4),
@@ -213,7 +214,7 @@ class Trainer(object):
         self.env = gym.make('PongNoFrameskip-v4')
 
         self.env = other.common.wrappers.wrap_dqn(self.env)
-        self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
+        self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
         self.target_net = TargetNet(self.policy_net)
         # self.selector = actions.EpsilonGreedyActionSelector(epsilon=self.params['epsilon_start'])
         self.epsilon_tracker = EpsilonTracker(self.params)
