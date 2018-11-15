@@ -187,7 +187,6 @@ class Trainer(object):
 
 
     def calculateLoss(self):
-        import pdb; pdb.set_trace()
         transitions = self.memory.sample(self.batch_size)
         batch = self.transition(*zip(*transitions))
 
