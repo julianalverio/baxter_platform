@@ -20,6 +20,7 @@ from lib import dqn_model, common
 from other import actions, agent, experience
 import other
 import csv
+import torch.nn as nn
 import collections
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"

@@ -18,7 +18,6 @@ import os
 import datetime
 import yagmail
 import csv
-import torch.nn as nn
 import copy
 #HACK SPECIFIC TO MELVILLE
 import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
