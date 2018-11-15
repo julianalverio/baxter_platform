@@ -65,12 +65,9 @@ class DQNAgent(object):
         self.device = device
 
     def __call__(self, state):
-        import pdb; pdb.set_trace()
         state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
         q_v = self.dqn_model(state)
         return q_v
-        # q = q_v.data.cpu().numpy()
-        # return q
 
 
 class TargetNet:
@@ -238,8 +235,7 @@ class Trainer(object):
         if random.random() < self.epsilon_tracker.epsilon():
             action = random.randrange(self.env.action_space.n)
         else:
-            import pdb; pdb.set_trace()
-            action = torch.argmax(self.agent(self.state), dim=0)
+            action = torch.argmax(self.agent(self.state), dim=1)
         next_state, reward, done, _ = self.env.step(action)
         self.score += reward
         if done:
