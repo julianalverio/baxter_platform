@@ -171,9 +171,9 @@ class Trainer(object):
 
     def addExperience(self):
         if random.random() < self.epsilon_tracker.epsilon():
-            action = random.randrange(self.env.action_space.n)
+            action = torch.tensor([random.randrange(self.env.action_space.n)])
         else:
-            action = torch.tensor(torch.argmax(self.policy_net(self.state), dim=1))
+            action = torch.argmax(self.policy_net(self.state), dim=1)
         next_state, reward, done, _ = self.env.step(action.item())
         self.score += reward
         if done:
