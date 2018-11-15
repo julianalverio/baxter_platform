@@ -9,7 +9,6 @@ from tensorboardX import SummaryWriter
 
 from lib import dqn_model, common
 
-import pdb; pdb.set_trace()
 import sys; import os; sys.path.insert(0, os.getcwd())
 import ptan
 
