@@ -18,6 +18,7 @@ import os
 import datetime
 import yagmail
 import csv
+import torch.nn as nn
 import copy
 #HACK SPECIFIC TO MELVILLE
 import sys; sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages')
@@ -50,6 +51,7 @@ class ReplayMemory(object):
     def push(self, *args):
         if len(self.memory) < self.capacity:
             self.memory.append(None)
+        self.memory[self.position] = self.transition(*args)
         self.position = (self.position + 1) % self.capacity
 
     def sample(self, batch_size):
