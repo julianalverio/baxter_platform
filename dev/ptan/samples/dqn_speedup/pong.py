@@ -190,6 +190,7 @@ class Trainer(object):
         transitions = self.memory.sample(self.batch_size)
         batch = self.transition(*zip(*transitions))
 
+        import pdb; pdb.set_trace()
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                                 batch.next_state)), device=self.device, dtype=torch.uint8)
         non_final_next_states = torch.cat([s for s in batch.next_state
