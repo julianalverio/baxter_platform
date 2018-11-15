@@ -79,6 +79,7 @@ class ExperienceSource:
                     states_input.append(state)
                     states_indices.append(idx)
             if states_input:
+                import pdb; pdb.set_trace()
                 states_actions, new_agent_states = self.agent(states_input, agent_states)
                 for idx, action in enumerate(states_actions):
                     g_idx = states_indices[idx]
