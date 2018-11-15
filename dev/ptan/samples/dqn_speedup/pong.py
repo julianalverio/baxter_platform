@@ -25,6 +25,65 @@ import collections
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 
+
+class DQN(nn.Module):
+    def __init__(self, input_shape, n_actions):
+        super(DQN, self).__init__()
+
+        self.conv = nn.Sequential(
+            nn.Conv2d(input_shape[0], 32, kernel_size=8, stride=4),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=4, stride=2),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1),
+            nn.ReLU()
+        )
+
+        conv_out_size = self._get_conv_out(input_shape)
+        self.fc = nn.Sequential(
+            nn.Linear(conv_out_size, 512),
+            nn.ReLU(),
+            nn.Linear(512, n_actions)
+        )
+
+    def _get_conv_out(self, shape):
+        o = self.conv(Variable(torch.zeros(1, *shape)))
+        return int(np.prod(o.size()))
+
+    def forward(self, x):
+        fx = x.float() / 256
+        conv_out = self.conv(fx).view(fx.size()[0], -1)
+        return self.fc(conv_out)
+
+
+class DQNAgent(BaseAgent):
+    def __init__(self, dqn_model, device="cpu"):
+        self.dqn_model = dqn_model
+        self.device = device
+
+    def __call__(self, state):
+        state = torch.tensor(np.expand_dims(states[0], 0))
+        # if torch.is_tensor(states):
+        #     states = states.to(self.device)
+        q_v = self.dqn_model(states)
+        q = q_v.data.cpu().numpy()
+        return q
+        # actions = self.action_selector(q)
+        # return actions
+
+
+class TargetNet:
+    def __init__(self, model):
+        self.model = model
+        self.target_model = copy.deepcopy(model)
+
+    def sync(self):
+        self.target_model.load_state_dict(self.model.state_dict())
+
+    def save(self, name):
+        torch.save(self.target_model, name)
+
+
 class RewardTracker:
     def __init__(self, length=100, stop_reward=20):
         self.stop_reward = stop_reward
@@ -152,10 +211,10 @@ class Trainer(object):
 
         self.env = other.common.wrappers.wrap_dqn(self.env)
         self.policy_net = dqn_model.DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
-        self.target_net = agent.TargetNet(self.policy_net)
+        self.target_net = TargetNet(self.policy_net)
         # self.selector = actions.EpsilonGreedyActionSelector(epsilon=self.params['epsilon_start'])
         self.epsilon_tracker = EpsilonTracker(self.params)
-        self.agent = agent.DQNAgent(self.policy_net, self.selector, device=self.device)
+        self.agent = DQNAgent(self.policy_net, device=self.device)
         # self.exp_source = experience.ExperienceSourceFirstLast(self.env, self.agent, gamma=self.params['gamma'], steps_count=1)
         # self.buffer = experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
@@ -217,6 +276,7 @@ class Trainer(object):
         frame_idx = 0
         while True:
             frame_idx += 1
+            import pdb; pdb.set_trace()
             game_over = self.addExperience()
 
             # is this round over?

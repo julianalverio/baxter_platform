@@ -28,9 +28,8 @@ class BaseAgent:
 
 
 class DQNAgent(BaseAgent):
-    def __init__(self, dqn_model, action_selector, device="cpu"):
+    def __init__(self, dqn_model, device="cpu"):
         self.dqn_model = dqn_model
-        self.action_selector = action_selector
         self.device = device
 
     def __call__(self, states):
