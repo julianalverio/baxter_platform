@@ -23,6 +23,7 @@ import csv
 import torch.nn as nn
 import collections
 import copy
+from collections import namedtuple
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
