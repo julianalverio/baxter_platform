@@ -242,7 +242,7 @@ class Trainer(object):
             action = random.randrange(self.env.action_space.n)
         else:
             import pdb; pdb.set_trace()
-            action = torch.argmax(self.policy_net(self.state), dim=0)
+            action = torch.argmax(self.agent(self.state), dim=0)
         next_state, reward, done, _ = self.env.step(action)
         self.score += reward
         if done:
