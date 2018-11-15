@@ -53,21 +53,23 @@ class DQN(nn.Module):
         o = self.conv(Variable(torch.zeros(1, *shape)))
         return int(np.prod(o.size()))
 
-    def forward(self, x):
-        fx = x.float() / 256
-        conv_out = self.conv(fx).view(fx.size()[0], -1)
-        return self.fc(conv_out)
+    # input is a lazyframes object
+    def forward(self, state):
+        x = torch.tensor(np.expand_dims(state, 0)).to(self.device)
+        x = x.float() / 256
+        x = self.conv(x).view(x.size()[0], -1)
+        return self.fc(x)
 
 
-class DQNAgent(object):
-    def __init__(self, dqn_model, device="cpu"):
-        self.dqn_model = dqn_model
-        self.device = device
-
-    def __call__(self, state):
-        state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
-        q_v = self.dqn_model(state)
-        return q_v
+# class DQNAgent(object):
+#     def __init__(self, dqn_model, device="cpu"):
+#         self.dqn_model = dqn_model
+#         self.device = device
+#
+#     def __call__(self, state):
+#         state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
+#         q_v = self.dqn_model(state)
+#         return q_v
 
 
 class TargetNet:
@@ -235,7 +237,7 @@ class Trainer(object):
         if random.random() < self.epsilon_tracker.epsilon():
             action = random.randrange(self.env.action_space.n)
         else:
-            action = torch.argmax(self.agent(self.state), dim=1)
+            action = torch.argmax(self.policy_net(self.state), dim=1)
         next_state, reward, done, _ = self.env.step(action)
         self.score += reward
         if done:
