@@ -187,6 +187,7 @@ class Trainer(object):
 
 
     def calculateLoss(self):
+        import pdb; pdb.set_trace()
         transitions = self.memory.sample(self.batch_size)
         batch = self.transition(*zip(*transitions))
 
@@ -214,12 +215,14 @@ class Trainer(object):
 
             # is this round over?
             if game_over:
+                self.reward_tracker.add(self.score)
                 print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 if (self.episode % 100 == 0):
                     self.target_net.save('pong_%s.pth' % self.episode)
                     print('Model Saved!')
                 if self.reward_tracker.meanScore() > 20:
                     print('Challenge Won in %s Episodes' % self.episode)
+                self.score = 0
 
             # are we done prefetching?
             if len(self.memory) < self.params['replay_initial']:
