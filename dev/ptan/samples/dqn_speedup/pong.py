@@ -161,7 +161,7 @@ class Trainer(object):
         self.epsilon_tracker = EpsilonTracker(self.params)
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = RewardTracker()
-        self.transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
+        self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state'))
         self.memory = ReplayMemory(self.params['replay_size'], self.transition)
         self.episode = 0
         self.state = self.env.reset()
