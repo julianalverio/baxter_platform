@@ -214,7 +214,7 @@ class Trainer(object):
         self.target_net = TargetNet(self.policy_net)
         # self.selector = actions.EpsilonGreedyActionSelector(epsilon=self.params['epsilon_start'])
         self.epsilon_tracker = EpsilonTracker(self.params)
-        self.agent = DQNAgent(self.policy_net, device=self.device)
+        # self.agent = DQNAgent(self.policy_net, device=self.device)
         # self.exp_source = experience.ExperienceSourceFirstLast(self.env, self.agent, gamma=self.params['gamma'], steps_count=1)
         # self.buffer = experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
