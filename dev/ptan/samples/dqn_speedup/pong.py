@@ -230,7 +230,7 @@ class Trainer(object):
         # for row in csv_reader:
         #     self.losses.append(row[0])
         self.episode = 0
-        self.state = None
+        self.state = self.env.reset()
         self.score = 0
         self.batch_size = self.params['batch_size']
 
