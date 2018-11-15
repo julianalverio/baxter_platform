@@ -237,10 +237,10 @@ class Trainer(object):
 
 
     def addExperience(self):
-        import pdb; pdb.set_trace()
         if random.random() < self.epsilon_tracker.epsilon():
             action = random.randrange(self.env.action_space.n)
         else:
+            import pdb; pdb.set_trace()
             action = torch.argmax(self.policy_net(self.state), dim=0)
         next_state, reward, done, _ = self.env.step(action)
         self.score += reward
@@ -279,7 +279,6 @@ class Trainer(object):
         frame_idx = 0
         while True:
             frame_idx += 1
-            import pdb; pdb.set_trace()
             game_over = self.addExperience()
 
             # is this round over?
