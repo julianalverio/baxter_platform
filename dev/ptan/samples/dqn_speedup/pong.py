@@ -65,9 +65,10 @@ class DQNAgent(object):
         self.device = device
 
     def __call__(self, state):
-        state = torch.tensor(np.expand_dims(states[0], 0))
+        import pdb; pdb.set_trace()
+        state = torch.tensor(np.expand_dims(states[0], 0)).to(self.device)
         # if torch.is_tensor(states):
-        #     states = states.to(self.device)
+        state = state.to(self.device)
         q_v = self.dqn_model(states)
         q = q_v.data.cpu().numpy()
         return q
