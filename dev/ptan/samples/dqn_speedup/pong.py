@@ -57,7 +57,7 @@ class DQN(nn.Module):
         return self.fc(conv_out)
 
 
-class DQNAgent(BaseAgent):
+class DQNAgent(object):
     def __init__(self, dqn_model, device="cpu"):
         self.dqn_model = dqn_model
         self.device = device
