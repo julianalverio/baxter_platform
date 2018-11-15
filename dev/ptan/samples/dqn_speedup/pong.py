@@ -55,6 +55,7 @@ class DQN(nn.Module):
 
     # input is a lazyframes object
     def forward(self, state):
+        import pdb; pdb.set_trace()
         x = torch.tensor(np.expand_dims(state, 0)).to(self.device)
         x = x.float() / 256
         x = self.conv(x).view(x.size()[0], -1)
