@@ -72,10 +72,13 @@ class DQN(nn.Module):
         o = self.conv(Variable(torch.zeros(1, *shape)))
         return int(np.prod(o.size()))
 
+    def preprocess(self, state):
+        state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
+        return state.float() / 256
+
     # input is a lazyframes object
     def forward(self, state):
-        x = torch.tensor(np.expand_dims(state, 0)).to(self.device)
-        x = x.float() / 256
+        x = self.preprocess(state)
         x = self.conv(x).view(x.size()[0], -1)
         return self.fc(x)
 
@@ -190,11 +193,9 @@ class Trainer(object):
         transitions = self.memory.sample(self.batch_size)
         batch = self.transition(*zip(*transitions))
 
+        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
         import pdb; pdb.set_trace()
-        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
-                                                batch.next_state)), device=self.device, dtype=torch.uint8)
-        non_final_next_states = torch.cat([s for s in batch.next_state
-                                           if s is not None])
+        non_final_next_states = torch.cat([self.policy_net.preprocess(s) for s in batch.next_state if s is not None])
         state_batch = torch.cat(list(batch.state))
         action_batch = torch.cat(list(batch.action))
         reward_batch = torch.cat(list(batch.reward))
