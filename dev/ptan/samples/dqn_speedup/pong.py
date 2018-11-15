@@ -32,6 +32,7 @@ class RewardTracker:
         self.rewards = []
         self.position = 0
         self.stop_reward = stop_reward
+        self.mean_score = 0
 
     def add(self, reward):
         if len(self.rewards) < self.length:
@@ -39,54 +40,55 @@ class RewardTracker:
         else:
             self.rewards[self.position] = reward
             self.position = (self.position + 1) % self.length
-        if np.mean(self.rewards) >= self.stop_reward:
-            return True
-        return False
+        self.mean_score = np.mean(self.rewards)
+
+    def meanScore(self):
+        return self.mean_score
 
 
 class EpsilonTracker:
-    def __init__(self, epsilon_greedy_selector, params):
-        self.epsilon_greedy_selector = epsilon_greedy_selector
-        self.epsilon_start = params['epsilon_start']
+    def __init__(self, params):
+        self.epsilon = params['epsilon_start']
         self.epsilon_final = params['epsilon_final']
-        self.epsilon_frames = params['epsilon_frames']
-        self.frame(0)
+        self.epsilon_delta = 1.0 * (params['epsilon_start'] - params['epsilon_final']) / params['epsilon_frames']
 
-    def frame(self, frame):
-        self.epsilon_greedy_selector.epsilon = \
-            max(self.epsilon_final, self.epsilon_start - frame / self.epsilon_frames)
-
-def unpack_batch(batch):
-    states, actions, rewards, dones, last_states = [], [], [], [], []
-    for exp in batch:
-        state = np.array(exp.state, copy=False)
-        states.append(state)
-        actions.append(exp.action)
-        rewards.append(exp.reward)
-        dones.append(exp.last_state is None)
-        if exp.last_state is None:
-            last_states.append(state)       # the result will be masked anyway
-        else:
-            last_states.append(np.array(exp.last_state, copy=False))
-    return np.array(states, copy=False), np.array(actions), np.array(rewards, dtype=np.float32), \
-           np.array(dones, dtype=np.uint8), np.array(last_states, copy=False)
+    def epsilon(self):
+        old_epsilon = self.epsilon
+        self.epsilon -= self.epsilon_delta
+        return max(old_epsilon, self.epsilon_final)
 
 
-def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
-    ExperienceFirstLast = collections.namedtuple('ExperienceFirstLast', ('state', 'action', 'reward', 'next_state'))
-    batch = ExperienceFirstLast(*zip(*batch))
-    non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
-                                            batch.next_state)), device=torch.device('cuda'), dtype=torch.uint8)
-    non_final_next_states = [np.array(s, copy=False) for s in batch.next_state if s is not None]
-    import pdb; pdb.set_trace()
-    state_batch = torch.tensor(np.array([np.array(state, copy=False) for state in batch.state], copy=False))
-    action_batch = torch.cat([torch.tensor(int(x)).view((1,1)) for x in batch.action])
-    reward_batch = torch.cat([torch.tensor(int(x)).view((1,1)) for x in batch.reward])
-    state_action_values = self.policy_net(state_batch).gather(1, action_batch)
-    next_state_values = torch.zeros(self.batch_size * self.steps_before_optimize, device=torch.device('cuda'))
-    next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
-    expected_state_action_values = (next_state_values * gamma) + reward_batch
-    return nn.MSELoss()(state_action_values, expected_state_action_values)
+# def unpack_batch(batch):
+#     states, actions, rewards, dones, last_states = [], [], [], [], []
+#     for exp in batch:
+#         state = np.array(exp.state, copy=False)
+#         states.append(state)
+#         actions.append(exp.action)
+#         rewards.append(exp.reward)
+#         dones.append(exp.last_state is None)
+#         if exp.last_state is None:
+#             last_states.append(state)       # the result will be masked anyway
+#         else:
+#             last_states.append(np.array(exp.last_state, copy=False))
+#     return np.array(states, copy=False), np.array(actions), np.array(rewards, dtype=np.float32), \
+#            np.array(dones, dtype=np.uint8), np.array(last_states, copy=False)
+#
+#
+# def calc_loss_dqn(batch, net, tgt_net, gamma, cuda=True, cuda_async=False):
+#     ExperienceFirstLast = collections.namedtuple('ExperienceFirstLast', ('state', 'action', 'reward', 'next_state'))
+#     batch = ExperienceFirstLast(*zip(*batch))
+#     non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
+#                                             batch.next_state)), device=torch.device('cuda'), dtype=torch.uint8)
+#     non_final_next_states = [np.array(s, copy=False) for s in batch.next_state if s is not None]
+#     import pdb; pdb.set_trace()
+#     state_batch = torch.tensor(np.array([np.array(state, copy=False) for state in batch.state], copy=False))
+#     action_batch = torch.cat([torch.tensor(int(x)).view((1,1)) for x in batch.action])
+#     reward_batch = torch.cat([torch.tensor(int(x)).view((1,1)) for x in batch.reward])
+#     state_action_values = self.policy_net(state_batch).gather(1, action_batch)
+#     next_state_values = torch.zeros(self.batch_size * self.steps_before_optimize, device=torch.device('cuda'))
+#     next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
+#     expected_state_action_values = (next_state_values * gamma) + reward_batch
+#     return nn.MSELoss()(state_action_values, expected_state_action_values)
 
     #From my old pong:
     # self.optimizer.zero_grad()
@@ -142,85 +144,111 @@ class ReplayMemory(object):
 
 
 
-
-
 class Trainer(object):
     def __init__(self):
         self.params = common.HYPERPARAMS['pong']
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.env = gym.make('PongNoFrameskip-v4')
+
         self.env = other.common.wrappers.wrap_dqn(self.env)
         self.policy_net = dqn_model.DQN(self.env.observation_space.shape, self.env.action_space.n).to(self.device)
         self.target_net = agent.TargetNet(self.policy_net)
-        self.selector = actions.EpsilonGreedyActionSelector(epsilon=self.params['epsilon_start'])
-        self.epsilon_tracker = EpsilonTracker(self.selector, self.params)
+        # self.selector = actions.EpsilonGreedyActionSelector(epsilon=self.params['epsilon_start'])
+        self.epsilon_tracker = EpsilonTracker(self.params)
         self.agent = agent.DQNAgent(self.policy_net, self.selector, device=self.device)
-        self.exp_source = experience.ExperienceSourceFirstLast(self.env, self.agent, gamma=self.params['gamma'], steps_count=1)
-        self.buffer = experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
+        # self.exp_source = experience.ExperienceSourceFirstLast(self.env, self.agent, gamma=self.params['gamma'], steps_count=1)
+        # self.buffer = experience.ExperienceReplayBuffer(self.exp_source, buffer_size=self.params['replay_size'])
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = RewardTracker()
-        csv_file = open('losses.csv', 'r')
-        csv_reader = csv.reader(csv_file)
-        self.losses = []
-        for row in csv_reader:
-            self.losses.append(row[0])
+        self.transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
+        # csv_file = open('losses.csv', 'r')
+        # csv_reader = csv.reader(csv_file)
+        self.memory = ReplayMemory(self.params['replay_size'], self.transition)
+        # self.losses = []
+        # for row in csv_reader:
+        #     self.losses.append(row[0])
         self.episode = 0
+        self.state = None
+        self.score = 0
+        self.batch_size = self.params['batch_size']
+
+
+
+    def addExperience(self):
+        import pdb; pdb.set_trace()
+        if random.random() < self.epsilon_tracker.epsilon():
+            action = random.randrange(self.env.action_space.n)
+        else:
+            action = torch.argmax(self.policy_net(self.state), dim=0)
+        next_state, r, done, _ = env.step(action)
+        self.score += r
+        if done:
+            self.memory.push(self.state, torch.tensor([action]), torch.tensor([reward], device=self.device), None)
+            self.state = self.env.reset()
+            self.episode += 1
+        else:
+            self.memory.push(self.state, torch.tensor([action]), torch.tensor([reward], device=self.device), next_state)
+            self.state = next_state
+        return done
+
+
+    def calculateLoss(self):
+        transitions = self.memory.sample(self.batch_size)
+        batch = self.transition(*zip(*transitions))
+
+        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
+                                                batch.next_state)), device=self.device, dtype=torch.uint8)
+        non_final_next_states = torch.cat([s for s in batch.next_state
+                                           if s is not None])
+        state_batch = torch.cat(batch.state)
+        action_batch = torch.cat(batch.action)
+        reward_batch = torch.cat(batch.reward)
+
+        state_action_values = self.policy_net(state_batch).gather(1, action_batch)
+        next_state_values = torch.zeros(self.batch_size * self.steps_before_optimize, device=self.device)
+        next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
+        expected_state_action_values = (next_state_values * self.gamma) + reward_batch
+        return nn.MSELoss()(state_action_values, expected_state_action_values)
+
 
 
 
     def train(self):
         frame_idx = 0
-        counter = 0
         while True:
             frame_idx += 1
-            self.buffer.populate()
-            self.epsilon_tracker.frame(frame_idx)
+            game_over = self.addExperience()
 
-            #is this round over?
-            new_rewards = self.exp_source.pop_total_rewards()
-            if new_rewards:
-                self.episode += 1
-                done = self.reward_tracker.add(new_rewards[0])
-                print('Game: %s Score: %s Mean Score: %s' % (
-                self.episode, self.reward_tracker.rewards[-1],
-                np.mean(self.reward_tracker.rewards)))
-                if (len(self.reward_tracker.rewards) % 100 == 0):
-                    self.target_net.save('pong_%s.pth' % len(self.reward_tracker.rewards))
+            # is this round over?
+            if game_over:
+                print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
+                if (self.episode % 100 == 0):
+                    self.target_net.save('pong_%s.pth' % self.episode)
                     print('Model Saved!')
-                #did qwe beat the challenge?
-                if done:
-                    break
+                if self.reward_tracker.meanScore() > 20:
+                    print('Challenge Won in %s Episodes' % self.episode)
 
-            #are we not done prefetching?
-            if len(self.buffer) < self.params['replay_initial']:
+            # are we done prefetching?
+            if len(self.memory) < self.params['replay_initial']:
                 continue
 
+            loss = self.calculateLoss()
             self.optimizer.zero_grad()
-            batch = self.buffer.sample(self.params['batch_size'])
-            loss_v = common.calc_loss_dqn(batch, self.policy_net, self.target_net.target_model, gamma=self.params['gamma'])
+            loss.backward()
+            # for param in self.policy_net.parameters():
+            #     param.grad.data.clamp_(-1, 1)
 
-            if loss_v.item() != float(self.losses[counter]):
-                print('FAILURE')
-                import pdb;
-                pdb.set_trace()
-            counter += 1
-            if counter == 1:
-                print("CHECKING NOW")
-            if counter == 2000:
-                print('ALL GOOD')
-                break
-            loss_v.backward()
             self.optimizer.step()
 
             if frame_idx % self.params['target_net_sync'] == 0:
                 self.target_net.sync()
 
-
-def playback(path):
-    target_net = torch.load(path)
-    env = gym.make('PongNoFrameskip-v4')
-
-
+#
+# def playback(path):
+#     target_net = torch.load(path)
+#     env = gym.make('PongNoFrameskip-v4')
+#
+#
 
 
 
