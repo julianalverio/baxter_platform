@@ -14,7 +14,7 @@ import argparse
 import torch
 import torch.optim as optim
 
-# from tensorboardX import SummaryWriter
+from tensorboardX import SummaryWriter
 
 # from lib import dqn_model, common
 # from other import actions, agent, experience
@@ -132,10 +132,10 @@ class Trainer(object):
     def __init__(self):
         self.params = HYPERPARAMS
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.env = gym.make('PongNoFrameskip-v4')
-        self.env = other.common.wrappers.wrap_dqn(self.env)
+        self.env = gym.make('FetchPush-v1').unwrapped
 
-        self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
+        self.action_space = 6
+        self.policy_net = DQN(self.env.observation_space.shape, self.action_space, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
         self.epsilon_tracker = EpsilonTracker(self.params)
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
@@ -146,16 +146,47 @@ class Trainer(object):
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
+        self.task = 1
+        self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
 
+
+    def reset(self):
+        obs = self.env.reset()
+        self.env.viewer.cam.lookat[0] = 1.
+        self.env.viewer.cam.lookat[1] = 1.5
+        self.env.viewer.cam.lookat[2] = 1.1
+        self.env.viewer.cam.azimuth = 165.
+        self.env.viewer.cam.elevation = 10.
+        self.env.viewer.cam.distance = 2.5
+        self.env.sim.nsubsteps = 2
+        self.env.block_gripper = True
+        return obs
 
     def preprocess(self, state):
+        import pdb; pdb.set_trace()
+        state = state[30:450, 100:425]
+        state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
+        cv2.resize(state, (self.width, self.height), interpolation=cv2.INTER_AREA)
+        # now convert to CHW, make tensor move to GPU, divide by 256 and return
+
         state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
         return state.float() / 256
+
+        # def _observation(self, frame):
+        #     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+        #     frame = cv2.resize(frame, (self.width, self.height), interpolation=cv2.INTER_AREA)
+        #     # return frame[:, :, None]
+
+        # def getScreen(self):
+        #     screen = Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425)).resize((105, 81),
+        #                                                                                                  Image.NEAREST)
+        #     return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((2, 1, 0))).unsqueeze(0).to(
+        #         self.device)
 
 
     def addExperience(self):
         if random.random() < self.epsilon_tracker.epsilon():
-            action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
+            action = torch.tensor([random.randrange(self.action_space)], device=self.device)
         else:
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         next_state, reward, done, _ = self.env.step(action.item())
@@ -190,8 +221,25 @@ class Trainer(object):
         #     param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
 
-
-
+    '''
+    Task 1: Touch the block, discrete reward
+    Task 2: Touch the block, continuous reward
+    '''
+    def getReward(self):
+        gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
+        object_position = self.env.sim.data.get_site_xpos('object0')
+        if self.task == 1:
+            if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
+                return 1, True
+            return 0, False
+        if self.task == 2:
+            distance =  np.linalg.norm(gripper_position - object_position)
+            if distance <= 0.5:
+                reward = 1.-distance
+            if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
+                return reward, True
+            else:
+                return reward, False
 
     def train(self):
         frame_idx = 0
@@ -223,19 +271,18 @@ class Trainer(object):
 
     def playback(self, path):
         target_net = torch.load(path, map_location='cpu')
-        env = gym.make('PongNoFrameskip-v4')
+        env = gym.make('FetchPush-v1')
         env = other.common.wrappers.wrap_dqn(env)
         state = self.preprocess(env.reset())
         done = False
         score = 0
         import time
         while not done:
-            time.sleep(0.015)
             env.render(mode='human')
+            time.sleep(0.1)
             action = torch.argmax(target_net(state), dim=1).to(self.device)
-            state, reward, done, _ = env.step(action.item())
-            state = self.preprocess(state)
-            score += reward
+            state, _, done, _ = env.step(action.item())
+            score += self.getReward()
         print("Score: ", score)
 
 
@@ -243,8 +290,8 @@ class Trainer(object):
 if __name__ == "__main__":
     trainer = Trainer()
     print('Trainer Initialized')
-    # trainer.train()
-    trainer.playback('pong_900.pth')
+    trainer.train()
+    # trainer.playback('pong_500.pth')
 
 
 
