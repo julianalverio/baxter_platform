@@ -61,38 +61,18 @@ class DQN(nn.Module):
             nn.ReLU()
         )
 
-        conv_out_size = self._get_conv_out(input_shape)
+        conv_out = self.conv(Variable(torch.zeros(1, *shape)))
+        conv_out_size = int(np.prod(conv_out.size()))
         self.fc = nn.Sequential(
             nn.Linear(conv_out_size, 512),
             nn.ReLU(),
             nn.Linear(512, n_actions)
         )
 
-    def _get_conv_out(self, shape):
-        o = self.conv(Variable(torch.zeros(1, *shape)))
-        return int(np.prod(o.size()))
 
-    def preprocess(self, state):
-        state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
-        return state.float() / 256
-
-
-    # input is a lazyframes object
     def forward(self, x):
         x = self.conv(x).view(x.size()[0], -1)
         return self.fc(x)
-
-
-class TargetNet:
-    def __init__(self, model):
-        self.model = model
-        self.target_model = copy.deepcopy(model)
-
-    def sync(self):
-        self.target_model.load_state_dict(self.model.state_dict())
-
-    def save(self, name):
-        torch.save(self.target_model, name)
 
 
 class RewardTracker:
@@ -128,10 +108,7 @@ class EpsilonTracker:
         return max(old_epsilon, self.epsilon_final)
 
 
-
-
 class ReplayMemory(object):
-
     def __init__(self, capacity, transition):
         self.capacity = capacity
         self.memory = []
@@ -151,7 +128,6 @@ class ReplayMemory(object):
         return len(self.memory)
 
 
-
 class Trainer(object):
     def __init__(self):
         self.params = HYPERPARAMS
@@ -160,7 +136,8 @@ class Trainer(object):
         self.env = other.common.wrappers.wrap_dqn(self.env)
 
         self.policy_net = DQN(self.env.observation_space.shape, self.env.action_space.n, self.device).to(self.device)
-        self.target_net = TargetNet(self.policy_net)
+        self.target_net = copy.deepcopy(self.policy_net)
+        # self.target_net = TargetNet(self.policy_net)
         self.epsilon_tracker = EpsilonTracker(self.params)
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
         self.reward_tracker = RewardTracker()
@@ -170,6 +147,7 @@ class Trainer(object):
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
+
 
     def preprocess(self, state):
         state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
@@ -194,10 +172,9 @@ class Trainer(object):
         return done
 
 
-    def calculateLoss(self):
+    def optimizeModel(self):
         transitions = self.memory.sample(self.batch_size)
         batch = self.transition(*zip(*transitions))
-
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
         non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
         state_batch = torch.cat(list(batch.state))
@@ -207,7 +184,13 @@ class Trainer(object):
         next_state_values = torch.zeros(self.batch_size, device=self.device)
         next_state_values[non_final_mask] = self.target_net.model(non_final_next_states).max(1)[0].detach()
         expected_state_action_values = (next_state_values * self.params['gamma']) + reward_batch
-        return nn.MSELoss()(state_action_values, expected_state_action_values.unsqueeze(1))
+        loss = nn.MSELoss()(state_action_values, expected_state_action_values.unsqueeze(1))
+        self.optimizer.zero_grad()
+        loss.backward()
+        # for param in self.policy_net.parameters():
+        #     param.grad.data.clamp_(-1, 1)
+        self.optimizer.step()
+
 
 
 
@@ -215,6 +198,7 @@ class Trainer(object):
         frame_idx = 0
         while True:
             frame_idx += 1
+            # play one move
             game_over = self.addExperience()
 
             # is this round over?
@@ -222,27 +206,35 @@ class Trainer(object):
                 self.reward_tracker.add(self.score)
                 print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 if (self.episode % 100 == 0):
-                    self.target_net.save('pong_%s.pth' % self.episode)
+                    torch.save(self.target_net, 'pong_%s.pth' % self.episode)
                     print('Model Saved!')
                 if self.reward_tracker.meanScore() > 20:
                     print('Challenge Won in %s Episodes' % self.episode)
+                    torch.save(self.target_net, 'pong_%s.pth' % self.episode)
+                    print('Model Saved!')
                 self.score = 0
 
             # are we done prefetching?
             if len(self.memory) < self.params['replay_initial']:
                 continue
-
-            loss = self.calculateLoss()
-            self.optimizer.zero_grad()
-            loss.backward()
-            # for param in self.policy_net.parameters():
-            #     param.grad.data.clamp_(-1, 1)
-
-            self.optimizer.step()
-
+            self.optimizeModel()
             if frame_idx % self.params['target_net_sync'] == 0:
-                self.target_net.sync()
+                self.target_net.load_state_dict(self.policy_net.state_dict())
 
+
+    def playback(self, path):
+        target_net = torch.load(path)
+        env = gym.make('PongNoFrameskip-v4')
+        env = other.common.wrappers.wrap_dqn(env)
+        state = self.preprocess(env.reset())
+        done = False
+        score = 0
+        while not done:
+            env.render(mode='human')
+            action = torch.argmax(target_net(state), dim=1).to(self.device)
+            state, reward, done, _ = env.step(action.item())
+            score += reward
+        print("Score: ", score)
 
 
 
@@ -250,6 +242,7 @@ if __name__ == "__main__":
     trainer = Trainer()
     print('Trainer Initialized')
     trainer.train()
+    # trainer.playback('pong_500.pth')
 
 
 
