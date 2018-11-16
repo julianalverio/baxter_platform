@@ -145,7 +145,6 @@ class Trainer(object):
         self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state'))
         self.memory = ReplayMemory(self.params['replay_size'], self.transition)
         self.episode = 0
-        self.reset()
         self.state = self.preprocess(self.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
@@ -193,13 +192,6 @@ class Trainer(object):
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
         reward, done = self.getReward()
         self.score += reward
-        if done:
-            self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
-            self.state = self.preprocess(self.reset())
-            self.episode += 1
-        else:
-            self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state)
-            self.state = next_state
         return done
 
 
@@ -248,6 +240,14 @@ class Trainer(object):
             frame_idx += 1
             # play one move
             done = self.addExperience()
+            done = done or self.movement_count == 1000
+            if done:
+                self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
+                self.state = self.preprocess(self.reset())
+                self.episode += 1
+            else:
+                self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state)
+                self.state = next_state
 
             # is this round over?
             if done or self.movement_count == 1000:
