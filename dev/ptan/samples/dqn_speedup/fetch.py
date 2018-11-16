@@ -232,11 +232,12 @@ class Trainer(object):
                 return 1., True
             return 0., False
         if self.task == 2:
-            distance =  np.linalg.norm(gripper_position - object_position)
+            distance = np.linalg.norm(gripper_position - object_position)
             if distance <= 0.5:
                 reward = 1.-distance
             else:
                 reward = 0.
+            print(reward)
             if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
                 return reward, True
             else:
@@ -262,10 +263,6 @@ class Trainer(object):
                 self.reward_tracker.add(self.score)
                 print('Episode: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 if (self.episode % 100 == 0):
-                    torch.save(self.target_net, 'pong_%s.pth' % self.episode)
-                    print('Model Saved!')
-                if self.reward_tracker.meanScore() > 20:
-                    print('Challenge Won in %s Episodes' % self.episode)
                     torch.save(self.target_net, 'pong_%s.pth' % self.episode)
                     print('Model Saved!')
                 self.score = 0
@@ -298,7 +295,7 @@ class Trainer(object):
 if __name__ == "__main__":
     trainer = Trainer()
     print('Trainer Initialized')
-    print("Pretaining Now...")
+    print("Prefetching Now...")
     trainer.train()
     # trainer.playback('pong_500.pth')
 
