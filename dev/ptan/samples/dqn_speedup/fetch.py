@@ -34,9 +34,10 @@ import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 HYPERPARAMS = {
         'env_name':         "PongNoFrameskip-v4",
         'stop_reward':      18.0,
-        'run_name':         'pong',
+        # 'run_name':         'pong',
         'replay_size':      100000,
-        'replay_initial':   10000,
+        # 'replay_initial':   10000,
+        'replay_initial':   0,
         'target_net_sync':  1000,
         'epsilon_frames':   10**5,
         'epsilon_start':    1.0,
@@ -167,6 +168,8 @@ class Trainer(object):
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
+        import pdb; pdb.set_trace()
+        cv2.imshow(state)
         state = state[30:450, 100:425]
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (210, 163), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
@@ -217,7 +220,10 @@ class Trainer(object):
         state_action_values = self.policy_net(state_batch).gather(1, action_batch.unsqueeze(1))
         next_state_values = torch.zeros(self.batch_size, device=self.device)
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
-        expected_state_action_values = (next_state_values * self.params['gamma']) + reward_batch
+        try:
+            expected_state_action_values = (next_state_values * self.params['gamma']) + reward_batch
+        except:
+            import pdb; pdb.set_trace()
         loss = nn.MSELoss()(state_action_values, expected_state_action_values.unsqueeze(1))
         self.optimizer.zero_grad()
         loss.backward()
