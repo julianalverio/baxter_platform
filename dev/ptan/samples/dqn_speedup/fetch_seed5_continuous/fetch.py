@@ -25,7 +25,7 @@ from torch.autograd import Variable
 import cv2
 
 
-import os; os.environ["CUDA_VISIBLE_DEVICES"]="0"
+import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 
 HYPERPARAMS = {
