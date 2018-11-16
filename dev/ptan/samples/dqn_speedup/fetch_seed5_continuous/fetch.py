@@ -23,9 +23,9 @@ import copy
 from collections import namedtuple
 from torch.autograd import Variable
 import cv2
+import mujoco_py
 
-
-import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
+import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
 
 HYPERPARAMS = {
@@ -275,11 +275,14 @@ class Trainer(object):
     def playback(self, path):
         target_net = torch.load(path, map_location='cpu')
         env = gym.make('FetchPush-v1')
-        state = self.preprocess(env.reset())
+        state = self.preprocess(self.reset())
+        env.render()
         done = False
         score = 0
         import time
+        cpu = torch.device('cpu')
         while not done:
+            state = state.to(cpu)
             env.render(mode='human')
             time.sleep(0.1)
             action = torch.argmax(target_net(state), dim=1).to(self.device)
@@ -293,8 +296,9 @@ if __name__ == "__main__":
     trainer = Trainer()
     print('Trainer Initialized')
     print("Prefetching Now...")
+    import pdb; pdb.set_trace()
     trainer.train()
-    # trainer.playback('pong_500.pth')
+    # trainer.playback('pong_1000.pth')
 
 
 
