@@ -167,7 +167,9 @@ class Trainer(object):
         import pdb; pdb.set_trace()
         state = state[30:450, 100:425]
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
-        cv2.resize(state, (self.width, self.height), interpolation=cv2.INTER_AREA)
+        np.swapaxes(state, 0, 2)
+        state = cv2.resize(state, (210, 163), interpolation=cv2.INTER_AREA)/256.
+        return torch.tensor(state, device=self.device)
         # now convert to CHW, make tensor move to GPU, divide by 256 and return
 
         state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
@@ -184,13 +186,21 @@ class Trainer(object):
         #     return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((2, 1, 0))).unsqueeze(0).to(
         #         self.device)
 
+    def convertAction(self, action):
+        movement = np.zeros(4)
+        if action.item() % 2 == 0:
+            movement[action.item() // 2] += 1
+        else:
+            movement[action.item() // 2] -= 1
+        return movement
+
 
     def addExperience(self):
         if random.random() < self.epsilon_tracker.epsilon():
             action = torch.tensor([random.randrange(self.action_space)], device=self.device)
         else:
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
-        next_state, reward, done, _ = self.env.step(action.item())
+        next_state, reward, done, _ = self.env.step(self.convertAction(action))
         next_state = self.preprocess(next_state)
         self.score += reward
         if done:
