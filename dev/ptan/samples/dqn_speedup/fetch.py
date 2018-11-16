@@ -167,7 +167,6 @@ class Trainer(object):
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
-        import pdb; pdb.set_trace()
         state = state[30:450, 100:425]
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (210, 163), interpolation=cv2.INTER_AREA).transpose()/256.
