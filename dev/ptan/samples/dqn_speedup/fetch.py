@@ -135,7 +135,6 @@ class Trainer(object):
         self.env = gym.make('FetchPush-v1').unwrapped
 
         self.action_space = 6
-        import pdb; pdb.set_trace()
         self.observation_space = [3, 163, 210]
         self.policy_net = DQN(self.observation_space, self.action_space, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
