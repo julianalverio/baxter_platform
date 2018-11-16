@@ -276,6 +276,7 @@ class Trainer(object):
         target_net = torch.load(path, map_location='cpu')
         env = gym.make('FetchPush-v1')
         state = self.preprocess(self.reset())
+        env.render()
         done = False
         score = 0
         import time
