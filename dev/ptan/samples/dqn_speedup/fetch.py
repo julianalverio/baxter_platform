@@ -144,6 +144,7 @@ class Trainer(object):
         self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state'))
         self.memory = ReplayMemory(self.params['replay_size'], self.transition)
         self.episode = 0
+        self.reset()
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
@@ -152,7 +153,7 @@ class Trainer(object):
 
 
     def reset(self):
-        obs = self.env.reset()
+        self.env.reset()
         self.env.viewer.cam.lookat[0] = 1.
         self.env.viewer.cam.lookat[1] = 1.5
         self.env.viewer.cam.lookat[2] = 1.1
@@ -161,7 +162,7 @@ class Trainer(object):
         self.env.viewer.cam.distance = 2.5
         self.env.sim.nsubsteps = 2
         self.env.block_gripper = True
-        return obs
+        return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
         import pdb; pdb.set_trace()
