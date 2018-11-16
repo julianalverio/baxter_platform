@@ -236,7 +236,6 @@ class Trainer(object):
                 reward = 1. - distance
             else:
                 reward = 0.
-            print(reward)
             if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
                 return reward, True
             else:
