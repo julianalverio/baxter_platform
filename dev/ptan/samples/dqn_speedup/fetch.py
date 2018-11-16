@@ -14,27 +14,22 @@ import argparse
 import torch
 import torch.optim as optim
 
-from tensorboardX import SummaryWriter
 
-# from lib import dqn_model, common
-# from other import actions, agent, experience
 import other
 import csv
 import torch.nn as nn
 import collections
+from PIL import Image
 import copy
 from collections import namedtuple
 from torch.autograd import Variable
 import cv2
 
 
-import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
+import os; os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 
 HYPERPARAMS = {
-        'env_name':         "PongNoFrameskip-v4",
-        'stop_reward':      18.0,
-        # 'run_name':         'pong',
         'replay_size':      100000,
         'replay_initial':   10000,
         'target_net_sync':  1000,
@@ -136,7 +131,7 @@ class Trainer(object):
         self.env = gym.make('FetchPush-v1').unwrapped
 
         self.action_space = 6
-        self.observation_space = [1, 163, 210]
+        self.observation_space = [1, 183, 210]
         self.policy_net = DQN(self.observation_space, self.action_space, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
         self.epsilon_tracker = EpsilonTracker(self.params)
@@ -146,7 +141,6 @@ class Trainer(object):
         self.memory = ReplayMemory(self.params['replay_size'], self.transition)
         self.episode = 0
         self.state = self.preprocess(self.reset())
-        import pdb; pdb.set_trace()
         self.score = 0
         self.batch_size = self.params['batch_size']
         self.task = 1
@@ -168,9 +162,9 @@ class Trainer(object):
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
-        state = state[30:450, 100:425]
+        state = state[30:450, 80:445]
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
-        state = cv2.resize(state, (210, 163), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
+        state = cv2.resize(state, (210, 183), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
         return torch.tensor(state, device=self.device).unsqueeze(0).unsqueeze(0)
 
 
@@ -218,10 +212,7 @@ class Trainer(object):
         state_action_values = self.policy_net(state_batch).gather(1, action_batch.unsqueeze(1))
         next_state_values = torch.zeros(self.batch_size, device=self.device)
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
-        try:
-            expected_state_action_values = (next_state_values * self.params['gamma']) + reward_batch
-        except:
-            import pdb; pdb.set_trace()
+        expected_state_action_values = (next_state_values * self.params['gamma']) + reward_batch
         loss = nn.MSELoss()(state_action_values, expected_state_action_values.unsqueeze(1))
         self.optimizer.zero_grad()
         loss.backward()
@@ -253,19 +244,19 @@ class Trainer(object):
         frame_idx = 0
         while True:
             frame_idx += 1
-            # play one move
+            # execute one move
             done = self.addExperience()
 
             # are we done prefetching?
             if len(self.memory) < self.params['replay_initial']:
                 continue
             if len(self.memory) == self.params['replay_initial']:
+                self.episode, self.movement_count = 0, 0
                 print("Done Prefetching.")
 
 
             # is this round over?
             if done:
-                import pdb; pdb.set_trace()
                 self.reward_tracker.add(self.score)
                 print('Episode: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 if (self.episode % 100 == 0):
