@@ -72,13 +72,9 @@ class DQN(nn.Module):
         o = self.conv(Variable(torch.zeros(1, *shape)))
         return int(np.prod(o.size()))
 
-    def preprocess(self, state):
-        state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
-        return state.float() / 256
 
     # input is a lazyframes object
-    def forward(self, state):
-        x = self.preprocess(state)
+    def forward(self, x):
         x = self.conv(x).view(x.size()[0], -1)
         return self.fc(x)
 
@@ -167,9 +163,13 @@ class Trainer(object):
         self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state'))
         self.memory = ReplayMemory(self.params['replay_size'], self.transition)
         self.episode = 0
-        self.state = self.env.reset()
+        self.state = self.preprocess(env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
+
+    def preprocess(self, state):
+        state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
+        return state.float() / 256
 
 
     def addExperience(self):
@@ -177,11 +177,12 @@ class Trainer(object):
             action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
         else:
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
-        next_state, reward, done, _ = self.env.step(action.item())
+        next_state, reward, done, _ = self.env.step(action.item())s
+        next_state = self.preprocess(next_state)
         self.score += reward
         if done:
             self.memory.push(self.state, torch.tensor([action]), torch.tensor([reward], device=self.device), None)
-            self.state = self.env.reset()
+            self.state = self.preprocess(self.env.reset())
             self.episode += 1
         else:
             self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state)
