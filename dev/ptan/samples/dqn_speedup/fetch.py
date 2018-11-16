@@ -192,7 +192,7 @@ class Trainer(object):
         self.movement_count += 1
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
         reward, done = self.getReward()
-        done = done or self.movement_count == 1000
+        done = done or self.movement_count == 1500
         self.score += reward
         if done:
             self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
@@ -255,6 +255,9 @@ class Trainer(object):
             # are we done prefetching?
             if len(self.memory) < self.params['replay_initial']:
                 continue
+            if len(self.memory) == self.params['replay_initial']:
+                print("Done Prefetching.")
+
 
             # is this round over?
             if done:
@@ -298,6 +301,7 @@ class Trainer(object):
 if __name__ == "__main__":
     trainer = Trainer()
     print('Trainer Initialized')
+    print("Pretaining Now...")
     trainer.train()
     # trainer.playback('pong_500.pth')
 
