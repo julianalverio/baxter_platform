@@ -177,7 +177,7 @@ class Trainer(object):
             action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
         else:
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
-        next_state, reward, done, _ = self.env.step(action.item())s
+        next_state, reward, done, _ = self.env.step(action.item())
         next_state = self.preprocess(next_state)
         self.score += reward
         if done:
