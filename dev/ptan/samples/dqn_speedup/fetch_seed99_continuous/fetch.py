@@ -125,7 +125,7 @@ class Trainer(object):
         self.env = gym.make('FetchPush-v1').unwrapped
 
         self.action_space = 6
-        self.observation_space = [1, 183, 210]
+        self.observation_space = [1, 146, 168]
         self.policy_net = DQN(self.observation_space, self.action_space, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
         self.epsilon_tracker = EpsilonTracker(self.params)
@@ -158,7 +158,7 @@ class Trainer(object):
     def preprocess(self, state):
         state = state[30:450, 80:445]
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
-        state = cv2.resize(state, (210, 183), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
+        state = cv2.resize(state, (168, 146), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
         return torch.tensor(state, device=self.device).unsqueeze(0).unsqueeze(0)
 
 
@@ -270,7 +270,6 @@ class Trainer(object):
     def playback(self, path):
         target_net = torch.load(path, map_location='cpu')
         env = gym.make('FetchPush-v1')
-        env = other.common.wrappers.wrap_dqn(env)
         state = self.preprocess(env.reset())
         done = False
         score = 0
