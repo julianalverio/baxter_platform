@@ -146,7 +146,7 @@ class Trainer(object):
         self.episode = 0
         self.reset()
         import pdb; pdb.set_trace()
-        self.state = self.preprocess(self.env.reset())
+        self.state = self.preprocess(self.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
         self.task = 1
@@ -208,7 +208,7 @@ class Trainer(object):
         self.score += reward
         if done:
             self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
-            self.state = self.preprocess(self.env.reset())
+            self.state = self.preprocess(self.reset())
             self.episode += 1
         else:
             self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state)
