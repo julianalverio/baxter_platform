@@ -135,6 +135,7 @@ class Trainer(object):
         self.env = gym.make('FetchPush-v1').unwrapped
 
         self.action_space = 6
+        import pdb; pdb.set_trace()
         self.policy_net = DQN(self.env.observation_space.shape, self.action_space, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
         self.epsilon_tracker = EpsilonTracker(self.params)
