@@ -1,25 +1,19 @@
 #!/usr/bin/env python3
 import torch
 torch.backends.cudnn.deterministic = True
-torch.manual_seed(5)
-torch.cuda.manual_seed_all(5)
+torch.manual_seed(99)
+torch.cuda.manual_seed_all(99)
 import random
-random.seed(5)
+random.seed(99)
 import numpy as np
-np.random.seed(5)
+np.random.seed(99)
 
 import gym
-import argparse
-
 import torch
 import torch.optim as optim
 
 
-import other
-import csv
 import torch.nn as nn
-import collections
-from PIL import Image
 import copy
 from collections import namedtuple
 from torch.autograd import Variable

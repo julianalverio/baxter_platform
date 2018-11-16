@@ -15,7 +15,6 @@ import torch
 import torch.optim as optim
 
 
-import other
 import csv
 import torch.nn as nn
 import collections
@@ -143,7 +142,7 @@ class Trainer(object):
         self.state = self.preprocess(self.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
-        self.task = 2
+        self.task = 1
         self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
         self.movement_count = 0
 
@@ -277,7 +276,6 @@ class Trainer(object):
     def playback(self, path):
         target_net = torch.load(path, map_location='cpu')
         env = gym.make('FetchPush-v1')
-        env = other.common.wrappers.wrap_dqn(env)
         state = self.preprocess(env.reset())
         done = False
         score = 0
