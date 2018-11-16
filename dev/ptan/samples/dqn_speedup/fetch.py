@@ -151,6 +151,7 @@ class Trainer(object):
         self.batch_size = self.params['batch_size']
         self.task = 1
         self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
+        self.movement_count = 0
 
 
     def reset(self):
@@ -171,21 +172,7 @@ class Trainer(object):
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (210, 163), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
         return torch.tensor(state, device=self.device).unsqueeze(0).unsqueeze(0)
-        # now convert to CHW, make tensor move to GPU, divide by 256 and return
 
-        # state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
-        # return state.float() / 256
-
-        # def _observation(self, frame):
-        #     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-        #     frame = cv2.resize(frame, (self.width, self.height), interpolation=cv2.INTER_AREA)
-        #     # return frame[:, :, None]
-
-        # def getScreen(self):
-        #     screen = Image.fromarray(self.env.render(mode='rgb_array')).crop((30, 100, 450, 425)).resize((105, 81),
-        #                                                                                                  Image.NEAREST)
-        #     return torch.from_numpy(np.array(screen, dtype=np.float32).transpose((2, 1, 0))).unsqueeze(0).to(
-        #         self.device)
 
     def convertAction(self, action):
         movement = np.zeros(4)
@@ -202,6 +189,7 @@ class Trainer(object):
         else:
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         self.env.step(self.convertAction(action))
+        self.movement_count += 1
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
         reward, done = self.getReward()
         self.score += reward
@@ -259,10 +247,10 @@ class Trainer(object):
         while True:
             frame_idx += 1
             # play one move
-            game_over = self.addExperience()
+            done = self.addExperience()
 
             # is this round over?
-            if game_over:
+            if done or self.movement_count == 1000:
                 self.reward_tracker.add(self.score)
                 print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 if (self.episode % 100 == 0):
@@ -273,6 +261,7 @@ class Trainer(object):
                     torch.save(self.target_net, 'pong_%s.pth' % self.episode)
                     print('Model Saved!')
                 self.score = 0
+                self.movement_count = 0
 
             # are we done prefetching?
             if len(self.memory) < self.params['replay_initial']:
