@@ -280,6 +280,7 @@ class Trainer(object):
         score = 0
         import time
         while not done:
+            state = state.to(self.device)
             env.render(mode='human')
             time.sleep(0.1)
             import pdb;
