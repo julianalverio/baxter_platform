@@ -177,7 +177,6 @@ class Trainer(object):
 
 
     def addExperience(self):
-        import pdb; pdb.set_trace()
         if random.random() < self.epsilon_tracker.epsilon():
             action = torch.tensor([random.randrange(self.env.action_space.n)], device=self.device)
         else:
@@ -186,7 +185,7 @@ class Trainer(object):
         next_state = self.preprocess(next_state)
         self.score += reward
         if done:
-            self.memory.push(self.state, torch.tensor([action]), torch.tensor([reward], device=self.device), None)
+            self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
             self.state = self.preprocess(self.env.reset())
             self.episode += 1
         else:
