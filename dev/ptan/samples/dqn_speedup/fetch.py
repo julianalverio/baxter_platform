@@ -197,6 +197,7 @@ class Trainer(object):
         if done:
             self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
             self.state = self.preprocess(self.reset())
+            self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
             self.episode += 1
             self.movement_count = 0
         else:
@@ -251,10 +252,15 @@ class Trainer(object):
             # play one move
             done = self.addExperience()
 
+            # are we done prefetching?
+            if len(self.memory) < self.params['replay_initial']:
+                continue
+
             # is this round over?
             if done:
+                import pdb; pdb.set_trace()
                 self.reward_tracker.add(self.score)
-                print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
+                print('Episode: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 if (self.episode % 100 == 0):
                     torch.save(self.target_net, 'pong_%s.pth' % self.episode)
                     print('Model Saved!')
@@ -265,9 +271,7 @@ class Trainer(object):
                 self.score = 0
                 self.movement_count = 0
 
-            # are we done prefetching?
-            if len(self.memory) < self.params['replay_initial']:
-                continue
+
             self.optimizeModel()
             if frame_idx % self.params['target_net_sync'] == 0:
                 self.target_net.load_state_dict(self.policy_net.state_dict())
