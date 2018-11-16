@@ -182,7 +182,7 @@ class Trainer(object):
         reward_batch = torch.cat(list(batch.reward))
         state_action_values = self.policy_net(state_batch).gather(1, action_batch.unsqueeze(1))
         next_state_values = torch.zeros(self.batch_size, device=self.device)
-        next_state_values[non_final_mask] = self.target_net.model(non_final_next_states).max(1)[0].detach()
+        next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
         expected_state_action_values = (next_state_values * self.params['gamma']) + reward_batch
         loss = nn.MSELoss()(state_action_values, expected_state_action_values.unsqueeze(1))
         self.optimizer.zero_grad()
