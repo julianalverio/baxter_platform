@@ -183,6 +183,7 @@ class Trainer(object):
 
 
     def addExperience(self):
+        self.movement_count += 1
         if random.random() < self.epsilon_tracker.epsilon():
             action = torch.tensor([random.randrange(self.action_space)], device=self.device)
         else:
@@ -191,7 +192,16 @@ class Trainer(object):
         self.movement_count += 1
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
         reward, done = self.getReward()
+        done = done or self.movement_count == 1000
         self.score += reward
+        if done:
+            self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
+            self.state = self.preprocess(self.reset())
+            self.episode += 1
+            self.movement_count = 0
+        else:
+            self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state)
+            self.state = next_state
         return done
 
 
@@ -240,17 +250,9 @@ class Trainer(object):
             frame_idx += 1
             # play one move
             done = self.addExperience()
-            done = done or self.movement_count == 1000
-            if done:
-                self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
-                self.state = self.preprocess(self.reset())
-                self.episode += 1
-            else:
-                self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state)
-                self.state = next_state
 
             # is this round over?
-            if done or self.movement_count == 1000:
+            if done:
                 self.reward_tracker.add(self.score)
                 print('Game: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 if (self.episode % 100 == 0):
