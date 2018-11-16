@@ -146,6 +146,7 @@ class Trainer(object):
         self.memory = ReplayMemory(self.params['replay_size'], self.transition)
         self.episode = 0
         self.state = self.preprocess(self.reset())
+        import pdb; pdb.set_trace()
         self.score = 0
         self.batch_size = self.params['batch_size']
         self.task = 1
@@ -237,8 +238,8 @@ class Trainer(object):
         object_position = self.env.sim.data.get_site_xpos('object0')
         if self.task == 1:
             if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
-                return 1, True
-            return 0, False
+                return 1., True
+            return 0., False
         if self.task == 2:
             distance =  np.linalg.norm(gripper_position - object_position)
             if distance <= 0.5:
