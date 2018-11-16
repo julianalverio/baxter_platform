@@ -146,7 +146,6 @@ class Trainer(object):
         self.memory = ReplayMemory(self.params['replay_size'], self.transition)
         self.episode = 0
         self.reset()
-        import pdb; pdb.set_trace()
         self.state = self.preprocess(self.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
@@ -172,11 +171,11 @@ class Trainer(object):
         state = state[30:450, 100:425]
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (210, 163), interpolation=cv2.INTER_AREA).transpose()/256.
-        return torch.tensor(state, device=self.device).unsqueeze(0).unsqueeze(0)
+        return torch.tensor(state, device=self.device).unsqueeze(0)
         # now convert to CHW, make tensor move to GPU, divide by 256 and return
 
-        state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
-        return state.float() / 256
+        # state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
+        # return state.float() / 256
 
         # def _observation(self, frame):
         #     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
