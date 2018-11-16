@@ -145,6 +145,7 @@ class Trainer(object):
         self.memory = ReplayMemory(self.params['replay_size'], self.transition)
         self.episode = 0
         self.reset()
+        import pdb; pdb.set_trace()
         self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
