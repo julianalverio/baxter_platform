@@ -25,7 +25,7 @@ from torch.autograd import Variable
 import cv2
 import mujoco_py
 
-import os; os.environ["CUDA_VISIBLE_DEVICES"]="1"
+import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
 
 HYPERPARAMS = {
@@ -292,9 +292,9 @@ class Trainer(object):
 if __name__ == "__main__":
     trainer = Trainer()
     print('Trainer Initialized')
-    print("Prefetching Now...")
-    trainer.train()
-    # trainer.playback('pong_500.pth')
+    # print("Prefetching Now...")
+    # trainer.train()
+    trainer.playback('pong_1000.pth')
 
 
 
