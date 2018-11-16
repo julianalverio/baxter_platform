@@ -163,7 +163,7 @@ class Trainer(object):
         self.transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state'))
         self.memory = ReplayMemory(self.params['replay_size'], self.transition)
         self.episode = 0
-        self.state = self.preprocess(env.reset())
+        self.state = self.preprocess(self.env.reset())
         self.score = 0
         self.batch_size = self.params['batch_size']
 
