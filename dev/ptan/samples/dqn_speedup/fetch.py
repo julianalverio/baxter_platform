@@ -203,7 +203,7 @@ class Trainer(object):
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         self.env.step(self.convertAction(action))
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
-        reward = self.getReward()
+        reward, done = self.getReward()
         self.score += reward
         if done:
             self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
