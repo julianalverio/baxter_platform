@@ -275,6 +275,7 @@ class Trainer(object):
     def playback(self, path):
         target_net = torch.load(path, map_location='cpu')
         env = gym.make('FetchPush-v1')
+        import pdb; pdb.set_trace()
         state = self.preprocess(env.reset())
         done = False
         score = 0
