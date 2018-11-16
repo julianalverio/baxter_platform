@@ -171,9 +171,8 @@ class Trainer(object):
         import pdb; pdb.set_trace()
         state = state[30:450, 100:425]
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
-        np.swapaxes(state, 0, 2)
         state = cv2.resize(state, (210, 163), interpolation=cv2.INTER_AREA)/256.
-        return torch.tensor(state, device=self.device)
+        return torch.tensor(state.unsqueeze(0).usqueeze(0), device=self.device)
         # now convert to CHW, make tensor move to GPU, divide by 256 and return
 
         state = torch.tensor(np.expand_dims(state, 0)).to(self.device)
