@@ -275,7 +275,6 @@ class Trainer(object):
     def playback(self, path):
         target_net = torch.load(path, map_location='cpu')
         env = gym.make('FetchPush-v1')
-        import pdb; pdb.set_trace()
         state = self.preprocess(self.reset())
         done = False
         score = 0
@@ -283,6 +282,8 @@ class Trainer(object):
         while not done:
             env.render(mode='human')
             time.sleep(0.1)
+            import pdb;
+            pdb.set_trace()
             action = torch.argmax(target_net(state), dim=1).to(self.device)
             state, _, done, _ = env.step(action.item())
             score += self.getReward()
