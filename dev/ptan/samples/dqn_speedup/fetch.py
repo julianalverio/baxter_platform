@@ -154,6 +154,7 @@ class Trainer(object):
 
     def reset(self):
         self.env.reset()
+        self.env.render()
         self.env.viewer.cam.lookat[0] = 1.
         self.env.viewer.cam.lookat[1] = 1.5
         self.env.viewer.cam.lookat[2] = 1.1
