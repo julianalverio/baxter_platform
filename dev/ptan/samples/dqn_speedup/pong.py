@@ -61,7 +61,7 @@ class DQN(nn.Module):
             nn.ReLU()
         )
 
-        conv_out = self.conv(Variable(torch.zeros(1, *shape)))
+        conv_out = self.conv(Variable(torch.zeros(1, *input_shape)))
         conv_out_size = int(np.prod(conv_out.size()))
         self.fc = nn.Sequential(
             nn.Linear(conv_out_size, 512),
