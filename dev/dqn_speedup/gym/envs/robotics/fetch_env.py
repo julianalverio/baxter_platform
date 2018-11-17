@@ -1,7 +1,7 @@
 import numpy as np
 
 from gym.envs.robotics import rotations, robot_env, utils
-
+import os
 
 def goal_distance(goal_a, goal_b):
     assert goal_a.shape == goal_b.shape
