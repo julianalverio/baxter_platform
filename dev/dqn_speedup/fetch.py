@@ -21,7 +21,7 @@ import cv2
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
-# import gym
+import gym
 from gym.envs.robotics import fetch_env
 from gym import utils
 
@@ -125,8 +125,8 @@ class Trainer(object):
         self.params = HYPERPARAMS
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         import pdb; pdb.set_trace()
+        self.env = gym.make('FetchPush-v1').unwrapped
         self.env = self.makeEnv()
-        # self.env = gym.make('FetchPush-v1').unwrapped
 
         self.action_space = 6
         self.observation_space = [1, 146, 168]

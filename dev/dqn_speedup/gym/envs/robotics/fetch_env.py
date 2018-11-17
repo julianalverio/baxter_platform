@@ -56,11 +56,10 @@ class FetchEnv(robot_env.RobotEnv):
 
         self.metadata = {
             'render.modes': ['human', 'rgb_array'],
-            'video.frames_per_second': int(np.round(1.0 / self.dt))
+            'video.frames_per_second': int(np.round(1.0 / self.sim.model.opt.timestep * self.sim.nsubsteps))  ## this will most likely be broken
         }
 
         self.seed()
-        self._env_setup(initial_qpos=initial_qpos)
         self.initial_state = copy.deepcopy(self.sim.get_state())
 
         self.goal = self._sample_goal()
@@ -71,6 +70,10 @@ class FetchEnv(robot_env.RobotEnv):
             achieved_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
             observation=spaces.Box(-np.inf, np.inf, shape=obs['observation'].shape, dtype='float32'),
         ))
+
+    @property
+    def dt(self):
+        return self.sim.model.opt.timestep * self.sim.nsubsteps
 
     # GoalEnv methods
     # ----------------------------
