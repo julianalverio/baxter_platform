@@ -281,7 +281,11 @@ class Trainer(object):
         score = 0
         import time
         cpu = torch.device('cpu')
+        import pdb; pdb.set_trace()
         while not done:
+            action = torch.tensor([random.randrange(self.action_space)], device=self.device)
+            self.env.step(self.convertAction(action))
+
             state = state.to(cpu)
             env.render(mode='human')
             time.sleep(0.1)
