@@ -1,5 +1,6 @@
 import numpy as np
 
+import pdb; pdb.set_trace()
 from gym.envs.robotics import rotations, robot_env, utils
 import os
 import mujoco_py
