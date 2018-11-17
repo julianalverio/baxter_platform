@@ -197,7 +197,7 @@ class Trainer(object):
 
     def preprocess(self, state):
         # state = state[30:450, 80:445]
-        state = state[30:400, 70:450]
+        state = state[30:500, 70:450]
         Image.fromarray(state).show()
         import pdb; pdb.set_trace()
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
