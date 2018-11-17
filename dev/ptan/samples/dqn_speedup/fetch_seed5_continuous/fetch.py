@@ -285,7 +285,7 @@ class Trainer(object):
             state = state.to(cpu)
             env.render(mode='human')
             time.sleep(0.1)
-            action = torch.argmax(target_net(state), dim=1).to(self.device)
+            action = self.convertAction(torch.argmax(target_net(state), dim=1).to(self.device))
             state, _, done, _ = env.step(action.item())
             score += self.getReward()
         print("Score: ", score)
@@ -298,7 +298,7 @@ if __name__ == "__main__":
     print('Trainer Initialized')
     print("Prefetching Now...")
     import pdb; pdb.set_trace()
-    trainer.train()
+    # trainer.train()
     # trainer.playback('pong_1000.pth')
 
 
