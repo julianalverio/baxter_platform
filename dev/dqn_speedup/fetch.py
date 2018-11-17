@@ -26,6 +26,8 @@ sys.path.pop(0)
 import gym
 from gym.envs.robotics import fetch_env
 from gym import utils
+from gym.wrappers.time_limit import TimeLimit
+
 
 HYPERPARAMS = {
         'replay_size':      100000,
@@ -127,8 +129,9 @@ class Trainer(object):
         self.params = HYPERPARAMS
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         import pdb; pdb.set_trace()
-        self.env = gym.make('FetchPush-v1').unwrapped
+        # self.env = gym.make('FetchPush-v1').unwrapped
         self.env = self.makeEnv()
+        self.env = self.env.unwrapped
 
         self.action_space = 6
         self.observation_space = [1, 146, 168]
@@ -149,18 +152,32 @@ class Trainer(object):
 
 
     def makeEnv(self):
-        MODEL_XML_PATH = 'fetch/push.xml'
+        import pdb; pdb.set_trace()
         initial_qpos = {
             'robot0:slide0': 0.405,
             'robot0:slide1': 0.48,
             'robot0:slide2': 0.0,
             'object0:joint': [1.25, 0.53, 0.4, 1., 0., 0., 0.],
         }
-        return fetch_env.FetchEnv.__init__(
-            self, MODEL_XML_PATH, has_object=True, block_gripper=True, n_substeps=20,
+        env = fetch_env.FetchEnv('fetch/push.xml', has_object=True, block_gripper=True, n_substeps=20,
             gripper_extra_height=0.0, target_in_the_air=False, target_offset=0.0,
             obj_range=0.15, target_range=0.15, distance_threshold=0.05,
             initial_qpos=initial_qpos, reward_type='sparse')
+        return TimeLimit(env)
+
+
+        # MODEL_XML_PATH = 'fetch/push.xml'
+        # initial_qpos = {
+        #     'robot0:slide0': 0.405,
+        #     'robot0:slide1': 0.48,
+        #     'robot0:slide2': 0.0,
+        #     'object0:joint': [1.25, 0.53, 0.4, 1., 0., 0., 0.],
+        # }
+        # env = fetch_env.FetchEnv.__init__(
+        #     self, MODEL_XML_PATH, has_object=True, block_gripper=True, n_substeps=20,
+        #     gripper_extra_height=0.0, target_in_the_air=False, target_offset=0.0,
+        #     obj_range=0.15, target_range=0.15, distance_threshold=0.05,
+        #     initial_qpos=initial_qpos, reward_type='sparse')
         # utils.EzPickle.__init__(self)
 
 
