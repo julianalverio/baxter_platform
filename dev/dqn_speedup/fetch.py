@@ -193,10 +193,10 @@ class Trainer(object):
         self.env.block_gripper = True
         self.env.step([0, 0, 0, 0])
         self.env.render(mode='rgb_array')
-        import pdb; pdb.set_trace()
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
+        import pdb; pdb.set_trace()
         state = state[200:435, 50:460]
         Image.fromarray(state).show()
         time.sleep(0.2)
