@@ -192,6 +192,7 @@ class Trainer(object):
         self.env.block_gripper = True
         self.env.step([0,0,0,0])
         self.env.render()
+        self.env.render(mode='rgb_array')
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
