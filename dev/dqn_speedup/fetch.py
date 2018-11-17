@@ -182,7 +182,6 @@ class Trainer(object):
 
     def reset(self):
         self.env.reset()
-        import pdb; pdb.set_trace()
         self.env.render()
         self.env.viewer.cam.lookat[0] = 1.
         self.env.viewer.cam.lookat[1] = 1.5
@@ -192,8 +191,9 @@ class Trainer(object):
         self.env.viewer.cam.distance = 2.5
         self.env.sim.nsubsteps = 2
         self.env.block_gripper = True
-        self.env.step([0,0,0,0])
+        self.env.step([0, 0, 0, 0])
         self.env.render(mode='rgb_array')
+        import pdb; pdb.set_trace()
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
