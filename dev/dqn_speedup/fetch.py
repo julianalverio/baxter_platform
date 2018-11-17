@@ -22,7 +22,6 @@ import time
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
-import pdb; pdb.set_trace()
 import sys
 # sys.path.pop(0)
 # import gym
