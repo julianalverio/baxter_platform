@@ -293,13 +293,12 @@ class Trainer(object):
 
 
 if __name__ == "__main__":
-    import pdb; pdb.set_trace()
     trainer = Trainer()
     print('Trainer Initialized')
     print("Prefetching Now...")
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     # trainer.train()
-    # trainer.playback('pong_1000.pth')
+    trainer.playback('pong_1000.pth')
 
 
 
