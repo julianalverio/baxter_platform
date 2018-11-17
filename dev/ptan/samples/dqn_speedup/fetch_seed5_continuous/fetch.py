@@ -286,7 +286,7 @@ class Trainer(object):
             env.render(mode='human')
             time.sleep(0.1)
             action = self.convertAction(torch.argmax(target_net(state), dim=1).to(self.device))
-            env.step(action.item())
+            env.step(action)
             state = self.preprocess(env.render(mode='rgb_array'))
             score += self.getReward()
         print("Score: ", score)
