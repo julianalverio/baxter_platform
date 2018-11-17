@@ -13,9 +13,9 @@ class FetchEnv(robot_env.RobotEnv):
     """
 
     def __init__(
-        self, model_path, n_substeps, gripper_extra_height, block_gripper,
+        self, model_path, gripper_extra_height, block_gripper,
         has_object, target_in_the_air, target_offset, obj_range, target_range,
-        distance_threshold, initial_qpos, reward_type,
+        distance_threshold, initial_qpos, reward_type, n_substeps=4
     ):
         """Initializes a new Fetch environment.
 
@@ -43,9 +43,33 @@ class FetchEnv(robot_env.RobotEnv):
         self.distance_threshold = distance_threshold
         self.reward_type = reward_type
 
-        super(robot_env.RobotEnv, self).__init__(
-            model_path=model_path, n_substeps=n_substeps, n_actions=4,
-            initial_qpos=initial_qpos)
+        fullpath = os.path.join(os.path.dirname(__file__), 'assets', model_path)
+
+        # super(FetchEnv, self).__init__(
+        #     model_path=model_path, n_substeps=n_substeps, n_actions=4,
+        #     initial_qpos=initial_qpos)
+
+        model = mujoco_py.load_model_from_path(fullpath)
+        self.sim = mujoco_py.MjSim(model, nsubsteps=n_substeps)
+        self.viewer = None
+
+        self.metadata = {
+            'render.modes': ['human', 'rgb_array'],
+            'video.frames_per_second': int(np.round(1.0 / self.dt))
+        }
+
+        self.seed()
+        self._env_setup(initial_qpos=initial_qpos)
+        self.initial_state = copy.deepcopy(self.sim.get_state())
+
+        self.goal = self._sample_goal()
+        obs = self._get_obs()
+        self.action_space = spaces.Box(-1., 1., shape=(n_actions,), dtype='float32')
+        self.observation_space = spaces.Dict(dict(
+            desired_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
+            achieved_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
+            observation=spaces.Box(-np.inf, np.inf, shape=obs['observation'].shape, dtype='float32'),
+        ))
 
     # GoalEnv methods
     # ----------------------------
@@ -66,6 +90,10 @@ class FetchEnv(robot_env.RobotEnv):
             self.sim.data.set_joint_qpos('robot0:l_gripper_finger_joint', 0.)
             self.sim.data.set_joint_qpos('robot0:r_gripper_finger_joint', 0.)
             self.sim.forward()
+
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
 
     def _set_action(self, action):
         assert action.shape == (4,)
