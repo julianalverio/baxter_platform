@@ -8,17 +8,13 @@ random.seed(5)
 import numpy as np
 np.random.seed(5)
 
-import gym
-import argparse
+
 
 import torch
 import torch.optim as optim
 
 
-import other
-import csv
 import torch.nn as nn
-import collections
 from PIL import Image
 import copy
 from collections import namedtuple
@@ -26,7 +22,10 @@ from torch.autograd import Variable
 import cv2
 
 
-import os; os.environ["CUDA_VISIBLE_DEVICES"]="0"
+import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
+
+sys.path.insert(0, os.getcwd() + '/..')
+import gym
 
 
 HYPERPARAMS = {
@@ -234,10 +233,9 @@ class Trainer(object):
         if self.task == 2:
             distance = np.linalg.norm(gripper_position - object_position)
             if distance <= 0.5:
-                reward = 1. - distance
+                reward = round(1. - distance, 3)
             else:
                 reward = 0.
-            print(reward)
             if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
                 return reward, True
             else:
@@ -275,19 +273,15 @@ class Trainer(object):
 
 
     def playback(self, path):
-        target_net = torch.load(path, map_location='cpu')
-        env = gym.make('FetchPush-v1')
-        state = self.preprocess(env.reset())
+        target_net = torch.load(path)
+        state = self.preprocess(self.reset())
+        self.env.render()
         done = False
-        score = 0
-        import time
         while not done:
-            env.render(mode='human')
-            time.sleep(0.1)
-            action = torch.argmax(target_net(state), dim=1).to(self.device)
-            state, _, done, _ = env.step(action.item())
-            score += self.getReward()
-        print("Score: ", score)
+            self.env.render(mode='human')
+            action = self.convertAction(torch.argmax(target_net(state), dim=1).to(self.device))
+            self.env.step(action)
+            state = self.preprocess(self.env.render(mode='rgb_array'))
 
 
 
@@ -296,7 +290,7 @@ if __name__ == "__main__":
     print('Trainer Initialized')
     print("Prefetching Now...")
     trainer.train()
-    # trainer.playback('pong_500.pth')
+    # trainer.playback('pong_3200.pth')
 
 
 
