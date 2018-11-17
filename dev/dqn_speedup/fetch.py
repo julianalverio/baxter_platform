@@ -128,7 +128,6 @@ class Trainer(object):
     def __init__(self):
         self.params = HYPERPARAMS
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        import pdb; pdb.set_trace()
         # self.env = gym.make('FetchPush-v1').unwrapped
         self.env = self.makeEnv()
         self.env = self.env.unwrapped
@@ -152,7 +151,6 @@ class Trainer(object):
 
 
     def makeEnv(self):
-        import pdb; pdb.set_trace()
         initial_qpos = {
             'robot0:slide0': 0.405,
             'robot0:slide1': 0.48,
@@ -197,6 +195,8 @@ class Trainer(object):
 
     def preprocess(self, state):
         state = state[30:450, 80:445]
+        import pdb; pdb.set_trace()
+        Image.fromarray(state).show()
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (168, 146), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
         return torch.tensor(state, device=self.device).unsqueeze(0).unsqueeze(0)
