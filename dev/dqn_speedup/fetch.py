@@ -17,6 +17,7 @@ import copy
 from collections import namedtuple
 from torch.autograd import Variable
 import cv2
+import time
 
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
@@ -181,7 +182,6 @@ class Trainer(object):
 
     def reset(self):
         self.env.reset()
-        self.env.render()
         self.env.viewer.cam.lookat[0] = 1.
         self.env.viewer.cam.lookat[1] = 1.5
         self.env.viewer.cam.lookat[2] = 1.1
@@ -191,15 +191,13 @@ class Trainer(object):
         self.env.sim.nsubsteps = 2
         self.env.block_gripper = True
         self.env.step([0,0,0,0])
-        self.env.render()
         self.env.render(mode='rgb_array')
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
-        # state = state[30:450, 80:445]
-        import pdb; pdb.set_trace()
-        state = state[30:500, 70:450]
+        state = state[200:435, 50:460]
         Image.fromarray(state).show()
+        time.sleep(0.2)
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (168, 146), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
         return torch.tensor(state, device=self.device).unsqueeze(0).unsqueeze(0)
