@@ -282,8 +282,8 @@ class Trainer(object):
         import time
         import pdb; pdb.set_trace()
         while not done:
-            action = torch.tensor([random.randrange(self.action_space)], device=self.device)
-            self.env.step(self.convertAction(action))
+            # action = torch.tensor([random.randrange(self.action_space)], device=self.device)
+            # self.env.step(self.convertAction(action))
 
             env.render(mode='human')
             time.sleep(0.1)
