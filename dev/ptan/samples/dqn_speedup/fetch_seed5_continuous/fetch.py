@@ -278,17 +278,13 @@ class Trainer(object):
         self.env.render()
         done = False
         score = 0
-        import time
-        import pdb; pdb.set_trace()
+        # import time
         while not done:
             self.env.render(mode='human')
-            time.sleep(0.1)
+            # time.sleep()
             action = self.convertAction(torch.argmax(target_net(state), dim=1).to(self.device))
             self.env.step(action)
             state = self.preprocess(self.env.render(mode='rgb_array'))
-            # score, _ = self.getReward()
-
-        print("Score: ", score)
 
 
 
