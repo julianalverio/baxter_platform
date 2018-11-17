@@ -98,7 +98,6 @@ class Trainer(object):
         self.optimizer = optim.Adam(self.policy_net.parameters())
         self.memory = ReplayMemory(1000, self.transition)
 
-        self.num_episodes = num_episodes
         self.steps_done = 0
 
         self.initial_object_position = None
