@@ -95,9 +95,6 @@ class FetchEnv(robot_env.RobotEnv):
             self.sim.data.set_joint_qpos('robot0:r_gripper_finger_joint', 0.)
             self.sim.forward()
 
-    def seed(self, seed=None):
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
 
     def _set_action(self, action):
         assert action.shape == (4,)
