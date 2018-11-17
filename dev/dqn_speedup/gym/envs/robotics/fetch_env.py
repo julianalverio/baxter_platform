@@ -1,8 +1,7 @@
 import numpy as np
 
 from gym.envs.robotics import rotations, robot_env, utils
-import os
-import mujoco_py
+
 
 def goal_distance(goal_a, goal_b):
     assert goal_a.shape == goal_b.shape
@@ -14,12 +13,11 @@ class FetchEnv(robot_env.RobotEnv):
     """
 
     def __init__(
-        self, model_path, gripper_extra_height, block_gripper,
+        self, model_path, n_substeps, gripper_extra_height, block_gripper,
         has_object, target_in_the_air, target_offset, obj_range, target_range,
-        distance_threshold, initial_qpos, reward_type, n_substeps=4
+        distance_threshold, initial_qpos, reward_type,
     ):
         """Initializes a new Fetch environment.
-
         Args:
             model_path (string): path to the environments XML file
             n_substeps (int): number of substeps the simulation runs on every call to step
@@ -44,36 +42,9 @@ class FetchEnv(robot_env.RobotEnv):
         self.distance_threshold = distance_threshold
         self.reward_type = reward_type
 
-        fullpath = os.path.join(os.path.dirname(__file__), 'assets', model_path)
-
         super(FetchEnv, self).__init__(
             model_path=model_path, n_substeps=n_substeps, n_actions=4,
             initial_qpos=initial_qpos)
-
-        # model = mujoco_py.load_model_from_path(fullpath)
-        # self.sim = mujoco_py.MjSim(model, nsubsteps=n_substeps)
-        # self.viewer = None
-        #
-        # self.metadata = {
-        #     'render.modes': ['human', 'rgb_array'],
-        #     'video.frames_per_second': int(np.round(1.0 / self.sim.model.opt.timestep * self.sim.nsubsteps))  ## this will most likely be broken
-        # }
-        #
-        # self.seed()
-        # self.initial_state = copy.deepcopy(self.sim.get_state())
-        #
-        # self.goal = self._sample_goal()
-        # obs = self._get_obs()
-        # self.action_space = spaces.Box(-1., 1., shape=(n_actions,), dtype='float32')
-        # self.observation_space = spaces.Dict(dict(
-        #     desired_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
-        #     achieved_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
-        #     observation=spaces.Box(-np.inf, np.inf, shape=obs['observation'].shape, dtype='float32'),
-        # ))
-
-    @property
-    def dt(self):
-        return self.sim.model.opt.timestep * self.sim.nsubsteps
 
     # GoalEnv methods
     # ----------------------------
@@ -94,7 +65,6 @@ class FetchEnv(robot_env.RobotEnv):
             self.sim.data.set_joint_qpos('robot0:l_gripper_finger_joint', 0.)
             self.sim.data.set_joint_qpos('robot0:r_gripper_finger_joint', 0.)
             self.sim.forward()
-
 
     def _set_action(self, action):
         assert action.shape == (4,)
@@ -150,28 +120,20 @@ class FetchEnv(robot_env.RobotEnv):
         }
 
     def _viewer_setup(self):
-        # body_id = self.sim.model.body_name2id('robot0:gripper_link')
-        # lookat = self.sim.data.body_xpos[body_id]
-        # for idx, value in enumerate(lookat):
-        #     self.viewer.cam.lookat[idx] = value
-        # self.viewer.cam.distance = 2.5
-        # self.viewer.cam.azimuth = 132.
-        # self.viewer.cam.elevation = -14.
-        self.env.viewer.cam.lookat[0] = 1.
-        self.env.viewer.cam.lookat[1] = 1.5
-        self.env.viewer.cam.lookat[2] = 1.1
-        self.env.viewer.cam.azimuth = 165.
-        self.env.viewer.cam.elevation = 10.
-        self.env.viewer.cam.distance = 2.5
-
+        body_id = self.sim.model.body_name2id('robot0:gripper_link')
+        lookat = self.sim.data.body_xpos[body_id]
+        for idx, value in enumerate(lookat):
+            self.viewer.cam.lookat[idx] = value
+        self.viewer.cam.distance = 2.5
+        self.viewer.cam.azimuth = 132.
+        self.viewer.cam.elevation = -14.
 
     def _render_callback(self):
-        pass
         # Visualize target.
-        # sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()
-        # site_id = self.sim.model.site_name2id('target0')
-        # self.sim.model.site_pos[site_id] = self.goal - sites_offset[0]
-        # self.sim.forward()
+        sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()
+        site_id = self.sim.model.site_name2id('target0')
+        self.sim.model.site_pos[site_id] = self.goal - sites_offset[0]
+        self.sim.forward()
 
     def _reset_sim(self):
         self.sim.set_state(self.initial_state)
