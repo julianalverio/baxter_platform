@@ -23,8 +23,8 @@ import time
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
 import sys
-sys.path.pop(0)
-import gym
+# sys.path.pop(0)
+# import gym
 from gym.envs.robotics import fetch_env
 from gym import utils
 from gym.wrappers.time_limit import TimeLimit
