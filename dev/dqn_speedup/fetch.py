@@ -22,7 +22,7 @@ import cv2
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
 import sys
-sys.pop(0)
+sys.path.pop(0)
 import gym
 from gym.envs.robotics import fetch_env
 from gym import utils
