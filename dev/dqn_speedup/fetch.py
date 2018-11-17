@@ -196,7 +196,6 @@ class Trainer(object):
 
     def preprocess(self, state):
         state = state[30:450, 80:445]
-        import pdb; pdb.set_trace()
         Image.fromarray(state).show()
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (168, 146), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
@@ -213,6 +212,7 @@ class Trainer(object):
 
 
     def addExperience(self):
+        import pdb; pdb.set_trace()
         self.movement_count += 1
         if random.random() < self.epsilon_tracker.epsilon():
             action = torch.tensor([random.randrange(self.action_space)], device=self.device)
