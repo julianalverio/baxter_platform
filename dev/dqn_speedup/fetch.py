@@ -192,6 +192,7 @@ class Trainer(object):
         self.env.viewer.cam.distance = 2.5
         self.env.sim.nsubsteps = 2
         self.env.block_gripper = True
+        self.env.render()
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
