@@ -87,6 +87,7 @@ class RobotEnv(gym.GoalEnv):
             self.viewer = None
 
     def render(self, mode='human'):
+        import pdb; pdb.set_trace()
         self._render_callback()
         if mode == 'rgb_array':
             self._get_viewer().render()
