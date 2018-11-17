@@ -27,6 +27,7 @@ import mujoco_py
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
+import pdb; pdb.set_trace()
 sys.path.insert(os.getcwd() + '/..')
 import gym
 
