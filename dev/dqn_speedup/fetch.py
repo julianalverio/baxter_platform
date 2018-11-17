@@ -196,6 +196,7 @@ class Trainer(object):
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
+        import pdb; pdb.set_trace()
         state = state[30:450, 80:445]
         Image.fromarray(state).show()
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
