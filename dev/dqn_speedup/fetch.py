@@ -25,7 +25,7 @@ import cv2
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
 import sys
 import pdb; pdb.set_trace()
-sys.path.insert(0, os.getcwd() + '/..')
+sys.path.insert(0, '/storage/jalverio/venv/baxter_platform/dev/')
 import gym
 
 
