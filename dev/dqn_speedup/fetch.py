@@ -214,7 +214,6 @@ class Trainer(object):
 
 
     def addExperience(self):
-        import pdb; pdb.set_trace()
         self.movement_count += 1
         if random.random() < self.epsilon_tracker.epsilon():
             action = torch.tensor([random.randrange(self.action_space)], device=self.device)
