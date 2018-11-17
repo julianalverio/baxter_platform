@@ -24,10 +24,6 @@ from torch.autograd import Variable
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
 import sys
-import pdb; pdb.set_trace()
-sys.path.insert(0, '/storage/jalverio/venv/baxter_platform/dev/gym')
-# from . import gym
-import pdb; pdb.set_trace()
 import gym
 
 
