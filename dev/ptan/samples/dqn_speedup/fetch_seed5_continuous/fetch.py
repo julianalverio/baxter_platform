@@ -294,7 +294,7 @@ if __name__ == "__main__":
     print("Prefetching Now...")
     # import pdb; pdb.set_trace()
     # trainer.train()
-    trainer.playback('pong_1000.pth')
+    trainer.playback('pong_3200.pth')
 
 
 
