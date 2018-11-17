@@ -8,7 +8,6 @@ random.seed(5)
 import numpy as np
 np.random.seed(5)
 
-import gym
 import argparse
 
 import torch
@@ -25,7 +24,12 @@ from torch.autograd import Variable
 import cv2
 import mujoco_py
 
+
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
+
+sys.path.insert(os.getcwd() + '/..')
+import gym
+
 
 
 HYPERPARAMS = {
