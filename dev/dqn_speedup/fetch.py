@@ -23,7 +23,7 @@ import cv2
 
 
 import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
-
+import sys
 sys.path.insert(0, os.getcwd() + '/..')
 import gym
 
