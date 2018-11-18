@@ -265,7 +265,7 @@ class Trainer(object):
         if self.task == 2:
             distance = np.linalg.norm(gripper_position - object_position)
             reward = 1./distance
-            if self.env.sim.data.get_site_xpos('robot0:grip') > 0.6:
+            if self.env.sim.data.get_site_xpos('robot0:grip')[2] > 0.6:
                 reward = -1.
             if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
                 self.score += 1.
