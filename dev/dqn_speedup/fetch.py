@@ -188,10 +188,7 @@ class Trainer(object):
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
-        import pdb; pdb.set_trace()
         state = state[200:435, 50:460]
-        Image.fromarray(state).show()
-        time.sleep(0.2)
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (168, 146), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
         return torch.tensor(state, device=self.device).unsqueeze(0).unsqueeze(0)
