@@ -24,7 +24,7 @@ from gym.wrappers.time_limit import TimeLimit
 
 
 HYPERPARAMS = {
-        'replay_size':      50000,
+        'replay_size':      35000,
         'replay_initial':   10000,
         'target_net_sync':  1000,
         'epsilon_frames':   10**5,
@@ -146,7 +146,6 @@ class Trainer(object):
         self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
         self.movement_count = 0
         self.seed = seed
-        self.memory.showCapacity()
 
 
     def makeEnv(self):
