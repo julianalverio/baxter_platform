@@ -158,7 +158,7 @@ class Trainer(object):
             'robot0:slide2': 0.0,
             'object0:joint': [1.25, 0.53, 0.4, 1., 0., 0., 0.],
         }
-        env = fetch_env.FetchEnv('fetch/push.xml', has_object=True, block_gripper=True, n_substeps=20,
+        env = fetch_env.FetchEnv('fetch/push.xml', has_object=True, block_gripper=True, n_substeps=2,
             gripper_extra_height=0.0, target_in_the_air=False, target_offset=0.0,
             obj_range=0.15, target_range=0.15, distance_threshold=0.05,
             initial_qpos=initial_qpos, reward_type='sparse')
@@ -182,14 +182,8 @@ class Trainer(object):
 
     def reset(self):
         self.env.reset()
-        import pdb; pdb.set_trace()
         self.env.render()
-        self.env.viewer.cam.lookat[0] = 1.
-        self.env.viewer.cam.lookat[1] = 1.5
-        self.env.viewer.cam.lookat[2] = 1.1
-        self.env.viewer.cam.azimuth = 165.
-        self.env.viewer.cam.elevation = 10.
-        self.env.viewer.cam.distance = 2.5
+
         self.env.sim.nsubsteps = 2
         self.env.block_gripper = True
         self.env.step([0, 0, 0, 0])
