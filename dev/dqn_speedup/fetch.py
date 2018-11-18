@@ -183,7 +183,6 @@ class Trainer(object):
     def reset(self):
         self.env.reset()
         self.env.render()
-
         self.env.sim.nsubsteps = 2
         return self.env.render(mode='rgb_array')
 
@@ -271,6 +270,11 @@ class Trainer(object):
                 return reward, False
 
     def train(self):
+        for _ in range(200):
+            self.env.step([0,0,0,1])
+            self.env.render()
+            print(self.env.sim.data.get_site_xpos('robot0:grip')[2])
+
         frame_idx = 0
         while True:
             frame_idx += 1
