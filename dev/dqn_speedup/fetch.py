@@ -135,7 +135,7 @@ class Trainer(object):
         self.env = self.env.unwrapped
 
         self.action_space = 6
-        self.observation_space = [1, 146, 168]
+        self.observation_space = [3, 102, 205]
         self.policy_net = DQN(self.observation_space, self.action_space, self.device).to(self.device)
         self.target_net = copy.deepcopy(self.policy_net)
         self.epsilon_tracker = EpsilonTracker(self.params)
@@ -190,8 +190,8 @@ class Trainer(object):
     def preprocess(self, state):
         state = state[230:435, 50:460]
         # state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
-        import pdb; pdb.set_trace()
-        state = cv2.resize(state, (168, 146), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
+        state = cv2.resize(state, (state.shape[1]//2, state.shape[0]//2), interpolation=cv2.INTER_AREA).astype(np.float32)/256
+        np.swapaxes(state, 0, 2)
         return torch.tensor(state, device=self.device).unsqueeze(0)
 
     # indices are x, y, z, gripper
@@ -224,6 +224,8 @@ class Trainer(object):
         else:
             self.memory.push(self.state, action, torch.tensor([reward], device=self.device), next_state)
             self.state = next_state
+        if self.state == next_state:
+            print('CURRENT STATE EQUAL TO NEXT STATE')
         return done
 
 
