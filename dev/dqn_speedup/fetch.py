@@ -254,7 +254,6 @@ class Trainer(object):
     '''
     def getReward(self):
         gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
-        import pdb; pdb.set_trace()
         object_position = self.env.sim.data.get_site_xpos('object0')
         # if self.task == 1:
         #     if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
