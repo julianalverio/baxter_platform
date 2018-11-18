@@ -214,10 +214,6 @@ class Trainer(object):
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
         reward, done = self.getReward()
         done = done or self.movement_count == 1500
-        if not np.any(cv2.subtract(np.array(self.state), np.array(next_state))):
-            print('CURRENT STATE EQUAL TO NEXT STATE')
-        else:
-            print('ALL GOOD')
 
 
         if done:
@@ -236,7 +232,7 @@ class Trainer(object):
         transitions = self.memory.sample(self.batch_size)
         batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
-        non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
+        non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])g
         state_batch = torch.cat(list(batch.state))
         action_batch = torch.cat(list(batch.action))
         reward_batch = torch.cat(list(batch.reward))
