@@ -102,6 +102,7 @@ class EpsilonTracker:
     def epsilon(self):
         old_epsilon = self._epsilon
         self._epsilon -= self.epsilon_delta
+        print old_epsilon
         return max(old_epsilon, self.epsilon_final)
 
 
