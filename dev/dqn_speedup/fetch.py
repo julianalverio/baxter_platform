@@ -188,8 +188,8 @@ class Trainer(object):
 
     def preprocess(self, state):
         import pdb; pdb.set_trace()
-        Image.fromarray(self.env.render(mode='rgb_array')[200:435, 50:460]).show()
-        state = state[200:435, 50:460]
+        Image.fromarray(self.env.render(mode='rgb_array')[230:435, 50:460]).show()
+        state = state[230:435, 50:460]
         state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (168, 146), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
         return torch.tensor(state, device=self.device).unsqueeze(0).unsqueeze(0)
@@ -261,10 +261,9 @@ class Trainer(object):
         #     return 0., False
         if self.task == 2:
             distance = np.linalg.norm(gripper_position - object_position)
-            if distance <= 0.5:
-                reward = 1./distance
-            else:
-                reward = 0.
+            reward = 1./distance
+            if self.env.sim.data.get_site_xpos('robot0:grip') > 0.6:
+                reward = -1.
             if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
                 self.score += 1.
                 return reward, True
