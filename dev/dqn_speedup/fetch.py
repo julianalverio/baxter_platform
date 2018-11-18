@@ -215,9 +215,10 @@ class Trainer(object):
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
         reward, done = self.getReward()
         done = done or self.movement_count == 1500
-        import pdb; pdb.set_trace()
-        if not np.any(cv2.subtract(self.state, next_state)):
+        if not np.any(cv2.subtract(np.array(self.state), np.array(next_state))):
             print('CURRENT STATE EQUAL TO NEXT STATE')
+        else:
+            print('ALL GOOD')
 
 
         if done:
