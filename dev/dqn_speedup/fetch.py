@@ -117,6 +117,9 @@ class ReplayMemory(object):
     def __len__(self):
         return len(self.memory)
 
+    def capacity(self):
+        print('Buffer Capacity:', len(self.memory) * 1. / self.capacity)
+
 
 class Trainer(object):
     def __init__(self, seed):
@@ -143,6 +146,7 @@ class Trainer(object):
         self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
         self.movement_count = 0
         self.seed = seed
+        self.memory.capacity()
 
 
     def makeEnv(self):
@@ -269,7 +273,7 @@ class Trainer(object):
             if done:
                 self.reward_tracker.add(self.score)
                 print('Episode: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
-                print("Buffer %s full" % len(self.memory)*1./self.memory.capacity)
+                self.memory.capacity()
                 if (self.episode % 100 == 0):
                     torch.save(self.target_net, 'fetch_seed%s_%s.pth' % (self.seed, self.episode))
                     print('Model Saved!')
