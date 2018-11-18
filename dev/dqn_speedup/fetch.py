@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
-import torch
-torch.backends.cudnn.deterministic = True
-torch.manual_seed(5)
-torch.cuda.manual_seed_all(5)
 import random
-random.seed(5)
 import numpy as np
-np.random.seed(5)
-
 import torch
 import torch.optim as optim
 
@@ -126,7 +119,7 @@ class ReplayMemory(object):
 
 
 class Trainer(object):
-    def __init__(self):
+    def __init__(self, seed):
         self.params = HYPERPARAMS
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         # self.env = gym.make('FetchPush-v1').unwrapped
@@ -149,6 +142,7 @@ class Trainer(object):
         self.task = 2
         self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
         self.movement_count = 0
+        self.seed = seed
 
 
     def makeEnv(self):
@@ -163,21 +157,6 @@ class Trainer(object):
             obj_range=0.15, target_range=0.15, distance_threshold=0.05,
             initial_qpos=initial_qpos, reward_type='sparse')
         return TimeLimit(env)
-
-
-        # MODEL_XML_PATH = 'fetch/push.xml'
-        # initial_qpos = {
-        #     'robot0:slide0': 0.405,
-        #     'robot0:slide1': 0.48,
-        #     'robot0:slide2': 0.0,
-        #     'object0:joint': [1.25, 0.53, 0.4, 1., 0., 0., 0.],
-        # }
-        # env = fetch_env.FetchEnv.__init__(
-        #     self, MODEL_XML_PATH, has_object=True, block_gripper=True, n_substeps=20,
-        #     gripper_extra_height=0.0, target_in_the_air=False, target_offset=0.0,
-        #     obj_range=0.15, target_range=0.15, distance_threshold=0.05,
-        #     initial_qpos=initial_qpos, reward_type='sparse')
-        # utils.EzPickle.__init__(self)
 
 
     def reset(self):
@@ -270,6 +249,7 @@ class Trainer(object):
             else:
                 return reward, False
 
+
     def train(self):
         frame_idx = 0
         while True:
@@ -290,7 +270,7 @@ class Trainer(object):
                 self.reward_tracker.add(self.score)
                 print('Episode: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
                 if (self.episode % 100 == 0):
-                    torch.save(self.target_net, 'pong_%s.pth' % self.episode)
+                    torch.save(self.target_net, 'fetch_seed%s_%s.pth' % (self.seed, self.episode))
                     print('Model Saved!')
                 self.score = 0
                 self.movement_count = 0
@@ -315,7 +295,14 @@ class Trainer(object):
 
 
 if __name__ == "__main__":
-    trainer = Trainer()
+    seed = random.randrange(0, 100)
+    print('RANDOM SEED: ', seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    trainer = Trainer(seed)
     print('Trainer Initialized')
     print("Prefetching Now...")
     trainer.train()
