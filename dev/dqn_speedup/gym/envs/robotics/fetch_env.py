@@ -130,10 +130,11 @@ class FetchEnv(robot_env.RobotEnv):
 
     def _render_callback(self):
         # Visualize target.
-        sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()
-        site_id = self.sim.model.site_name2id('target0')
-        self.sim.model.site_pos[site_id] = self.goal - sites_offset[0]
-        self.sim.forward()
+        # sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()
+        # site_id = self.sim.model.site_name2id('target0')
+        # self.sim.model.site_pos[site_id] = self.goal - sites_offset[0]
+        # self.sim.forward()
+        pass
 
     def _reset_sim(self):
         self.sim.set_state(self.initial_state)
