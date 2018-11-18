@@ -190,8 +190,7 @@ class Trainer(object):
         state = state[230:435, 50:460]
         # state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (state.shape[1]//2, state.shape[0]//2), interpolation=cv2.INTER_AREA).astype(np.float32)/256
-        import pdb; pdb.set_trace()
-        np.swapaxes(state, 0, 2)
+        state = np.swapaxes(state, 0, 2)
         return torch.tensor(state, device=self.device).unsqueeze(0)
 
     # indices are x, y, z, gripper
