@@ -102,7 +102,7 @@ class EpsilonTracker:
     def epsilon(self):
         old_epsilon = self._epsilon
         self._epsilon -= self.epsilon_delta
-        print old_epsilon
+        print(old_epsilon)
         return max(old_epsilon, self.epsilon_final)
 
 
@@ -188,12 +188,11 @@ class Trainer(object):
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
-        import pdb; pdb.set_trace()
-        Image.fromarray(self.env.render(mode='rgb_array')[230:435, 50:460]).show()
         state = state[230:435, 50:460]
-        state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
+        # state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
+        import pdb; pdb.set_trace()
         state = cv2.resize(state, (168, 146), interpolation=cv2.INTER_AREA).transpose().astype(np.float32)/256
-        return torch.tensor(state, device=self.device).unsqueeze(0).unsqueeze(0)
+        return torch.tensor(state, device=self.device).unsqueeze(0)
 
     # indices are x, y, z, gripper
     def convertAction(self, action):
