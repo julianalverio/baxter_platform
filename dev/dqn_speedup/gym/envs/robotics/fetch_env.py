@@ -133,7 +133,7 @@ class FetchEnv(robot_env.RobotEnv):
         # sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()
         # site_id = self.sim.model.site_name2id('target0')
         # self.sim.model.site_pos[site_id] = self.goal - sites_offset[0]
-        # self.sim.forward()
+        self.sim.forward()
         pass
 
     def _reset_sim(self):
