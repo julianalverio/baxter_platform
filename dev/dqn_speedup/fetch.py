@@ -24,7 +24,7 @@ from gym.wrappers.time_limit import TimeLimit
 
 
 HYPERPARAMS = {
-        'replay_size':      100000,
+        'replay_size':      50000,
         'replay_initial':   10000,
         'target_net_sync':  1000,
         'epsilon_frames':   10**5,
