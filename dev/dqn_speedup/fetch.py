@@ -185,9 +185,6 @@ class Trainer(object):
         self.env.render()
 
         self.env.sim.nsubsteps = 2
-        self.env.block_gripper = True
-        self.env.step([0, 0, 0, 0])
-        self.env.render(mode='rgb_array')
         return self.env.render(mode='rgb_array')
 
     def preprocess(self, state):
@@ -220,7 +217,6 @@ class Trainer(object):
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
         reward, done = self.getReward()
         done = done or self.movement_count == 1500
-        self.score += reward
         if done:
             self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
             self.state = self.preprocess(self.reset())
@@ -258,18 +254,21 @@ class Trainer(object):
     '''
     def getReward(self):
         gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
+        import pdb; pdb.set_trace()
         object_position = self.env.sim.data.get_site_xpos('object0')
-        if self.task == 1:
-            if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
-                return 1., True
-            return 0., False
+        # if self.task == 1:
+        #     if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
+        #         self.score += 1.
+        #         return 1., True
+        #     return 0., False
         if self.task == 2:
             distance = np.linalg.norm(gripper_position - object_position)
             if distance <= 0.5:
-                reward = round(1. - distance, 3)
+                reward = 1./distance
             else:
                 reward = 0.
             if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
+                self.score += 1.
                 return reward, True
             else:
                 return reward, False
