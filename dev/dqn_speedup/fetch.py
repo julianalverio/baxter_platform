@@ -232,7 +232,7 @@ class Trainer(object):
         transitions = self.memory.sample(self.batch_size)
         batch = self.transition(*zip(*transitions))
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
-        non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])g
+        non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
         state_batch = torch.cat(list(batch.state))
         action_batch = torch.cat(list(batch.action))
         reward_batch = torch.cat(list(batch.reward))
