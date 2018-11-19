@@ -300,7 +300,7 @@ class Trainer(object):
             try:
                 self.env.render(mode='human')
                 action = self.convertAction(torch.argmax(target_net(state), dim=1).to(self.device))
-                if self.env.sim.data.get_site_xpos('robot0:grip')[2] <= 0.416 and torch.argmax(target_net(state), dim=1).item() == 6:
+                if self.env.sim.data.get_site_xpos('robot0:grip')[2] <= 0.416 and torch.argmax(target_net(state), dim=1).item() == 5:
                     print('NEGATIVE REWARD')
                 self.env.step(action)
                 state = self.preprocess(self.env.render(mode='rgb_array'))
