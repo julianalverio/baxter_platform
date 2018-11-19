@@ -123,7 +123,7 @@ class ReplayMemory(object):
 
 
 class Trainer(object):
-    def __init__(self, seed):
+    def __init__(self, seed, warm_start_path=''):
         self.params = HYPERPARAMS
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         # self.env = gym.make('FetchPush-v1').unwrapped
@@ -132,7 +132,10 @@ class Trainer(object):
 
         self.action_space = 6
         self.observation_space = [3, 102, 205]
-        self.policy_net = DQN(self.observation_space, self.action_space, self.device).to(self.device)
+        if not warm_start_path:
+            self.policy_net = DQN(self.observation_space, self.action_space, self.device).to(self.device)
+        else:
+            self.policy_net = torch.load(warm_start_path)
         self.target_net = copy.deepcopy(self.policy_net)
         self.epsilon_tracker = EpsilonTracker(self.params)
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.params['learning_rate'])
