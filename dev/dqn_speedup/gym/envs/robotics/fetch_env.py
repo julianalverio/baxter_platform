@@ -143,7 +143,7 @@ class FetchEnv(robot_env.RobotEnv):
 
     def _reset_sim(self):
         self.sim.set_state(self.initial_state)
-
+        import pdb; pdb.set_trace()
         # Randomize start position of object.
         if self.has_object:
             object_xpos = self.initial_gripper_xpos[:2]
