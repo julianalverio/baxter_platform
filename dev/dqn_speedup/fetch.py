@@ -12,7 +12,7 @@ from torch.autograd import Variable
 import cv2
 import time
 import argparse
-
+import csv
 
 import os
 
@@ -148,6 +148,8 @@ class Trainer(object):
         self.movement_count = 0
         self.seed = seed
         self.penalty = 0.
+        csv_file = open('seed%s_scores.csv' % self.seed, 'w+')
+        self.writer = csv.writer(csv_file)
 
 
     def makeEnv(self):
@@ -194,9 +196,9 @@ class Trainer(object):
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
         if gripper_position[2] <= 0.416 and action.item() == 5:
-            self.penalty -= 1.
+            self.penalty += 1.
         if gripper_position[2] >= 0.64 and action.item() == 4:
-            self.penalty -= 1.
+            self.penalty += 1.
         self.env.step(self.convertAction(action))
         self.movement_count += 1
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
@@ -249,13 +251,12 @@ class Trainer(object):
         #     return 0., False
         if self.task == 2:
             distance = np.linalg.norm(gripper_position - object_position)
-            reward = 1./distance
-            if self.env.sim.data.get_site_xpos('robot0:grip')[2] > 0.6:
-                reward = -1.
+            reward = -distance
             if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
+                reward += 10.
                 self.score += 1.
                 done = True
-            reward += self.penalty
+            reward -= self.penalty
             self.penalty = 0
             return reward, done
 
@@ -280,6 +281,7 @@ class Trainer(object):
             if done:
                 self.reward_tracker.add(self.score)
                 print('Episode: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
+                self.writer.writerow([self.score])
                 if (self.episode % 100 == 0):
                     torch.save(self.target_net, 'fetch_seed%s_%s.pth' % (self.seed, self.episode))
                     print('Model Saved!')
