@@ -314,9 +314,12 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     trainer = Trainer(seed)
     print('Trainer Initialized')
-    # print("Prefetching Now...")
-    print('showing example now')
-    trainer.train()
+    print("Prefetching Now...")
+    # print('showing example now')
+    try:
+        trainer.train()
+    except:
+        import pdb; pdb.set_trace()
     # trainer.playback('fetch_seed63_900.pth')
 
 
