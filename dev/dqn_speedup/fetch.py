@@ -310,6 +310,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("gpu", help="index of which gpu to use", type=int)
     args = parser.parse_args()
+    import pdb; pdb.set_trace()
     gpu_num = parser.gpu
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_num)
     seed = random.randrange(0, 100)
