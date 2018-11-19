@@ -171,6 +171,7 @@ class Trainer(object):
 
     def preprocess(self, state):
         state = state[230:435, 50:460]
+        Image.fromarray(state).show()
         # state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (state.shape[1]//2, state.shape[0]//2), interpolation=cv2.INTER_AREA).astype(np.float32)/256
         state = np.swapaxes(state, 0, 2)
@@ -194,7 +195,6 @@ class Trainer(object):
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         if self.env.sim.data.get_site_xpos('robot0:grip')[2] <= 0.416 and action.item() == 5:
             self.penalty -= 1.
-            print('GAVE A NEGATIVE PENALTY FOR BEING A BAD BOI')
         self.env.step(self.convertAction(action))
         self.movement_count += 1
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
@@ -260,6 +260,13 @@ class Trainer(object):
 
 
     def train(self):
+        while 1:
+            self.env.step([0,0,1,0])
+            self.preprocess(self.env.render(mode='rgb_array'))
+            import pdb; pdb.set_trace()
+
+
+
         frame_idx = 0
         while True:
             frame_idx += 1
