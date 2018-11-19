@@ -192,7 +192,10 @@ class Trainer(object):
             action = torch.tensor([random.randrange(self.action_space)], device=self.device)
         else:
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
-        if self.env.sim.data.get_site_xpos('robot0:grip')[2] <= 0.416 and action.item() == 5:
+        gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')[2]
+        if gripper_position[2] <= 0.416 and action.item() == 5:
+            self.penalty -= 1.
+        if gripper_position[2] >= 0.64 and action.item() == 4:
             self.penalty -= 1.
         self.env.step(self.convertAction(action))
         self.movement_count += 1
