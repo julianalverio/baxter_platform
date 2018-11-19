@@ -239,6 +239,7 @@ class Trainer(object):
     '''
     Task 1: Touch the block, discrete reward
     Task 2: Touch the block, continuous reward
+    Task 3: Move the block as far to the right as possible
     '''
     def getReward(self):
         done = False
@@ -260,6 +261,12 @@ class Trainer(object):
             self.penalty = 0
             return reward, done
 
+        if self.task == 3:
+            reward = self.env.sim.data.get_site_xpos('object0')[0] - self.initial_object_position[0]
+            reward -= self.penalty
+            self.penalty = 0
+            return reward, False
+
 
     def train(self):
         frame_idx = 0
@@ -280,7 +287,7 @@ class Trainer(object):
             # is this round over?
             if done:
                 self.reward_tracker.add(self.score)
-                print('Episode: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
+                print('Episode: %s Epsilon: %s Score: %s Mean Score: %s' % (self.episode, self.epsilon_tracker._epsilon ,self.score, self.reward_tracker.meanScore()))
                 self.writer.writerow([self.score])
                 if (self.episode % 100 == 0):
                     torch.save(self.target_net, 'fetch_seed%s_%s.pth' % (self.seed, self.episode))
@@ -321,7 +328,7 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     trainer = Trainer(seed)
     print('Trainer Initialized')
-    
+
     print("Prefetching Now...")
     # print('showing example now')
     trainer.train()
