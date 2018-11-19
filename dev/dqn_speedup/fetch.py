@@ -299,6 +299,7 @@ class Trainer(object):
         while not done:
             self.env.render(mode='human')
             action = self.convertAction(torch.argmax(target_net(state), dim=1).to(self.device))
+            self.getReward()
             self.env.step(action)
             state = self.preprocess(self.env.render(mode='rgb_array'))
 
@@ -314,13 +315,10 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     trainer = Trainer(seed)
     print('Trainer Initialized')
-    print("Prefetching Now...")
-    # print('showing example now')
-    try:
-        trainer.train()
-    except:
-        import pdb; pdb.set_trace()
-    # trainer.playback('fetch_seed63_900.pth')
+    # print("Prefetching Now...")
+    print('showing example now')
+    # trainer.train()
+    trainer.playback('fetch_seed63_900.pth')
 
 
 
