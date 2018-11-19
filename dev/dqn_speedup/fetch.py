@@ -148,7 +148,6 @@ class Trainer(object):
         self.movement_count = 0
         self.seed = seed
         self.penalty = 0.
-        self.prefetching = True
 
 
     def makeEnv(self):
@@ -189,7 +188,6 @@ class Trainer(object):
 
 
     def addExperience(self):
-        self.movement_count += 1
         if random.random() < self.epsilon_tracker.epsilon():
             action = torch.tensor([random.randrange(self.action_space)], device=self.device)
         else:
@@ -275,6 +273,7 @@ class Trainer(object):
                 continue
             if len(self.memory) == self.params['replay_initial']:
                 self.episode, self.movement_count, self.score = 0, 0, 0
+                self.reset()
                 print("Done Prefetching.")
 
 
