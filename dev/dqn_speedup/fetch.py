@@ -271,8 +271,8 @@ class Trainer(object):
             self.penalty = 0
             return reward, False
 
-        if self.task == 4:
-            reward +=
+        # if self.task == 4:
+        #     reward +=
 
 
 
