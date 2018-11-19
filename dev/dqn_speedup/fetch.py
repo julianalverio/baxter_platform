@@ -272,8 +272,8 @@ class Trainer(object):
                 continue
             if len(self.memory) == self.params['replay_initial']:
                 self.episode, self.movement_count, self.score = 0, 0, 0
-                self.reset()
                 print("Done Prefetching.")
+                self.reset()
 
 
             # is this round over?
