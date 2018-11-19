@@ -171,8 +171,6 @@ class Trainer(object):
 
     def preprocess(self, state):
         state = state[230:435, 50:460]
-        Image.fromarray(state).show()
-        import pdb; pdb.set_trace()
         # state = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
         state = cv2.resize(state, (state.shape[1]//2, state.shape[0]//2), interpolation=cv2.INTER_AREA).astype(np.float32)/256
         state = np.swapaxes(state, 0, 2)
@@ -261,11 +259,16 @@ class Trainer(object):
 
 
     def train(self):
+        counter = 0
         while 1:
-            self.env.step([0,0,1,0])
-            self.preprocess(self.env.render(mode='rgb_array'))
-            import pdb; pdb.set_trace()
-
+            counter += 1
+            if counter % 5 == 0:
+                state = self.env.render(mode='rgb_array')
+                state = state[230:435, 50:460]
+                Image.fromarray(state).show()
+                import pdb; pdb.set_trace()
+            self.env.step([0, 0, 1, 0])
+            self.env.render()
 
 
         frame_idx = 0
