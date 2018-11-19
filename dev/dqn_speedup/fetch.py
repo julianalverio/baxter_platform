@@ -194,6 +194,7 @@ class Trainer(object):
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
         if self.env.sim.data.get_site_xpos('robot0:grip')[0] <= 0.416 and action.item() == 6:
             self.penalty -= 1.
+            print('GAVE A NEGATIVE PENALTY FOR BEING A BAD BOI')
         self.env.step(self.convertAction(action))
         self.movement_count += 1
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
@@ -315,8 +316,8 @@ if __name__ == "__main__":
     print('Trainer Initialized')
     # print("Prefetching Now...")
     print('showing example now')
-    # trainer.train()
-    trainer.playback('fetch_seed63_900.pth')
+    trainer.train()
+    # trainer.playback('fetch_seed63_900.pth')
 
 
 
