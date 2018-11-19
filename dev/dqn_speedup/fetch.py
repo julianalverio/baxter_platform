@@ -146,6 +146,7 @@ class Trainer(object):
         self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
         self.movement_count = 0
         self.seed = seed
+        self.penalty = 0.
 
 
     def makeEnv(self):
@@ -191,6 +192,8 @@ class Trainer(object):
             action = torch.tensor([random.randrange(self.action_space)], device=self.device)
         else:
             action = torch.argmax(self.policy_net(self.state), dim=1).to(self.device)
+        if self.env.sim.data.get_site_xpos('robot0:grip')[0] <= 0.416 and action.item() == 6:
+            self.penalty -= 1.
         self.env.step(self.convertAction(action))
         self.movement_count += 1
         next_state = self.preprocess(self.env.render(mode='rgb_array'))
@@ -234,6 +237,7 @@ class Trainer(object):
     Task 2: Touch the block, continuous reward
     '''
     def getReward(self):
+        done = False
         gripper_position = self.env.sim.data.get_site_xpos('robot0:grip')
         object_position = self.env.sim.data.get_site_xpos('object0')
         # if self.task == 1:
@@ -248,9 +252,10 @@ class Trainer(object):
                 reward = -1.
             if np.linalg.norm(self.initial_object_position - object_position) > 1e-3:
                 self.score += 1.
-                return reward, True
-            else:
-                return reward, False
+                done = True
+            reward += self.penalty
+            self.penalty = 0
+            return reward, done
 
 
     def train(self):
@@ -290,11 +295,7 @@ class Trainer(object):
         state = self.preprocess(self.reset())
         self.env.render()
         done = False
-        count = 0
         while not done:
-            count += 1
-            if count % 100 == 0:
-                import pdb; pdb.set_trace()
             self.env.render(mode='human')
             action = self.convertAction(torch.argmax(target_net(state), dim=1).to(self.device))
             self.env.step(action)

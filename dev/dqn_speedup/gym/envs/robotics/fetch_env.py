@@ -143,16 +143,19 @@ class FetchEnv(robot_env.RobotEnv):
 
     def _reset_sim(self):
         self.sim.set_state(self.initial_state)
-        import pdb; pdb.set_trace()
         # Randomize start position of object.
         if self.has_object:
-            object_xpos = self.initial_gripper_xpos[:2]
-            while np.linalg.norm(object_xpos - self.initial_gripper_xpos[:2]) < 0.1:
-                object_xpos = self.initial_gripper_xpos[:2] + self.np_random.uniform(-self.obj_range, self.obj_range, size=2)
             object_qpos = self.sim.data.get_joint_qpos('object0:joint')
-            assert object_qpos.shape == (7,)
-            object_qpos[:2] = object_xpos
+            object_qpos[:2] = [1.44919374, 0.6288377]
             self.sim.data.set_joint_qpos('object0:joint', object_qpos)
+
+            # object_xpos = self.initial_gripper_xpos[:2]
+            # while np.linalg.norm(object_xpos - self.initial_gripper_xpos[:2]) < 0.1:
+            #     object_xpos = self.initial_gripper_xpos[:2] + self.np_random.uniform(-self.obj_range, self.obj_range, size=2)
+            # object_qpos = self.sim.data.get_joint_qpos('object0:joint')
+            # assert object_qpos.shape == (7,)
+            # object_qpos[:2] = object_xpos
+            # self.sim.data.set_joint_qpos('object0:joint', object_qpos)
 
         self.sim.forward()
         return True
