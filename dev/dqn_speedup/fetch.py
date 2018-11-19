@@ -13,7 +13,7 @@ import cv2
 import time
 
 
-import os; os.environ["CUDA_VISIBLE_DEVICES"]="0"
+import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
 import sys
 # sys.path.pop(0)
