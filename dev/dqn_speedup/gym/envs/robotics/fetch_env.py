@@ -146,7 +146,7 @@ class FetchEnv(robot_env.RobotEnv):
         # Randomize start position of object.
         if self.has_object:
             object_qpos = self.sim.data.get_joint_qpos('object0:joint')
-            object_qpos[:2] = [1.37, 0.64]
+            object_qpos[:2] = [1.38, 0.65]
             self.sim.data.set_joint_qpos('object0:joint', object_qpos)
 
             # object_xpos = self.initial_gripper_xpos[:2]
