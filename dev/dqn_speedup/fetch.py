@@ -11,9 +11,10 @@ from collections import namedtuple
 from torch.autograd import Variable
 import cv2
 import time
+import argparse
 
 
-import os; os.environ["CUDA_VISIBLE_DEVICES"]="3"
+import os
 
 import sys
 # sys.path.pop(0)
@@ -262,18 +263,6 @@ class Trainer(object):
 
 
     def train(self):
-        counter = 0
-        while 1:
-            counter += 1
-            if counter % 5 == 0:
-                state = self.env.render(mode='rgb_array')
-                state = state[230:435, 50:460]
-                Image.fromarray(state).show()
-                import pdb; pdb.set_trace()
-            self.env.step([0, 0, 1, 0])
-            self.env.render()
-
-
         frame_idx = 0
         while True:
             frame_idx += 1
@@ -318,6 +307,11 @@ class Trainer(object):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("gpu", help="index of which gpu to use", type=int)
+    args = parser.parse_args()
+    gpu_num = parser.gpu
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_num)
     seed = random.randrange(0, 100)
     print('RANDOM SEED: ', seed)
     np.random.seed(seed)
@@ -327,8 +321,8 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     trainer = Trainer(seed)
     print('Trainer Initialized')
-    # print("Prefetching Now...")
-    print('showing example now')
+    print("Prefetching Now...")
+    # print('showing example now')
     trainer.train()
     # trainer.playback('fetch_seed63_900.pth')
 
