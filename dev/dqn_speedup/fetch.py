@@ -243,6 +243,7 @@ class Trainer(object):
     Task 1: Touch the block, discrete reward
     Task 2: Touch the block, continuous reward
     Task 3: Move the block as far to the right as possible
+    Task 4: Raise the block; possible negative reward if the block goes higher than the gripper
     '''
     def getReward(self):
         done = False
@@ -270,6 +271,10 @@ class Trainer(object):
             self.penalty = 0
             return reward, False
 
+        if self.task == 4:
+            reward +=
+
+
 
     def train(self):
         frame_idx = 0
@@ -291,7 +296,7 @@ class Trainer(object):
             if done:
                 self.reward_tracker.add(self.score)
                 print('Episode: %s Epsilon: %s Score: %s Mean Score: %s' % (self.episode, round(self.epsilon_tracker._epsilon, 2) ,self.score, self.reward_tracker.meanScore()))
-                self.writer.writerow([self.score, round(self.epsilon_tracker._epsilon, 2)])
+                self.writer.writerow([self.reward_tracker.meanScore(), round(self.epsilon_tracker._epsilon, 2)])
                 if (self.episode % 100 == 0):
                     torch.save(self.target_net, 'fetch_seed%s_%s.pth' % (self.seed, self.episode))
                     print('Model Saved!')
@@ -332,10 +337,10 @@ if __name__ == "__main__":
     trainer = Trainer(seed)
     print('Trainer Initialized')
 
-    print("Prefetching Now...")
-    # print('showing example now')
-    trainer.train()
-    # trainer.playback('fetch_seed22_200.pth')
+    # print("Prefetching Now...")
+    print('showing example now')
+    # trainer.train()
+    trainer.playback('fetch_seed25_8500.pth')
 
 
 
