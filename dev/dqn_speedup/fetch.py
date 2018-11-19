@@ -297,13 +297,15 @@ class Trainer(object):
         self.env.render()
         done = False
         while not done:
-            self.env.render(mode='human')
-            action = self.convertAction(torch.argmax(target_net(state), dim=1).to(self.device))
-            if self.env.sim.data.get_site_xpos('robot0:grip')[0] <= 0.416 and torch.argmax(target_net(state), dim=1).item() == 6:
-                print('NEGATIVE REWARD')
-            self.env.step(action)
-            state = self.preprocess(self.env.render(mode='rgb_array'))
-
+            try:
+                self.env.render(mode='human')
+                action = self.convertAction(torch.argmax(target_net(state), dim=1).to(self.device))
+                if self.env.sim.data.get_site_xpos('robot0:grip')[0] <= 0.416 and torch.argmax(target_net(state), dim=1).item() == 6:
+                    print('NEGATIVE REWARD')
+                self.env.step(action)
+                state = self.preprocess(self.env.render(mode='rgb_array'))
+            except:
+                import pdb; pdb.set_trace()
 
 
 if __name__ == "__main__":
