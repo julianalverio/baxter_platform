@@ -290,8 +290,11 @@ class Trainer(object):
         state = self.preprocess(self.reset())
         self.env.render()
         done = False
+        count = 0
         while not done:
-            import pdb; pdb.set_trace()
+            count += 1
+            if count % 100 == 0:
+                import pdb; pdb.set_trace()
             self.env.render(mode='human')
             action = self.convertAction(torch.argmax(target_net(state), dim=1).to(self.device))
             self.env.step(action)
