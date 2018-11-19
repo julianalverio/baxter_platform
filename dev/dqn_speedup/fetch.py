@@ -148,6 +148,7 @@ class Trainer(object):
         self.movement_count = 0
         self.seed = seed
         self.penalty = 0.
+        self.prefetching = True
 
 
     def makeEnv(self):
@@ -206,6 +207,7 @@ class Trainer(object):
 
 
         if done:
+            print('I AM RESETTING NOW')
             self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
             self.state = self.preprocess(self.reset())
             self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
@@ -273,7 +275,7 @@ class Trainer(object):
             if len(self.memory) < self.params['replay_initial']:
                 continue
             if len(self.memory) == self.params['replay_initial']:
-                self.episode, self.movement_count = 0, 0
+                self.episode, self.movement_count, self.score = 0, 0, 0
                 print("Done Prefetching.")
 
 
@@ -281,7 +283,6 @@ class Trainer(object):
             if done:
                 self.reward_tracker.add(self.score)
                 print('Episode: %s Score: %s Mean Score: %s' % (self.episode, self.score, self.reward_tracker.meanScore()))
-                # self.memory.showCapacity()
                 if (self.episode % 100 == 0):
                     torch.save(self.target_net, 'fetch_seed%s_%s.pth' % (self.seed, self.episode))
                     print('Model Saved!')
