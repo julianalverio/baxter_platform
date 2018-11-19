@@ -290,8 +290,8 @@ class Trainer(object):
             # is this round over?
             if done:
                 self.reward_tracker.add(self.score)
-                print('Episode: %s Epsilon: %s Score: %s Mean Score: %s' % (self.episode, self.epsilon_tracker._epsilon ,self.score, self.reward_tracker.meanScore()))
-                self.writer.writerow([self.score])
+                print('Episode: %s Epsilon: %s Score: %s Mean Score: %s' % (self.episode, round(self.epsilon_tracker._epsilon, 2) ,self.score, self.reward_tracker.meanScore()))
+                self.writer.writerow([self.score, round(self.epsilon_tracker._epsilon, 2)])
                 if (self.episode % 100 == 0):
                     torch.save(self.target_net, 'fetch_seed%s_%s.pth' % (self.seed, self.episode))
                     print('Model Saved!')
