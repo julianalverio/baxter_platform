@@ -205,9 +205,8 @@ class Trainer(object):
         reward, done = self.getReward()
         done = done or self.movement_count == 1500
 
-
         if done:
-            print('I AM RESETTING NOW')
+            import pdb; pdb.set_trace()
             self.memory.push(self.state, action, torch.tensor([reward], device=self.device), None)
             self.state = self.preprocess(self.reset())
             self.initial_object_position = copy.deepcopy(self.env.sim.data.get_site_xpos('object0'))
