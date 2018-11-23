@@ -1,3 +1,0 @@
-Wed Nov  7 23:07:57 2018
-ERROR: OpenGL version 1.5 or higher required
-
